@@ -1,12 +1,24 @@
-import { Card, Heading, Input, Button, Box } from "@chakra-ui/react";
+import {
+    Card,
+    Heading,
+    Input,
+    Box,
+    Grid,
+    GridItem,
+    Button,
+} from "@chakra-ui/react";
 import JSZip from "jszip";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { FileNode, buildFileTree } from "../helpers/FileNode";
 import { FileTree } from "../components/global/FileTree";
 
 export default function DemoPage() {
+    const fileInputRef = useRef();
     const zip = new JSZip();
     const [fileTree, setFileTree] = useState<FileNode | null>(null);
+    const [currentReadFile, setCurrentReadFile] = useState<FileNode | null>(
+        null
+    );
 
     const selectFile = async (files: FileList | null) => {
         if (files) {
@@ -15,7 +27,7 @@ export default function DemoPage() {
             const extractedFiles = [];
             for (const [filename, fileData] of Object.entries(contents.files)) {
                 if (!fileData.dir) {
-                    const content = await fileData.async("text");
+                    const content = await fileData.async("binarystring");
                     extractedFiles.push({ filename, content });
                 }
             }
@@ -24,11 +36,21 @@ export default function DemoPage() {
         }
     };
 
+    const removeFile = () => {
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+        }
+        setFileTree(null);
+        setCurrentReadFile(null);
+    };
+
     return (
         <Box>
-            <Card margin="auto" width="60%">
-                <Heading textAlign={"center"}>Upload File</Heading>
+            <Heading textAlign={"center"}>Demo</Heading>
+            <Box display="flex" justifyContent={"space-evenly"}>
                 <Input
+                    ref={fileInputRef}
+                    width="fit-content"
                     border="none"
                     type="file"
                     accept=".zip"
@@ -37,8 +59,30 @@ export default function DemoPage() {
                         selectFile(e.target.files);
                     }}
                 />
-                {fileTree && <FileTree node={fileTree} />}
-            </Card>
+                <Button onClick={removeFile}>Remove zip file</Button>
+            </Box>
+            <Grid templateColumns="repeat(4, 1fr)" gap={1}>
+                <GridItem colSpan={1}>
+                    <Card overflow={"scroll"} padding="10px" height="500px">
+                        {fileTree && (
+                            <FileTree
+                                node={fileTree}
+                                setReadFile={setCurrentReadFile}
+                            />
+                        )}
+                    </Card>
+                </GridItem>
+                <GridItem colSpan={3}>
+                    <Card
+                        padding="20px"
+                        overflow="scroll"
+                        height="500px"
+                        whiteSpace="pre"
+                    >
+                        {currentReadFile?.content}
+                    </Card>
+                </GridItem>
+            </Grid>
         </Box>
     );
 }
