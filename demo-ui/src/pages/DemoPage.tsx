@@ -19,6 +19,8 @@ export default function DemoPage() {
     const [currentReadFile, setCurrentReadFile] = useState<FileNode | null>(
         null
     );
+    const [currentReadDirectory, setCurrentReadDirectory] =
+        useState<FileNode | null>(null);
 
     const selectFile = async (files: FileList | null) => {
         if (files) {
@@ -68,6 +70,7 @@ export default function DemoPage() {
                             <FileTree
                                 node={fileTree}
                                 setReadFile={setCurrentReadFile}
+                                setReadDirectory={setCurrentReadDirectory}
                             />
                         )}
                     </Card>
@@ -83,6 +86,10 @@ export default function DemoPage() {
                     </Card>
                 </GridItem>
             </Grid>
+            <Card margin="10px auto" height="300px">
+                Selected Directory:
+                {currentReadDirectory ? currentReadDirectory.name : ""}
+            </Card>
         </Box>
     );
 }

@@ -5,22 +5,36 @@ import { FaFolder, FaFile } from "react-icons/fa";
 interface FileTreeProps {
     node: FileNode;
     setReadFile: (file: any) => void;
+    setReadDirectory: (file: any) => void;
 }
 
-function FileTree({ node, setReadFile }: FileTreeProps) {
-    const selectFile = () => {
-        if (!node.isDirectory) {
-            setReadFile(node);
+function FileTree({ node, setReadFile, setReadDirectory }: FileTreeProps) {
+    const selectFile = (currentNode: FileNode) => {
+        if (node.children.length > 0) {
+            setReadDirectory(currentNode);
+            return;
         }
+        setReadFile(currentNode);
     };
     return (
-        <Box ml={1} onClick={selectFile} className="fileTree">
-            <Box display="flex" alignItems="center">
+        <Box ml={1} className="fileTree" margin="10px">
+            <Box
+                display="flex"
+                alignItems="center"
+                onClick={() => {
+                    selectFile(node);
+                }}
+            >
                 <Icon as={node.isDirectory ? FaFolder : FaFile} mr={2} />
                 <Text>{node.name}</Text>
             </Box>
             {node.children.map((child, index) => (
-                <FileTree key={index} node={child} setReadFile={setReadFile} />
+                <FileTree
+                    key={index}
+                    node={child}
+                    setReadFile={setReadFile}
+                    setReadDirectory={setReadDirectory}
+                />
             ))}
         </Box>
     );
