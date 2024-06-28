@@ -7,6 +7,7 @@ import {
     GridItem,
     Button,
     Textarea,
+    Text,
 } from "@chakra-ui/react";
 import { ChangeEvent, MutableRefObject, ReactNode } from "react";
 import JSZip from "jszip";
@@ -61,20 +62,30 @@ export default function DemoPage() {
     return (
         <Box width="80%" margin="auto">
             <Heading textAlign={"center"}>Demo</Heading>
-            <Box display="flex" justifyContent={"space-evenly"}>
-                <Input
-                    ref={fileInputRef}
-                    width="fit-content"
-                    border="none"
-                    type="file"
-                    accept=".zip"
-                    multiple={true}
-                    onChange={(e) => {
-                        selectFile(e.target.files);
-                    }}
-                />
+            <Card margin="10px auto">
+                <Grid templateColumns="repeat(2, 1fr)">
+                    <GridItem margin="10px">
+                        <Input
+                            ref={fileInputRef}
+                            width="fit-content"
+                            border="none"
+                            type="file"
+                            accept=".zip"
+                            multiple={true}
+                            onChange={(e) => {
+                                selectFile(e.target.files);
+                            }}
+                        />
+                    </GridItem>
+                    <GridItem margin="10px">
+                        <Button onClick={removeFile}>Remove zip file</Button>
+                    </GridItem>
+                </Grid>
+            </Card>
+
+            {/* <Box display="flex" justifyContent={"space-evenly"}>
                 <Button onClick={removeFile}>Remove zip file</Button>
-            </Box>
+            </Box> */}
             <Grid templateColumns="repeat(4, 1fr)" gap={1}>
                 <GridItem colSpan={1}>
                     <Card overflow={"scroll"} padding="10px" height="500px">
@@ -98,9 +109,18 @@ export default function DemoPage() {
                     </Card>
                 </GridItem>
             </Grid>
+            <Card margin="10px auto" padding="10px" display={"grid"}>
+                <Grid templateColumns="repeat(2, 1fr)">
+                    <GridItem margin="10px">
+                        Selected Folder:
+                        {currentReadDirectory ? currentReadDirectory.name : ""}
+                    </GridItem>
+                    <GridItem margin="10px">
+                        <Button>Write Documentation</Button>
+                    </GridItem>
+                </Grid>
+            </Card>
             <Card margin="10px auto" padding="20px" height="300px">
-                Selected Directory:
-                {currentReadDirectory ? currentReadDirectory.name : ""}
                 <Grid templateColumns="repeat(2, 1fr)" gap={1}>
                     <GridItem>
                         <Textarea
