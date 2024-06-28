@@ -6,14 +6,18 @@ import {
     Grid,
     GridItem,
     Button,
+    Textarea,
 } from "@chakra-ui/react";
+import { ChangeEvent, MutableRefObject, ReactNode } from "react";
 import JSZip from "jszip";
 import { useRef, useState } from "react";
 import { FileNode, buildFileTree } from "../helpers/FileNode";
 import { FileTree } from "../components/global/FileTree";
+import ReactMarkdown from "react-markdown";
+import ChakraUIRenderer from "chakra-ui-markdown-renderer";
 
 export default function DemoPage() {
-    const fileInputRef = useRef();
+    const fileInputRef = useRef<HTMLDivElement>(null);
     const zip = new JSZip();
     const [fileTree, setFileTree] = useState<FileNode | null>(null);
     const [currentReadFile, setCurrentReadFile] = useState<FileNode | null>(
@@ -21,6 +25,7 @@ export default function DemoPage() {
     );
     const [currentReadDirectory, setCurrentReadDirectory] =
         useState<FileNode | null>(null);
+    const [markdownDocumentation, setMarkdownDocumentation] = useState("");
 
     const selectFile = async (files: FileList | null) => {
         if (files) {
@@ -46,8 +51,15 @@ export default function DemoPage() {
         setCurrentReadFile(null);
     };
 
+    const handleDocumentationChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+        // setMarkdownDocumentation(e.target.value);
+        if (previewRef.current) {
+            previewRef.current.innerHTML = sd.makeHtml(e.target.value);
+        }
+    };
+
     return (
-        <Box>
+        <Box width="80%" margin="auto">
             <Heading textAlign={"center"}>Demo</Heading>
             <Box display="flex" justifyContent={"space-evenly"}>
                 <Input
@@ -86,9 +98,25 @@ export default function DemoPage() {
                     </Card>
                 </GridItem>
             </Grid>
-            <Card margin="10px auto" height="300px">
+            <Card margin="10px auto" padding="20px" height="300px">
                 Selected Directory:
                 {currentReadDirectory ? currentReadDirectory.name : ""}
+                <Grid templateColumns="repeat(2, 1fr)" gap={1}>
+                    <GridItem>
+                        <Textarea
+                            spellCheck={false}
+                            onChange={(e) => {
+                                setMarkdownDocumentation(e.target.value);
+                            }}
+                        ></Textarea>
+                    </GridItem>
+                    <GridItem flex={1}>
+                        <Heading>Preview</Heading>
+                        <ReactMarkdown components={ChakraUIRenderer()}>
+                            {markdownDocumentation}
+                        </ReactMarkdown>
+                    </GridItem>
+                </Grid>
             </Card>
         </Box>
     );
