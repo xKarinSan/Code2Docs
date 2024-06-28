@@ -15,7 +15,6 @@ import { useRef, useState } from "react";
 import { FileNode, buildFileTree } from "../helpers/FileNode";
 import { FileTree } from "../components/global/FileTree";
 import ReactMarkdown from "react-markdown";
-import ChakraUIRenderer from "chakra-ui-markdown-renderer";
 
 export default function DemoPage() {
     const fileInputRef = useRef<HTMLDivElement>(null);
@@ -132,9 +131,9 @@ export default function DemoPage() {
                     </GridItem>
                     <GridItem flex={1}>
                         <Heading>Preview</Heading>
-                        <ReactMarkdown components={ChakraUIRenderer()}>
+                        {/* <ReactMarkdown components={ChakraUIRenderer()}> */}
                             {markdownDocumentation}
-                        </ReactMarkdown>
+                        {/* </ReactMarkdown> */}
                     </GridItem>
                 </Grid>
             </Card>
