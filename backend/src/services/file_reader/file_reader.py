@@ -16,10 +16,6 @@ class FileReader:
 
     def unzip_file(self, file: BinaryIO) -> None:
         read_zip_file = ZipFile(BytesIO(file.read()))
-        # print("read_zip_file", read_zip_file)
-        # print("read_zip_file.namelist", read_zip_file.namelist())
-        # items = read_zip_file.extractall("../file_items", read_zip_file.namelist())
-        # print("items", items)
         file_list = read_zip_file.namelist()
         for file_name in file_list:
             if ".java" in file_name:
