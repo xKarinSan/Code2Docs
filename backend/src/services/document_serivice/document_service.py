@@ -3,24 +3,23 @@ import os
 from typing import BinaryIO
 from zipfile import ZipFile
 
-# import openai
 from dotenv import load_dotenv, find_dotenv
-from langchain.document_loaders import Blob, UnstructuredFileLoader
+from langchain.document_loaders import Blob
+from langchain.chains.summarize import load_summarize_chain
+from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.llms import openai
+from langchain_openai import OpenAI
 
 _ = load_dotenv(find_dotenv())
 
-
 class DocumentService:
     def __init__(self):
-        # openai.api_key = os.environ["OPENAI_API_KEY"]
+        self.llm = OpenAI(api_key=os.environ["OPENAI_API_KEY"], temperature=0.2)
         self.text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=1000, chunk_overlap=200
+            chunk_size=1000, chunk_overlap=10
         )
         self.files = []
-        self.code_extensions = {
-            # Web development
+        self.code_extensions = { # Web development
             ".html",
             ".htm",
             ".css",
@@ -156,30 +155,31 @@ class DocumentService:
             ".vhdl",
             # Markdown (for documentation)
             ".md",
-            ".markdown",
-        }
-        pass
+            ".markdown",}
+
 
     def generate_docs(self, contents):
         """
         Load & index files
         """
-        pass
+        # Implement this method if needed
 
-    # load contents in zip files
     def unzip_file(self, file: BinaryIO) -> None:
         read_zip_file = ZipFile(BytesIO(file.read()))
-        
+
         for file_name in read_zip_file.namelist():
             if any(file_name.endswith(ext) for ext in self.code_extensions):
-                # print(ext)
                 with read_zip_file.open(file_name) as curr_file:
-                    blob = Blob.from_data(b"".join(curr_file.readlines()))
-                    self.files.append(blob)
+                    content = curr_file.read()
+                    blob = Blob(data=content, mime_type="text/plain")
+                    self.files.append((file_name, blob))
 
-
-    # extract and process code files
-
-
+    def summarise_files(self):
+        for file_name, blob in self.files:
+            content = blob.as_string()
+            doc = Document(page_content=content, metadata={"source": file_name})
+            chain = load_summarize_chain(llm=self.llm, chain_type="map_reduce")
+            summary = chain.run([doc])  # Pass a list containing the file
+            print("summary: ", summary)
 
 document_service = DocumentService()

@@ -8,4 +8,5 @@ router = APIRouter()
 @router.post("/")
 def upload_zip_file(file: UploadFile):
     document_service.unzip_file(file.file)
+    document_service.summarise_files()
     return {"message": "uploaded"}
