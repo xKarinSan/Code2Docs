@@ -52,6 +52,13 @@ export default function DemoPage() {
         setCurrentReadFile(null);
     };
 
+    const handleDocumentationChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+        // setMarkdownDocumentation(e.target.value);
+        if (previewRef.current) {
+            previewRef.current.innerHTML = sd.makeHtml(e.target.value);
+        }
+    };
+
     return (
         <Box width="80%" margin="auto">
             <Heading textAlign={"center"}>Demo</Heading>
@@ -75,10 +82,6 @@ export default function DemoPage() {
                     </GridItem>
                 </Grid>
             </Card>
-
-            {/* <Box display="flex" justifyContent={"space-evenly"}>
-                <Button onClick={removeFile}>Remove zip file</Button>
-            </Box> */}
             <Grid templateColumns="repeat(4, 1fr)" gap={1}>
                 <GridItem colSpan={1}>
                     <Card overflow={"scroll"} padding="10px" height="500px">
