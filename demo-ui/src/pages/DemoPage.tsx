@@ -17,8 +17,9 @@ import { FileTree } from "../components/global/FileTree";
 import ReactMarkdown from "react-markdown";
 
 export default function DemoPage() {
-    const fileInputRef = useRef<HTMLDivElement>(null);
     const zip = new JSZip();
+
+    const fileInputRef = useRef<HTMLDivElement>(null);
     const [fileTree, setFileTree] = useState<FileNode | null>(null);
     const [currentReadFile, setCurrentReadFile] = useState<FileNode | null>(
         null
@@ -49,13 +50,6 @@ export default function DemoPage() {
         }
         setFileTree(null);
         setCurrentReadFile(null);
-    };
-
-    const handleDocumentationChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-        // setMarkdownDocumentation(e.target.value);
-        if (previewRef.current) {
-            previewRef.current.innerHTML = sd.makeHtml(e.target.value);
-        }
     };
 
     return (
