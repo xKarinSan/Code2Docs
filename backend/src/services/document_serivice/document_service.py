@@ -9,8 +9,11 @@ from langchain.chains.summarize import load_summarize_chain
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAI
+from langchain_core.prompts import PromptTemplate, ChatPromptTemplate
+
 
 _ = load_dotenv(find_dotenv())
+
 
 class DocumentService:
     def __init__(self):
@@ -19,7 +22,7 @@ class DocumentService:
             chunk_size=1000, chunk_overlap=10
         )
         self.files = []
-        self.code_extensions = { # Web development
+        self.code_extensions = {  # Web development
             ".html",
             ".htm",
             ".css",
@@ -155,8 +158,8 @@ class DocumentService:
             ".vhdl",
             # Markdown (for documentation)
             ".md",
-            ".markdown",}
-
+            ".markdown",
+        }
 
     def generate_docs(self, contents):
         """
@@ -175,11 +178,22 @@ class DocumentService:
                     self.files.append((file_name, blob))
 
     def summarise_files(self):
+        i = 0
         for file_name, blob in self.files:
             content = blob.as_string()
-            doc = Document(page_content=content, metadata={"source": file_name})
-            chain = load_summarize_chain(llm=self.llm, chain_type="map_reduce")
-            summary = chain.run([doc])  # Pass a list containing the file
-            print("summary: ", summary)
+            template = """
+            Create a readme.md for the following content.
+            """
+            human_template = "{content}"
+
+            prompt = ChatPromptTemplate.from_messages(
+                [("system", template), ("human", human_template)]
+            )
+            messages = prompt.format_messages(content=content)
+            res = self.llm.predict_messages(messages)
+            with open("testing"+str(i)+".md","w") as path:
+                path.write(res.content)
+            i += 1
+
 
 document_service = DocumentService()
