@@ -21,7 +21,7 @@ _ = load_dotenv(find_dotenv())
 # files using map-reduce chains.
 class DocumentService:
     def __init__(self):
-        self.llm = OpenAI(api_key=os.environ["OPENAI_API_KEY"], temperature=0)
+        self.llm = OpenAI(api_key=os.environ["OPENAI_API_KEY"], temperature=0,model="gpt-3.5-turbo-instruct-0914")
         self.text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=1000, chunk_overlap=10
         )

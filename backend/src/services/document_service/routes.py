@@ -9,7 +9,6 @@ router = APIRouter()
 def document_zip_file(file: UploadFile) -> dict[str, str]:
     try:
         unzipped_files = document_service.unzip_file(file.file)
-        print("unziped_files", unzipped_files)
         if not unzipped_files:
             return JSONResponse(
                 status_code=400,
