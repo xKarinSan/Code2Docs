@@ -21,7 +21,7 @@ _ = load_dotenv(find_dotenv())
 # files using map-reduce chains.
 class DocumentService:
     def __init__(self):
-        self.llm = OpenAI(api_key=os.environ["OPENAI_API_KEY"], temperature=0.1)
+        self.llm = OpenAI(api_key=os.environ["OPENAI_API_KEY"], temperature=0)
         self.text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=1000, chunk_overlap=10
         )
@@ -177,19 +177,22 @@ class DocumentService:
         dictionary represent the directories where the files were located within the zip file, and the
         values are lists of tuples. Each tuple contains the file name and its content as a string.
         """
-        files = {}
-        with ZipFile(BytesIO(file.read())) as read_zip_file:
-            for file_name in read_zip_file.namelist():
-                if any(file_name.endswith(ext) for ext in self.code_extensions):
-                    with read_zip_file.open(file_name) as curr_file:
-                        content = curr_file.read().decode("utf-8")
-                        directory = str(Path(file_name).parent) or "."
+        try:
+            files = {}
+            with ZipFile(BytesIO(file.read())) as read_zip_file:
+                for file_name in read_zip_file.namelist():
+                    if any(file_name.endswith(ext) for ext in self.code_extensions):
+                        with read_zip_file.open(file_name) as curr_file:
+                            content = curr_file.read().decode("utf-8")
+                            directory = str(Path(file_name).parent) or "."
 
-                        if directory not in files:
-                            files[directory] = []
+                            if directory not in files:
+                                files[directory] = []
 
-                        files[directory].append((file_name, content))
-        return files
+                            files[directory].append((file_name, content))
+            return files
+        except:
+            return None
 
     def create_documents(self, unzipped_files: dict[str, str]) -> list[Document]:
         """
@@ -313,7 +316,7 @@ class DocumentService:
         with open("resultant.md", "w") as file:
             file.write(result)
 
-    def summarise_files(self, unzipped_files: dict[str, str]) -> str:
+    def summarise_files(self, unzipped_files: dict[str, str]) -> str | None:
         """
         The function `summarise_files` processes unzipped files using map-reduce chains and writes the
         result to a file.
@@ -325,18 +328,21 @@ class DocumentService:
         :return: The `summarise_files` method returns a string, which is the result of running the
         `map_reduce_chain` on the documents and then writing the result to a file.
         """
-        docs = self.create_documents(unzipped_files)
-        map_chain = self.create_map_chain()
-        reduce_chain = self.create_reduce_chain()
-        stuff_chain = self.create_stuff_chain(reduce_chain)
-        reduce_documents_chain = self.create_reduce_documents_chain(stuff_chain)
-        map_reduce_chain = self.create_map_reduce_chain(
-            map_chain, reduce_documents_chain
-        )
+        try:
+            docs = self.create_documents(unzipped_files)
+            map_chain = self.create_map_chain()
+            reduce_chain = self.create_reduce_chain()
+            stuff_chain = self.create_stuff_chain(reduce_chain)
+            reduce_documents_chain = self.create_reduce_documents_chain(stuff_chain)
+            map_reduce_chain = self.create_map_reduce_chain(
+                map_chain, reduce_documents_chain
+            )
 
-        result = map_reduce_chain.run(docs)
-        self.write_result_to_file(result)
-        return result
+            result = map_reduce_chain.run(docs)
+            self.write_result_to_file(result)
+            return result
+        except:
+            return None
 
 
 document_service = DocumentService()
