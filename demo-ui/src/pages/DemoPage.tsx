@@ -8,6 +8,8 @@ import {
     Button,
     Textarea,
     Text,
+    Spacer,
+    Flex,
 } from "@chakra-ui/react";
 import { ChangeEvent, MutableRefObject, ReactNode } from "react";
 import JSZip from "jszip";
@@ -27,6 +29,7 @@ export default function DemoPage() {
     const [currentReadDirectory, setCurrentReadDirectory] =
         useState<FileNode | null>(null);
     const [markdownDocumentation, setMarkdownDocumentation] = useState("");
+    const [markdownName, setMarkdownName] = useState("")
 
     const selectFile = async (files: FileList | null) => {
         if (files) {
@@ -58,6 +61,10 @@ export default function DemoPage() {
             previewRef.current.innerHTML = sd.makeHtml(e.target.value);
         }
     };
+
+    const handleNameChange = (e: ChangeEvent<HTMLInputElement>) => {
+        setMarkdownName(e.target.value)
+    }
 
     return (
         <Box width="80%" margin="auto">
@@ -106,7 +113,7 @@ export default function DemoPage() {
                 </GridItem>
             </Grid>
             <Card margin="10px auto" padding="10px" display={"grid"}>
-                <Grid templateColumns="repeat(2, 1fr)">
+                <Grid templateColumns="repeat(2, 1fr)" gap={5}>
                     <GridItem margin="10px">
                         Selected Folder:
                         {currentReadDirectory ? currentReadDirectory.name : ""}
@@ -116,8 +123,21 @@ export default function DemoPage() {
                     </GridItem>
                 </Grid>
             </Card>
+            <Card margin="10px auto" padding="10px" display={"grid"}>
+                <Flex gap={5}>
+                <Spacer/>
+                <Input 
+                    width="30%" 
+                    placeholder="Name of md file" 
+                    onChange={handleNameChange}
+                    value={markdownName}></Input>
+                    <Button colorScheme="purple" borderRadius={5} size='md' width="200px" >
+                        Download
+                    </Button>
+                </Flex>
+            </Card>
             <Card margin="10px auto" padding="20px" height="300px">
-                <Grid templateColumns="repeat(2, 1fr)" gap={1}>
+                <Grid templateColumns="repeat(2, 1fr)" gap={5}>
                     <GridItem>
                         <Textarea
                             spellCheck={false}
