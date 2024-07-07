@@ -21,7 +21,9 @@ _ = load_dotenv(find_dotenv())
 # files using map-reduce chains.
 class DocumentService:
     def __init__(self):
-        self.llm = OpenAI(api_key=os.environ["OPENAI_API_KEY"], temperature=0,model="gpt-3.5-turbo-instruct-0914")
+        self.llm = OpenAI(
+            api_key=os.environ["OPENAI_API_KEY"], temperature=0, max_tokens=3000
+        )
         self.text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=1000, chunk_overlap=10
         )
@@ -170,12 +172,12 @@ class DocumentService:
         returns a dictionary mapping directories to lists of file names and their contents.
 
         :param file: The `unzip_file` method takes a file object (`file`) as input, which is expected to be
-        a binary file. The method reads the binary content of the file, treats it as a zip file, and then
-        extracts the contents of the zip file. The extracted files are stored in a
+        a binary file. The method reads the binary content of the file, treats it as a zip file, and
+        extracts the contents of the zip file. The extracted files are then stored in a
         :type file: BinaryIO
-        :return: A dictionary containing the extracted files from the input zip file. The keys of the
-        dictionary represent the directories where the files were located within the zip file, and the
-        values are lists of tuples. Each tuple contains the file name and its content as a string.
+        :return: A dictionary containing the extracted files from the zip file, grouped by their
+        directories. Each entry in the dictionary contains the directory path as the key and a list of
+        tuples (file name, file content) as the value.
         """
         try:
             files = {}
@@ -237,16 +239,20 @@ class DocumentService:
 
     def create_reduce_chain(self) -> LLMChain:
         """
-        This function creates a reduce chain with concise documentations for each file in a markdown format
-        with headings for each part.
-        :return: The `create_reduce_chain` method returns an instance of `LLMChain` with a prompt generated
-        from the `reduce_template` string and the `llm` attribute of the class instance. The prompt is
-        created using a `PromptTemplate` from the `reduce_template` string.
+        This Python function `create_reduce_chain` returns a `LLMChain` object with a specific markdown
+        format and prompt template.
+        :return: The `create_reduce_chain` method returns an instance of `LLMChain` with a prompt and the
+        current `llm` attribute. The prompt is generated using a template that rearranges the provided
+        `code_summaries` into a markdown format with headings for each part.
         """
-        reduce_template = """Here are the concise documentations of each file:
+        reduce_template = """Create a well-structured markdown document from the following content:
+    1. Organize the information into logical sections with appropriate headings (use ## for main headings and ### for subheadings).
+    2. Convert the content under each heading into concise bullet points.
+    3. Bold important keywords and key phrases within the bullet points.
+    4. Ensure the final document is easy to read and visually appealing.
+    5. Maintain the original meaning and key information while improving clarity and organization.:
         {code_summaries}
         
-        Rearrange them into a markdown format with headings for each part
         """
         reduce_prompt = PromptTemplate.from_template(reduce_template)
         return LLMChain(prompt=reduce_prompt, llm=self.llm)
