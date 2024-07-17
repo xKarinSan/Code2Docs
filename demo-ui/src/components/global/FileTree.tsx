@@ -4,8 +4,8 @@ import { FaFolder, FaFile } from "react-icons/fa";
 
 interface FileTreeProps {
     node: FileNode;
-    setReadFile: (file: any) => void;
-    setReadDirectory: (file: any) => void;
+    setReadFile: (file: FileNode) => void;
+    setReadDirectory: (file: FileNode) => void;
 }
 
 function FileTree({ node, setReadFile, setReadDirectory }: FileTreeProps) {

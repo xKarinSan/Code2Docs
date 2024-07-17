@@ -7,19 +7,16 @@ import {
     GridItem,
     Button,
     Textarea,
-    Text,
 } from "@chakra-ui/react";
-import { ChangeEvent, MutableRefObject, ReactNode } from "react";
 import JSZip from "jszip";
 import { useRef, useState } from "react";
 import { FileNode, buildFileTree } from "../helpers/FileNode";
 import { FileTree } from "../components/global/FileTree";
-import ReactMarkdown from "react-markdown";
 
 export default function DemoPage() {
     const zip = new JSZip();
 
-    const fileInputRef = useRef<HTMLDivElement>(null);
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
     const [fileTree, setFileTree] = useState<FileNode | null>(null);
     const [currentReadFile, setCurrentReadFile] = useState<FileNode | null>(
         null
@@ -46,17 +43,10 @@ export default function DemoPage() {
 
     const removeFile = () => {
         if (fileInputRef.current) {
-            fileInputRef.current.value = "";
+            fileInputRef.current!.value = "";
         }
         setFileTree(null);
         setCurrentReadFile(null);
-    };
-
-    const handleDocumentationChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-        // setMarkdownDocumentation(e.target.value);
-        if (previewRef.current) {
-            previewRef.current.innerHTML = sd.makeHtml(e.target.value);
-        }
     };
 
     return (
@@ -129,7 +119,7 @@ export default function DemoPage() {
                     <GridItem flex={1}>
                         <Heading>Preview</Heading>
                         {/* <ReactMarkdown components={ChakraUIRenderer()}> */}
-                            {markdownDocumentation}
+                        {markdownDocumentation}
                         {/* </ReactMarkdown> */}
                     </GridItem>
                 </Grid>
