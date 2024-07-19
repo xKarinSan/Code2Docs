@@ -8,7 +8,7 @@ app = FastAPI()
 
 @app.get("/healthcheck")
 def healthcheck():
-    return {"Hello": "World"}
+    return {"message": "Hello World"}
 
 
 app.add_middleware(
@@ -19,8 +19,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.mount("/document", document_service_app)
+app.mount("/demo", document_service_app)
 
 if __name__ == "__main__":
-    # uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
     uvicorn.run(app)
