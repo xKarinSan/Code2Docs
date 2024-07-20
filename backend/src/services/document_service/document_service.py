@@ -15,7 +15,7 @@ from langchain.schema.runnable import (
     RunnableSerializable,
 )
 import asyncio
-
+import logging
 
 # The `DocumentService` class provides methods for summarizing and documenting code files.
 class DocumentService:
@@ -135,20 +135,21 @@ class DocumentService:
         are the content of the files extracted from the provided zip file. If an exception occurs during
         the unzipping process, the method returns `None`.
         """
-        try:
-            files = {}
-            with ZipFile(BytesIO(await file.read())) as read_zip_file:
-                for file_name in read_zip_file.namelist():
-                    if any(file_name.endswith(ext) for ext in self.code_extensions):
-                        with read_zip_file.open(file_name) as curr_file:
-                            content = await asyncio.to_thread(curr_file.read)
-                            content = content.decode("utf-8")
-                            directory = str(Path(file_name).parent) or "."
-                            path_key = f"{directory}/{file_name.replace(' ', '_')}"
-                            files[path_key] = content
-            return files
-        except Exception:
-            return None
+        # try:
+        files = {}
+        with ZipFile(BytesIO(await file.read())) as read_zip_file:
+            for file_name in read_zip_file.namelist():
+                if any(file_name.endswith(ext) for ext in self.code_extensions):
+                    with read_zip_file.open(file_name) as curr_file:
+                        content = await asyncio.to_thread(curr_file.read)
+                        content = content.decode("utf-8")
+                        directory = str(Path(file_name).parent) or "."
+                        path_key = f"{directory}/{file_name.replace(' ', '_')}"
+                        files[path_key] = content
+        return files
+        # except Exception as e:
+        #     logging.warning(e)
+        #     return None
 
     async def get_file_summary(self, file_contents: str) -> PromptTemplate:
         """
