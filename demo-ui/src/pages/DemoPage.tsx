@@ -9,7 +9,14 @@ import {
     Textarea,
     Flex,
     useToast,
+    Modal,
+    ModalOverlay,
+    ModalContent,
+    ModalHeader,
+    ModalBody,
+    useDisclosure,
 } from "@chakra-ui/react";
+
 import JSZip from "jszip";
 import { useRef, useState } from "react";
 import { FileNode, buildFileTree } from "../helpers/FileNode";
@@ -17,8 +24,12 @@ import { FileTree } from "../components/global/FileTree";
 import axios from "axios";
 import ReactMarkdown from "react-markdown";
 import ChakraUIRenderer from "chakra-ui-markdown-renderer";
+import Lottie from "lottie-react";
+
+import writing from "../assets/writing.json";
 
 export default function DemoPage() {
+    const { isOpen, onOpen, onClose } = useDisclosure();
     const zip = new JSZip();
     const toast = useToast({
         duration: 5000,
@@ -80,26 +91,29 @@ export default function DemoPage() {
     };
 
     const generateDocumentation = async () => {
-        if(!currentReadDirectory){
+        if (!currentReadDirectory) {
             toast({
                 title: "Please select a folder!",
                 status: "error",
             });
-            return 
+            return;
         }
+        onOpen();
         const zipBlob = await createZipFile();
         const formData = new FormData();
         formData.append("file", zipBlob, "archive.zip");
         await axios
             .post(`${import.meta.env.VITE_API_URL}/demo`, formData)
             .then((res) => {
+                onClose()
                 setMarkdownDocumentation(res.data.data);
                 toast({
                     title: "Documentation successfully created!",
                     status: "success",
                 });
             })
-            .catch((e) => {
+            .catch(() => {
+                onClose()
                 toast({
                     title: "Failed to create documentation!",
                     status: "error",
@@ -183,6 +197,19 @@ export default function DemoPage() {
                     </Card>
                 </GridItem>
             </Grid>
+            <Modal
+                isOpen={isOpen}
+                onClose={onClose}
+                closeOnOverlayClick={false}
+            >
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalHeader>Writing in progress ...</ModalHeader>
+                    <ModalBody pb={6}>
+                        <Lottie animationData={writing} loop={true} />
+                    </ModalBody>
+                </ModalContent>
+            </Modal>
             <Card margin="10px auto" padding="10px" display={"grid"}>
                 <Grid templateColumns="repeat(3, 1fr)" gap={5}>
                     <GridItem margin="10px">
@@ -215,28 +242,6 @@ export default function DemoPage() {
                     </GridItem>
                 </Grid>
             </Card>
-            {/* <Card margin="10px auto" padding="10px" display={"grid"}>
-                <Flex gap={5}>
-                    <Spacer />
-                    <Input
-                        width="30%"
-                        placeholder="Name of md file"
-                        onChange={(e) => {
-                            setMarkdownName(e.target.value);
-                        }}
-                        value={markdownName}
-                    ></Input>
-                    <Button
-                        colorScheme="purple"
-                        borderRadius={5}
-                        size="md"
-                        width="200px"
-                        onClick={downloadDocumentation}
-                    >
-                        Download
-                    </Button>
-                </Flex>
-            </Card> */}
             <Card margin="10px auto" padding="20px" height="600px">
                 <Grid templateColumns="repeat(2, 1fr)" gap={5} height={"100%"}>
                     <GridItem>
