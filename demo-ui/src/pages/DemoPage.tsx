@@ -8,6 +8,7 @@ import {
     Button,
     Textarea,
     Flex,
+    useToast,
 } from "@chakra-ui/react";
 import JSZip from "jszip";
 import { useRef, useState } from "react";
@@ -19,7 +20,11 @@ import ChakraUIRenderer from "chakra-ui-markdown-renderer";
 
 export default function DemoPage() {
     const zip = new JSZip();
-
+    const toast = useToast({
+        duration: 5000,
+        isClosable: true,
+        position: "top",
+    });
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const [fileTree, setFileTree] = useState<FileNode | null>(null);
     const [currentReadFile, setCurrentReadFile] = useState<FileNode | null>(
@@ -68,30 +73,37 @@ export default function DemoPage() {
         if (currentReadDirectory) {
             addToZip(currentReadDirectory);
         }
+
         // Generate the zip file
         const content = await zip.generateAsync({ type: "blob" });
-
-        const url = URL.createObjectURL(content);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = 'archive.zip';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-
-
         return content;
     };
 
     const generateDocumentation = async () => {
+        if(!currentReadDirectory){
+            toast({
+                title: "Please select a folder!",
+                status: "error",
+            });
+            return 
+        }
         const zipBlob = await createZipFile();
         const formData = new FormData();
-        formData.append('file', zipBlob, 'archive.zip');
+        formData.append("file", zipBlob, "archive.zip");
         await axios
             .post(`${import.meta.env.VITE_API_URL}/demo`, formData)
             .then((res) => {
                 setMarkdownDocumentation(res.data.data);
+                toast({
+                    title: "Documentation successfully created!",
+                    status: "success",
+                });
+            })
+            .catch((e) => {
+                toast({
+                    title: "Failed to create documentation!",
+                    status: "error",
+                });
             });
     };
 
@@ -180,7 +192,7 @@ export default function DemoPage() {
                     <GridItem margin="10px" colSpan={2}>
                         <Flex gap={5}>
                             <Button onClick={generateDocumentation}>
-                                Write Documentation
+                                Write Docs
                             </Button>
                             <Input
                                 width="30%"
