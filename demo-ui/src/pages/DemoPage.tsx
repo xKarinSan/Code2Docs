@@ -7,7 +7,6 @@ import {
     GridItem,
     Button,
     Textarea,
-    Spacer,
     Flex,
 } from "@chakra-ui/react";
 import JSZip from "jszip";
@@ -15,6 +14,8 @@ import { useRef, useState } from "react";
 import { FileNode, buildFileTree } from "../helpers/FileNode";
 import { FileTree } from "../components/global/FileTree";
 import axios from "axios";
+import ReactMarkdown from "react-markdown";
+import ChakraUIRenderer from "chakra-ui-markdown-renderer";
 
 export default function DemoPage() {
     const zip = new JSZip();
@@ -43,19 +44,6 @@ export default function DemoPage() {
             const tree = buildFileTree(extractedFiles);
             setFileTree(tree);
         }
-    };
-
-    const traverseNode = (
-        currNode: FileNode | null,
-        currentChildrenArr: FileNode[]
-    ) => {
-        if (currNode?.children) {
-            currNode.children.forEach((child: FileNode) => {
-                currentChildrenArr.push(child);
-                traverseNode(child, currentChildrenArr);
-            });
-        }
-        return currentChildrenArr;
     };
 
     const createZipFile = async () => {
@@ -245,12 +233,11 @@ export default function DemoPage() {
                     <GridItem flex={1}>
                         <Box>
                             <Heading>Preview</Heading>
-                            {/* <ReactMarkdown components={ChakraUIRenderer()}> */}
                             <Box maxHeight="500px" overflow={"scroll"}>
-                                {markdownDocumentation}
+                                <ReactMarkdown components={ChakraUIRenderer()}>
+                                    {markdownDocumentation}
+                                </ReactMarkdown>
                             </Box>
-
-                            {/* </ReactMarkdown> */}
                         </Box>
                     </GridItem>
                 </Grid>
