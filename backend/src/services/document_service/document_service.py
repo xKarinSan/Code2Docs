@@ -217,7 +217,8 @@ class DocumentService:
             full_summary = "\n\n".join(summaries)
             self._write_result_to_file(full_summary, "readme")
             return full_summary
-        except Exception:
+        except Exception as e:
+            print(e)
             return None
 
     def _write_result_to_file(self, result: str, file_name: str):
