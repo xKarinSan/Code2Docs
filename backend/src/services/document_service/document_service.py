@@ -211,11 +211,11 @@ class DocumentService:
 
             summaries = []
             for i, (key, value) in enumerate(results.items()):
-                self._write_result_to_file(value, f"summary_{i}")
+                # self._write_result_to_file(value, f"summary_{i}")
                 summaries.append(value)
 
             full_summary = "\n\n".join(summaries)
-            self._write_result_to_file(full_summary, "readme")
+            # self._write_result_to_file(full_summary, "readme")
             return full_summary
         except Exception as e:
             print(e)
