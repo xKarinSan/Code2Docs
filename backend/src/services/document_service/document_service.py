@@ -1,31 +1,36 @@
-from io import BytesIO
 import os
+from io import BytesIO
 from pathlib import Path
-from typing import BinaryIO
+from typing import BinaryIO, Dict
 from zipfile import ZipFile
 
-from typing import Any
 from dotenv import load_dotenv, find_dotenv
-from langchain.schema import Document
-from langchain.text_splitter import RecursiveCharacterTextSplitter, TokenTextSplitter
+from langchain.schema.output_parser import StrOutputParser
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAI
 from langchain_core.prompts import PromptTemplate
-from langchain.chains.llm import LLMChain
-from langchain.chains.combine_documents.reduce import ReduceDocumentsChain
-from langchain.chains.combine_documents.stuff import StuffDocumentsChain
-from langchain.chains.combine_documents.map_reduce import MapReduceDocumentsChain
+from langchain.schema.runnable import (
+    RunnableParallel,
+    RunnableLambda,
+    RunnableSerializable,
+)
 
-_ = load_dotenv(find_dotenv())
 
-
+# The `DocumentService` class provides methods for summarizing and documenting code files.
 class DocumentService:
     def __init__(self):
-        self.llm = OpenAI(api_key=os.environ["OPENAI_API_KEY"], temperature=0.2)
+        _ = load_dotenv(find_dotenv())
+        self.llm = OpenAI(
+            api_key=os.environ["OPENAI_API_KEY"], temperature=0, max_tokens=2500
+        )
         self.text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=1000, chunk_overlap=10
         )
-        self.files = {}
-        self.code_extensions = {  # Web development
+        self.code_extensions = self._get_code_extensions()
+
+    def _get_code_extensions(self) -> set:
+        # Move the long list of extensions to a separate method
+        return {
             ".html",
             ".htm",
             ".css",
@@ -36,224 +41,201 @@ class DocumentService:
             ".php",
             ".asp",
             ".aspx",
-            # Python
             ".py",
             ".pyw",
             ".pyc",
             ".pyo",
             ".pyd",
-            # Java
             ".java",
             ".class",
-            # ".jar",
-            # C and C++
             ".c",
             ".cpp",
             ".h",
             ".hpp",
-            # C#
             ".cs",
             ".csx",
-            # Ruby
             ".rb",
             ".rbw",
-            # Go
             ".go",
-            # Swift
             ".swift",
-            # Kotlin
             ".kt",
             ".kts",
-            # Rust
             ".rs",
             ".rlib",
-            # Scala
             ".scala",
             ".sc",
-            # Haskell
             ".hs",
             ".lhs",
-            # Lua
             ".lua",
-            # Perl
             ".pl",
             ".pm",
-            # Shell scripting
             ".sh",
             ".bash",
             ".csh",
             ".tcsh",
             ".zsh",
-            # SQL
             ".sql",
-            # R
             ".r",
             ".R",
-            # MATLAB
             ".m",
-            # Visual Basic
             ".vb",
             ".vbs",
-            # Objective-C
-            ".m",
-            ".mm",
-            # Dart
             ".dart",
-            # Groovy
             ".groovy",
-            # PowerShell
             ".ps1",
             ".psm1",
-            # TypeScript
-            ".ts",
-            ".tsx",
-            # CoffeeScript
             ".coffee",
-            # Erlang
             ".erl",
             ".hrl",
-            # Fortran
             ".f",
             ".for",
             ".f90",
-            # Lisp
             ".lisp",
             ".lsp",
-            # Clojure
             ".clj",
             ".cljs",
-            # Julia
             ".jl",
-            # Elixir
             ".ex",
             ".exs",
-            # F#
             ".fs",
             ".fsx",
-            # COBOL
             ".cob",
             ".cbl",
-            # Assembly
             ".asm",
             ".s",
-            # D
             ".d",
-            # Scheme
             ".scm",
             ".ss",
-            # Prolog
-            ".pl",
-            ".pro",
-            # Ada
             ".ada",
             ".adb",
             ".ads",
-            # Tcl
             ".tcl",
-            # Smalltalk
             ".st",
-            # Verilog
             ".v",
             ".vh",
             ".sv",
-            # VHDL
             ".vhd",
             ".vhdl",
-            # Markdown (for documentation)
             ".md",
             ".markdown",
         }
 
-    def unzip_file(self, file: BinaryIO) -> Any:
+    def unzip_file(self, file: BinaryIO) -> Dict[str, str] | None:
         """
-        The `unzip_file` function reads a zip file, extracts files with specified code extensions, and
-        stores their content in a dictionary based on their directory.
-
-        :param file: The `file` parameter in the `unzip_file` method is expected to be a BinaryIO object,
-        which represents a binary input/output stream. This method reads the content of the provided zip
-        file, extracts files with specific code extensions, and stores the extracted file content in a
-        dictionary based on their
+        The `unzip_file` function reads a zip file, extracts text files with specified extensions, and
+        returns a dictionary mapping file paths to their contents.
+        
+        :param file: The `unzip_file` method takes a file object (`file`) as input, which is expected to be
+        a binary file. The method attempts to unzip the contents of the provided zip file and extract text
+        content from files with specific code extensions. The extracted content is stored in a dictionary
+        where the keys
         :type file: BinaryIO
+        :return: The `unzip_file` method returns a dictionary where the keys are file paths and the values
+        are the content of the files extracted from the provided zip file. If an exception occurs during the
+        extraction process, it returns `None`.
         """
-        with ZipFile(BytesIO(file.read())) as read_zip_file:
-            for file_name in read_zip_file.namelist():
-                if any(file_name.endswith(ext) for ext in self.code_extensions):
-                    with read_zip_file.open(file_name) as curr_file:
-                        content = curr_file.read().decode("utf-8")
-                        directory = str(Path(file_name).parent) or "."
+        try:
+            files = {}
+            with ZipFile(BytesIO(file.read())) as read_zip_file:
+                for file_name in read_zip_file.namelist():
+                    if any(file_name.endswith(ext) for ext in self.code_extensions):
+                        with read_zip_file.open(file_name) as curr_file:
+                            content = curr_file.read().decode("utf-8")
+                            directory = str(Path(file_name).parent) or "."
+                            path_key = f"{directory}/{file_name.replace(' ', '_')}"
+                            files[path_key] = content
+            return files
+        except Exception:
+            return None
 
-                        if directory not in self.files:
-                            self.files[directory] = []
-
-                        self.files[directory].append((file_name, content))
-
-    def summarise_files(self):
+    def get_file_summary(self, file_contents: str) -> PromptTemplate:
         """
-        This Python function processes files by splitting their content into chunks, creating documents with
-        metadata, and then running a series of chain operations to summarize and rearrange the
-        documentations.
-        :return: The `summarise_files` method returns the result of running the `map_reduce_chain` on the
-        list of documents (`docs`). The result is the output generated by processing the documents through
-        the entire chain of operations defined in the method.
-        """
-        text_splitter = TokenTextSplitter(chunk_size=1000, chunk_overlap=0)
-
-        docs = []
-        for directory, files in self.files.items():
-            for file_name, content in files:
-                chunks = text_splitter.split_text(content)
-                docs.extend(
-                    [
-                        Document(
-                            page_content=chunk,
-                            metadata={
-                                "file_name": f"{file_name} (Part {i+1}/{len(chunks)}"
-                            },
-                        )
-                        for i, chunk in enumerate(chunks)
-                    ]
-                )
-
-        # Map chain
-        map_template = """Concisely document the key functions/routes from the following code snippets:
-        {content} 
-        """
-        map_prompt = PromptTemplate.from_template(map_template)
-        map_chain = LLMChain(prompt=map_prompt, llm=self.llm)
-
-        # Reduce chain
-        reduce_template = """Here are the concise documentations of each file:
-        {code_summaries}
+        The function `get_file_summary` takes in a string of file contents and returns a formatted markdown
+        prompt template with the file contents included.
         
-        Rearrange them into a markdown format with headings for each part
+        :param file_contents: The `get_file_summary` method takes in a string `file_contents` as input and
+        returns a formatted prompt template using the provided `file_contents` in a markdown format. The
+        `PromptTemplate` class is used to create the template, and the `format_prompt` method is used to
+        substitute the
+        :type file_contents: str
+        :return: The function `get_file_summary` returns a formatted prompt template that documents the key
+        content from the provided `file_contents` in a markdown format.
         """
-        reduce_prompt = PromptTemplate.from_template(reduce_template)
-        reduce_chain = LLMChain(prompt=reduce_prompt, llm=self.llm)
+        file_summary_prompt = """Concisely document the key content from the following code in a markdown format:
 
-        # Stuff chain
-        stuff_chain = StuffDocumentsChain(
-            llm_chain=reduce_chain, document_variable_name="code_summaries"
+        {file_contents}
+        """
+        return PromptTemplate.from_template(file_summary_prompt).format_prompt(
+            file_contents=file_contents
         )
 
-        # Reduce documents chain
-        reduce_documents_chain = ReduceDocumentsChain(
-            combine_documents_chain=stuff_chain
-        )
-
-        # Map-reduce chain
-        map_reduce_chain = MapReduceDocumentsChain(
-            llm_chain=map_chain,
-            document_variable_name="content",
-            reduce_documents_chain=reduce_documents_chain,
-        )
-
-        # Run the chain
-        result = map_reduce_chain.run(docs)
+    def create_summary_chain(self, file_content: str) -> RunnableSerializable:
+        """
+        The function `create_summary_chain` returns a chain of operations to process file content and
+        generate a summary.
         
-        with open("resultant.md", "w") as file:
+        :param file_content: The `file_content` parameter is a string that contains the content of a file.
+        It is used as input to the `create_summary_chain` method to generate a summary chain for the file
+        content
+        :type file_content: str
+        :return: A chain of operations is being returned, which includes a lambda function that calls the
+        `get_file_summary` method on the `file_content`, followed by the `llm` operation, and finally the
+        `StrOutputParser` operation.
+        """
+        return (
+            RunnableLambda(lambda x: self.get_file_summary(file_content))
+            | self.llm
+            | StrOutputParser()
+        )
+
+    def summarise_files(self, unzipped_files: Dict[str, str]) -> str | None:
+        """
+        The function `summarise_files` processes unzipped files in parallel to create summaries and write
+        them to files.
+        
+        :param unzipped_files: The `unzipped_files` parameter is a dictionary where the keys are file names
+        and the values are the content of the files. The `summarise_files` method takes this dictionary as
+        input, processes the content of each file in parallel using a summary chain, writes the individual
+        summaries to files
+        :type unzipped_files: Dict[str, str]
+        :return: The `summarise_files` method returns the full summary of the files processed, or `None` if
+        an exception occurs during the processing.
+        """
+        try:
+            parallel_tasks = {
+                key: self.create_summary_chain(content)
+                for key, content in unzipped_files.items()
+            }
+            parallel_chain = RunnableParallel(**parallel_tasks)
+            results = parallel_chain.invoke({key: key for key in unzipped_files})
+
+            summaries = []
+            for i, (key, value) in enumerate(results.items()):
+                self._write_result_to_file(value, f"summary_{i}")
+                summaries.append(value)
+
+            full_summary = "\n\n".join(summaries)
+            self._write_result_to_file(full_summary, "readme")
+            return full_summary
+        except Exception:
+            return None
+
+    def _write_result_to_file(self, result: str, file_name: str):
+        """
+        NOTE: THIS IS TO BE REMOVED DURING PRODUCTION
+        The function `_write_result_to_file` writes the given result to a file with the specified file name
+        in Markdown format.
+        
+        :param result: The `result` parameter in the `_write_result_to_file` method is a string that
+        contains the data or content that you want to write to a file
+        :type result: str
+        :param file_name: The `file_name` parameter is a string that represents the name of the file where
+        the result will be written. In the `_write_result_to_file` method, the `result` string will be
+        written to a file with the name specified by the `file_name` parameter
+        :type file_name: str
+        """
+        with open(f"{file_name}.md", "w") as file:
             file.write(result)
-            
-        return result
 
 
 document_service = DocumentService()

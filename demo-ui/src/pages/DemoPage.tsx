@@ -11,17 +11,15 @@ import {
     Spacer,
     Flex,
 } from "@chakra-ui/react";
-import { ChangeEvent, MutableRefObject, ReactNode } from "react";
 import JSZip from "jszip";
 import { useRef, useState } from "react";
 import { FileNode, buildFileTree } from "../helpers/FileNode";
 import { FileTree } from "../components/global/FileTree";
-import ReactMarkdown from "react-markdown";
 
 export default function DemoPage() {
     const zip = new JSZip();
 
-    const fileInputRef = useRef<HTMLDivElement>(null);
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
     const [fileTree, setFileTree] = useState<FileNode | null>(null);
     const [currentReadFile, setCurrentReadFile] = useState<FileNode | null>(
         null
@@ -29,7 +27,7 @@ export default function DemoPage() {
     const [currentReadDirectory, setCurrentReadDirectory] =
         useState<FileNode | null>(null);
     const [markdownDocumentation, setMarkdownDocumentation] = useState("");
-    const [markdownName, setMarkdownName] = useState("")
+    const [markdownName, setMarkdownName] = useState("");
 
     const selectFile = async (files: FileList | null) => {
         if (files) {
@@ -49,22 +47,11 @@ export default function DemoPage() {
 
     const removeFile = () => {
         if (fileInputRef.current) {
-            fileInputRef.current.value = "";
+            fileInputRef.current!.value = "";
         }
         setFileTree(null);
         setCurrentReadFile(null);
     };
-
-    const handleDocumentationChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-        // setMarkdownDocumentation(e.target.value);
-        if (previewRef.current) {
-            previewRef.current.innerHTML = sd.makeHtml(e.target.value);
-        }
-    };
-
-    const handleNameChange = (e: ChangeEvent<HTMLInputElement>) => {
-        setMarkdownName(e.target.value)
-    }
 
     return (
         <Box width="80%" margin="auto">
@@ -125,13 +112,21 @@ export default function DemoPage() {
             </Card>
             <Card margin="10px auto" padding="10px" display={"grid"}>
                 <Flex gap={5}>
-                <Spacer/>
-                <Input 
-                    width="30%" 
-                    placeholder="Name of md file" 
-                    onChange={handleNameChange}
-                    value={markdownName}></Input>
-                    <Button colorScheme="purple" borderRadius={5} size='md' width="200px" >
+                    <Spacer />
+                    <Input
+                        width="30%"
+                        placeholder="Name of md file"
+                        onChange={(e) => {
+                            setMarkdownName(e.target.value);
+                        }}
+                        value={markdownName}
+                    ></Input>
+                    <Button
+                        colorScheme="purple"
+                        borderRadius={5}
+                        size="md"
+                        width="200px"
+                    >
                         Download
                     </Button>
                 </Flex>
@@ -149,7 +144,7 @@ export default function DemoPage() {
                     <GridItem flex={1}>
                         <Heading>Preview</Heading>
                         {/* <ReactMarkdown components={ChakraUIRenderer()}> */}
-                            {markdownDocumentation}
+                        {markdownDocumentation}
                         {/* </ReactMarkdown> */}
                     </GridItem>
                 </Grid>
