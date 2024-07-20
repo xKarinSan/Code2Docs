@@ -211,32 +211,12 @@ class DocumentService:
 
             summaries = []
             for i, (key, value) in enumerate(results.items()):
-                # self._write_result_to_file(value, f"summary_{i}")
                 summaries.append(value)
 
             full_summary = "\n\n".join(summaries)
-            # self._write_result_to_file(full_summary, "readme")
             return full_summary
         except Exception as e:
             print(e)
             return None
-
-    def _write_result_to_file(self, result: str, file_name: str):
-        """
-        NOTE: THIS IS TO BE REMOVED DURING PRODUCTION
-        The function `_write_result_to_file` writes the given result to a file with the specified file name
-        in Markdown format.
-        
-        :param result: The `result` parameter in the `_write_result_to_file` method is a string that
-        contains the data or content that you want to write to a file
-        :type result: str
-        :param file_name: The `file_name` parameter is a string that represents the name of the file where
-        the result will be written. In the `_write_result_to_file` method, the `result` string will be
-        written to a file with the name specified by the `file_name` parameter
-        :type file_name: str
-        """
-        with open(f"{file_name}.md", "w") as file:
-            file.write(result)
-
 
 document_service = DocumentService()
