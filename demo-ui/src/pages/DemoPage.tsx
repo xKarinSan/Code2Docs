@@ -70,13 +70,24 @@ export default function DemoPage() {
         }
         // Generate the zip file
         const content = await zip.generateAsync({ type: "blob" });
+
+        const url = URL.createObjectURL(content);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'archive.zip';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+
         return content;
     };
 
     const generateDocumentation = async () => {
         const zipBlob = await createZipFile();
         const formData = new FormData();
-        formData.append("file", zipBlob);
+        formData.append('file', zipBlob, 'archive.zip');
         await axios
             .post(`${import.meta.env.VITE_API_URL}/demo`, formData)
             .then((res) => {

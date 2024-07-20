@@ -7,15 +7,16 @@ router = APIRouter()
 
 
 @router.post("/")
-async def document_zip_file(file: UploadFile) -> dict[str, str]:
+def document_zip_file(file: UploadFile) -> dict[str, str]:
     # try:
-    unzipped_files = await document_service.unzip_file(file.file)
-    if not unzipped_files:
-        return JSONResponse(
-            status_code=400,
-            content={"message": "Invalid files"},
-        )
-    documentation_string = await document_service.summarise_files(unzipped_files)
+    unzipped_files = document_service.unzip_file(file.file)
+    # if not unzipped_files:
+    #     return JSONResponse(
+    #         status_code=400,
+    #         content={"message": "Invalid files"},
+    #     )
+    # logging.info("unzipped_files",unzipped_files)
+    documentation_string = document_service.summarise_files(unzipped_files)
     if not documentation_string:
         return JSONResponse(
             status_code=500,

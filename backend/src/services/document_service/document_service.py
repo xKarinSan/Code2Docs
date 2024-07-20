@@ -121,7 +121,7 @@ class DocumentService:
             ".markdown",
         }
 
-    async def unzip_file(self, file: BinaryIO) -> Dict[str, str] | None:
+    def unzip_file(self, file: BinaryIO) -> Dict[str, str] | None:
         """
         The `unzip_file` function asynchronously reads and extracts code files from a zip file, returning a
         dictionary mapping file paths to their contents, or None if an error occurs.
@@ -135,22 +135,21 @@ class DocumentService:
         are the content of the files extracted from the provided zip file. If an exception occurs during
         the unzipping process, the method returns `None`.
         """
-        # try:
-        files = {}
-        with ZipFile(BytesIO(file.read())) as read_zip_file:
-            for file_name in read_zip_file.namelist():
-                if any(file_name.endswith(ext) for ext in self.code_extensions):
-                    with read_zip_file.open(file_name) as curr_file:
-                        content = await asyncio.to_thread(curr_file.read)
-                        content = content.decode("utf-8")
-                        directory = str(Path(file_name).parent) or "."
-                        path_key = f"{directory}/{file_name.replace(' ', '_')}"
-                        files[path_key] = content
-        return files
-        # except Exception as e:
-        #     logging.warning(e)
-        #     return None
+        try:
+            files = {}
+            with ZipFile(BytesIO(file.read())) as read_zip_file:
+                for file_name in read_zip_file.namelist():
+                    if any(file_name.endswith(ext) for ext in self.code_extensions):
+                        with read_zip_file.open(file_name) as curr_file:
+                            content = curr_file.read().decode("utf-8")
 
+                            directory = str(Path(file_name).parent) or "."
+                            path_key = f"{directory}/{file_name.replace(' ', '_')}"
+                            files[path_key] = content
+            return files
+        except Exception:
+            return None
+        
     async def get_file_summary(self, file_contents: str) -> PromptTemplate:
         """
         The function `get_file_summary` takes in a string of file contents and returns a formatted markdown
@@ -192,7 +191,7 @@ class DocumentService:
             | StrOutputParser()
         )
 
-    async def summarise_files(self, unzipped_files: Dict[str, str]) -> str | None:
+    def summarise_files(self, unzipped_files: Dict[str, str]) -> str | None:
         """
         The function `summarise_files` processes unzipped files in parallel to create summaries and write
         them to files.
@@ -205,24 +204,25 @@ class DocumentService:
         :return: The `summarise_files` method returns the full summary of the files processed, or `None` if
         an exception occurs during the processing.
         """
-        try:
-            parallel_tasks = {
-                key: self.create_summary_chain(content)
-                for key, content in unzipped_files.items()
-            }
-            parallel_chain = RunnableParallel(**parallel_tasks)
-            results = await parallel_chain.invoke({key: key for key in unzipped_files})
+        # try:
+        parallel_tasks = {
+            key: self.create_summary_chain(content)
+            for key, content in unzipped_files.items()
+        }
+        parallel_chain = RunnableParallel(**parallel_tasks)
+        results = parallel_chain.invoke({key: key for key in unzipped_files})
 
-            summaries = []
-            for i, (key, value) in enumerate(results.items()):
-                await self._write_result_to_file(value, f"summary_{i}")
-                summaries.append(value)
+        summaries = []
+        for i, (key, value) in enumerate(results.items()):
+            # await self._write_result_to_file(value, f"summary_{i}")
+            summaries.append(value)
 
-            full_summary = "\n\n".join(summaries)
-            await self._write_result_to_file(full_summary, "readme")
-            return full_summary
-        except Exception:
-            return None
+        full_summary = "\n\n".join(summaries)
+        # await self._write_result_to_file(full_summary, "readme")
+        return full_summary
+        # except Exception:
+        #     return None
+        
         
     async def _write_result_to_file(self, result: str, file_name: str):
         async with asyncio.Lock():
