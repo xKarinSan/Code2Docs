@@ -7,7 +7,6 @@ import {
     GridItem,
     Button,
     Textarea,
-    Text,
     Spacer,
     Flex,
 } from "@chakra-ui/react";
@@ -15,6 +14,7 @@ import JSZip from "jszip";
 import { useRef, useState } from "react";
 import { FileNode, buildFileTree } from "../helpers/FileNode";
 import { FileTree } from "../components/global/FileTree";
+import axios from "axios";
 
 export default function DemoPage() {
     const zip = new JSZip();
@@ -43,6 +43,79 @@ export default function DemoPage() {
             const tree = buildFileTree(extractedFiles);
             setFileTree(tree);
         }
+    };
+
+    const traverseNode = (
+        currNode: FileNode | null,
+        currentChildrenArr: FileNode[]
+    ) => {
+        if (currNode?.children) {
+            currNode.children.forEach((child: FileNode) => {
+                currentChildrenArr.push(child);
+                traverseNode(child, currentChildrenArr);
+            });
+        }
+        return currentChildrenArr;
+    };
+
+    const createZipFile = async () => {
+        const addToZip = (node: FileNode, currentPath: string = "") => {
+            const newPath = currentPath
+                ? `${currentPath}/${node.name}`
+                : node.name;
+
+            if (node.isDirectory) {
+                // Create a folder in the zip
+                zip.folder(newPath);
+
+                // Recursively add children
+                node.children.forEach((child) => addToZip(child, newPath));
+            } else {
+                // Add file to the zip
+                zip.file(newPath, node.content || "");
+            }
+        };
+
+        // Start with the root node (currentReadDirectory)
+        if (currentReadDirectory) {
+            addToZip(currentReadDirectory);
+        }
+        // Generate the zip file
+        const content = await zip.generateAsync({ type: "blob" });
+        return content;
+    };
+
+    const generateDocumentation = async () => {
+        const zipBlob = await createZipFile();
+        const formData = new FormData();
+        formData.append("file", zipBlob);
+        await axios
+            .post(`${import.meta.env.VITE_API_URL}/demo`, formData)
+            .then((res) => {
+                setMarkdownDocumentation(res.data.data);
+            });
+    };
+
+    const downloadDocumentation = () => {
+        const blob = new Blob([markdownDocumentation], {
+            type: "text/markdown",
+        });
+
+        // Step 3: Create a download link for the Blob
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `${markdownName || "readme"}.md`;
+
+        // Append the link to the body (necessary for Firefox)
+        document.body.appendChild(link);
+
+        // Trigger the download
+        link.click();
+
+        // Clean up
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
     };
 
     const removeFile = () => {
@@ -106,7 +179,9 @@ export default function DemoPage() {
                         {currentReadDirectory ? currentReadDirectory.name : ""}
                     </GridItem>
                     <GridItem margin="10px">
-                        <Button>Write Documentation</Button>
+                        <Button onClick={generateDocumentation}>
+                            Write Documentation
+                        </Button>
                     </GridItem>
                 </Grid>
             </Card>
@@ -126,6 +201,7 @@ export default function DemoPage() {
                         borderRadius={5}
                         size="md"
                         width="200px"
+                        onClick={downloadDocumentation}
                     >
                         Download
                     </Button>
@@ -136,6 +212,7 @@ export default function DemoPage() {
                     <GridItem>
                         <Textarea
                             spellCheck={false}
+                            value={markdownDocumentation}
                             onChange={(e) => {
                                 setMarkdownDocumentation(e.target.value);
                             }}
