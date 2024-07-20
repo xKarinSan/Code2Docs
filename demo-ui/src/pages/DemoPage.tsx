@@ -7,11 +7,15 @@ import {
     GridItem,
     Button,
     Textarea,
+    Flex,
 } from "@chakra-ui/react";
 import JSZip from "jszip";
 import { useRef, useState } from "react";
 import { FileNode, buildFileTree } from "../helpers/FileNode";
 import { FileTree } from "../components/global/FileTree";
+import axios from "axios";
+import ReactMarkdown from "react-markdown";
+import ChakraUIRenderer from "chakra-ui-markdown-renderer";
 
 export default function DemoPage() {
     const zip = new JSZip();
@@ -24,6 +28,7 @@ export default function DemoPage() {
     const [currentReadDirectory, setCurrentReadDirectory] =
         useState<FileNode | null>(null);
     const [markdownDocumentation, setMarkdownDocumentation] = useState("");
+    const [markdownName, setMarkdownName] = useState("");
 
     const selectFile = async (files: FileList | null) => {
         if (files) {
@@ -39,6 +44,66 @@ export default function DemoPage() {
             const tree = buildFileTree(extractedFiles);
             setFileTree(tree);
         }
+    };
+
+    const createZipFile = async () => {
+        const addToZip = (node: FileNode, currentPath: string = "") => {
+            const newPath = currentPath
+                ? `${currentPath}/${node.name}`
+                : node.name;
+
+            if (node.isDirectory) {
+                // Create a folder in the zip
+                zip.folder(newPath);
+
+                // Recursively add children
+                node.children.forEach((child) => addToZip(child, newPath));
+            } else {
+                // Add file to the zip
+                zip.file(newPath, node.content || "");
+            }
+        };
+
+        // Start with the root node (currentReadDirectory)
+        if (currentReadDirectory) {
+            addToZip(currentReadDirectory);
+        }
+        // Generate the zip file
+        const content = await zip.generateAsync({ type: "blob" });
+        return content;
+    };
+
+    const generateDocumentation = async () => {
+        const zipBlob = await createZipFile();
+        const formData = new FormData();
+        formData.append("file", zipBlob);
+        await axios
+            .post(`${import.meta.env.VITE_API_URL}/demo`, formData)
+            .then((res) => {
+                setMarkdownDocumentation(res.data.data);
+            });
+    };
+
+    const downloadDocumentation = () => {
+        const blob = new Blob([markdownDocumentation], {
+            type: "text/markdown",
+        });
+
+        // Step 3: Create a download link for the Blob
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `${markdownName || "readme"}.md`;
+
+        // Append the link to the body (necessary for Firefox)
+        document.body.appendChild(link);
+
+        // Trigger the download
+        link.click();
+
+        // Clean up
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
     };
 
     const removeFile = () => {
@@ -96,31 +161,84 @@ export default function DemoPage() {
                 </GridItem>
             </Grid>
             <Card margin="10px auto" padding="10px" display={"grid"}>
-                <Grid templateColumns="repeat(2, 1fr)">
+                <Grid templateColumns="repeat(3, 1fr)" gap={5}>
                     <GridItem margin="10px">
                         Selected Folder:
                         {currentReadDirectory ? currentReadDirectory.name : ""}
                     </GridItem>
-                    <GridItem margin="10px">
-                        <Button>Write Documentation</Button>
+                    <GridItem margin="10px" colSpan={2}>
+                        <Flex gap={5}>
+                            <Button onClick={generateDocumentation}>
+                                Write Documentation
+                            </Button>
+                            <Input
+                                width="30%"
+                                placeholder="Name of md file"
+                                onChange={(e) => {
+                                    setMarkdownName(e.target.value);
+                                }}
+                                value={markdownName}
+                            ></Input>
+                            <Button
+                                colorScheme="purple"
+                                borderRadius={5}
+                                size="md"
+                                width="200px"
+                                onClick={downloadDocumentation}
+                            >
+                                Download
+                            </Button>
+                        </Flex>
                     </GridItem>
                 </Grid>
             </Card>
-            <Card margin="10px auto" padding="20px" height="300px">
-                <Grid templateColumns="repeat(2, 1fr)" gap={1}>
+            {/* <Card margin="10px auto" padding="10px" display={"grid"}>
+                <Flex gap={5}>
+                    <Spacer />
+                    <Input
+                        width="30%"
+                        placeholder="Name of md file"
+                        onChange={(e) => {
+                            setMarkdownName(e.target.value);
+                        }}
+                        value={markdownName}
+                    ></Input>
+                    <Button
+                        colorScheme="purple"
+                        borderRadius={5}
+                        size="md"
+                        width="200px"
+                        onClick={downloadDocumentation}
+                    >
+                        Download
+                    </Button>
+                </Flex>
+            </Card> */}
+            <Card margin="10px auto" padding="20px" height="600px">
+                <Grid templateColumns="repeat(2, 1fr)" gap={5} height={"100%"}>
                     <GridItem>
-                        <Textarea
-                            spellCheck={false}
-                            onChange={(e) => {
-                                setMarkdownDocumentation(e.target.value);
-                            }}
-                        ></Textarea>
+                        <Box>
+                            <Heading>Edit Preview</Heading>
+                            <Textarea
+                                spellCheck={false}
+                                value={markdownDocumentation}
+                                onChange={(e) => {
+                                    setMarkdownDocumentation(e.target.value);
+                                }}
+                                height={500}
+                                resize={"none"}
+                            ></Textarea>
+                        </Box>
                     </GridItem>
                     <GridItem flex={1}>
-                        <Heading>Preview</Heading>
-                        {/* <ReactMarkdown components={ChakraUIRenderer()}> */}
-                        {markdownDocumentation}
-                        {/* </ReactMarkdown> */}
+                        <Box>
+                            <Heading>Preview</Heading>
+                            <Box maxHeight="500px" overflow={"scroll"}>
+                                <ReactMarkdown components={ChakraUIRenderer()}>
+                                    {markdownDocumentation}
+                                </ReactMarkdown>
+                            </Box>
+                        </Box>
                     </GridItem>
                 </Grid>
             </Card>

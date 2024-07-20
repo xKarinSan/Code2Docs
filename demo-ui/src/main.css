@@ -1,6 +1,7 @@
 #root {
-    height: 100vh;
+    min-height: 100vh;
     background: #EEF2F7;
+    padding:10px
 }
 
 .fileTree:hover {
