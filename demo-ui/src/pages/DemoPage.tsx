@@ -173,19 +173,38 @@ export default function DemoPage() {
                 </GridItem>
             </Grid>
             <Card margin="10px auto" padding="10px" display={"grid"}>
-                <Grid templateColumns="repeat(2, 1fr)" gap={5}>
+                <Grid templateColumns="repeat(3, 1fr)" gap={5}>
                     <GridItem margin="10px">
                         Selected Folder:
                         {currentReadDirectory ? currentReadDirectory.name : ""}
                     </GridItem>
-                    <GridItem margin="10px">
-                        <Button onClick={generateDocumentation}>
-                            Write Documentation
-                        </Button>
+                    <GridItem margin="10px" colSpan={2}>
+                        <Flex gap={5}>
+                            <Button onClick={generateDocumentation}>
+                                Write Documentation
+                            </Button>
+                            <Input
+                                width="30%"
+                                placeholder="Name of md file"
+                                onChange={(e) => {
+                                    setMarkdownName(e.target.value);
+                                }}
+                                value={markdownName}
+                            ></Input>
+                            <Button
+                                colorScheme="purple"
+                                borderRadius={5}
+                                size="md"
+                                width="200px"
+                                onClick={downloadDocumentation}
+                            >
+                                Download
+                            </Button>
+                        </Flex>
                     </GridItem>
                 </Grid>
             </Card>
-            <Card margin="10px auto" padding="10px" display={"grid"}>
+            {/* <Card margin="10px auto" padding="10px" display={"grid"}>
                 <Flex gap={5}>
                     <Spacer />
                     <Input
@@ -206,23 +225,33 @@ export default function DemoPage() {
                         Download
                     </Button>
                 </Flex>
-            </Card>
-            <Card margin="10px auto" padding="20px" height="300px">
-                <Grid templateColumns="repeat(2, 1fr)" gap={5}>
+            </Card> */}
+            <Card margin="10px auto" padding="20px" height="600px">
+                <Grid templateColumns="repeat(2, 1fr)" gap={5} height={"100%"}>
                     <GridItem>
-                        <Textarea
-                            spellCheck={false}
-                            value={markdownDocumentation}
-                            onChange={(e) => {
-                                setMarkdownDocumentation(e.target.value);
-                            }}
-                        ></Textarea>
+                        <Box>
+                            <Heading>Edit Preview</Heading>
+                            <Textarea
+                                spellCheck={false}
+                                value={markdownDocumentation}
+                                onChange={(e) => {
+                                    setMarkdownDocumentation(e.target.value);
+                                }}
+                                height={500}
+                                resize={"none"}
+                            ></Textarea>
+                        </Box>
                     </GridItem>
                     <GridItem flex={1}>
-                        <Heading>Preview</Heading>
-                        {/* <ReactMarkdown components={ChakraUIRenderer()}> */}
-                        {markdownDocumentation}
-                        {/* </ReactMarkdown> */}
+                        <Box>
+                            <Heading>Preview</Heading>
+                            {/* <ReactMarkdown components={ChakraUIRenderer()}> */}
+                            <Box maxHeight="500px" overflow={"scroll"}>
+                                {markdownDocumentation}
+                            </Box>
+
+                            {/* </ReactMarkdown> */}
+                        </Box>
                     </GridItem>
                 </Grid>
             </Card>
