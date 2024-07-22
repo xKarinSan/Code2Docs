@@ -7,7 +7,7 @@ from zipfile import ZipFile
 from dotenv import load_dotenv, find_dotenv
 from langchain.schema.output_parser import StrOutputParser
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_openai import OpenAI
+from langchain_openai import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
 from langchain.schema.runnable import (
     RunnableParallel,
@@ -20,8 +20,11 @@ from langchain.schema.runnable import (
 class DocumentService:
     def __init__(self):
         _ = load_dotenv(find_dotenv())
-        self.llm = OpenAI(
-            api_key=os.environ["OPENAI_API_KEY"], temperature=0, max_tokens=2500
+        self.llm = ChatOpenAI(
+            model="gpt-3.5-turbo-0125",
+            api_key=os.environ["OPENAI_API_KEY"],
+            temperature=0,
+            max_tokens=2500,
         )
         self.text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=1000, chunk_overlap=10
@@ -124,7 +127,7 @@ class DocumentService:
         """
         The `unzip_file` function reads a zip file, extracts text files with specified extensions, and
         returns a dictionary mapping file paths to their contents.
-        
+
         :param file: The `unzip_file` method takes a file object (`file`) as input, which is expected to be
         a binary file. The method attempts to unzip the contents of the provided zip file and extract text
         content from files with specific code extensions. The extracted content is stored in a dictionary
@@ -152,7 +155,7 @@ class DocumentService:
         """
         The function `get_file_summary` takes in a string of file contents and returns a formatted markdown
         prompt template with the file contents included.
-        
+
         :param file_contents: The `get_file_summary` method takes in a string `file_contents` as input and
         returns a formatted prompt template using the provided `file_contents` in a markdown format. The
         `PromptTemplate` class is used to create the template, and the `format_prompt` method is used to
@@ -173,7 +176,7 @@ class DocumentService:
         """
         The function `create_summary_chain` returns a chain of operations to process file content and
         generate a summary.
-        
+
         :param file_content: The `file_content` parameter is a string that contains the content of a file.
         It is used as input to the `create_summary_chain` method to generate a summary chain for the file
         content
@@ -192,7 +195,7 @@ class DocumentService:
         """
         The function `summarise_files` processes unzipped files in parallel to create summaries and write
         them to files.
-        
+
         :param unzipped_files: The `unzipped_files` parameter is a dictionary where the keys are file names
         and the values are the content of the files. The `summarise_files` method takes this dictionary as
         input, processes the content of each file in parallel using a summary chain, writes the individual
@@ -211,12 +214,33 @@ class DocumentService:
 
             summaries = []
             for i, (key, value) in enumerate(results.items()):
+                self.write_result_to_file(value,f"summary_{i}")
                 summaries.append(value)
 
             full_summary = "\n\n".join(summaries)
+            self.write_result_to_file(full_summary,"result")
             return full_summary
         except Exception as e:
             print(e)
             return None
+        
+    def write_result_to_file(self, result: str, file_name: str):
+        """
+        NOTE: THIS IS TO BE REMOVED DURING PRODUCTION
+
+        The function `_write_result_to_file` writes the given result to a file with the specified file name
+        in Markdown format.
+        
+        :param result: The `result` parameter in the `_write_result_to_file` method is a string that
+        contains the data or content that you want to write to a file
+        :type result: str
+        :param file_name: The `file_name` parameter is a string that represents the name of the file where
+        the result will be written. In the `_write_result_to_file` method, the `result` string will be
+        written to a file with the name specified by the `file_name` parameter
+        :type file_name: str
+        """
+        with open(f"{file_name}.md", "w") as file:
+            file.write(result)
+
 
 document_service = DocumentService()
