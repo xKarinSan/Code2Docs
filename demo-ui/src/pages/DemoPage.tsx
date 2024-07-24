@@ -6,7 +6,6 @@ import {
     Grid,
     GridItem,
     Button,
-    Textarea,
     Flex,
     useToast,
     Modal,
@@ -22,11 +21,9 @@ import { useRef, useState } from "react";
 import { FileNode, buildFileTree } from "../helpers/FileNode";
 import { FileTree } from "../components/global/FileTree";
 import axios from "axios";
-import ReactMarkdown from "react-markdown";
-import ChakraUIRenderer from "chakra-ui-markdown-renderer";
 import Lottie from "lottie-react";
-
 import writing from "../assets/writing.json";
+import MarkdownEditor from "@uiw/react-markdown-editor";
 
 export default function DemoPage() {
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -105,7 +102,7 @@ export default function DemoPage() {
         await axios
             .post(`${import.meta.env.VITE_API_URL}/demo`, formData)
             .then((res) => {
-                onClose()
+                onClose();
                 setMarkdownDocumentation(res.data.data);
                 toast({
                     title: "Documentation successfully created!",
@@ -113,7 +110,7 @@ export default function DemoPage() {
                 });
             })
             .catch(() => {
-                onClose()
+                onClose();
                 toast({
                     title: "Failed to create documentation!",
                     status: "error",
@@ -242,33 +239,13 @@ export default function DemoPage() {
                     </GridItem>
                 </Grid>
             </Card>
-            <Card margin="10px auto" padding="20px" height="600px">
-                <Grid templateColumns="repeat(2, 1fr)" gap={5} height={"100%"}>
-                    <GridItem>
-                        <Box>
-                            <Heading>Edit Preview</Heading>
-                            <Textarea
-                                spellCheck={false}
-                                value={markdownDocumentation}
-                                onChange={(e) => {
-                                    setMarkdownDocumentation(e.target.value);
-                                }}
-                                height={500}
-                                resize={"none"}
-                            ></Textarea>
-                        </Box>
-                    </GridItem>
-                    <GridItem flex={1}>
-                        <Box>
-                            <Heading>Preview</Heading>
-                            <Box maxHeight="500px" overflow={"scroll"}>
-                                <ReactMarkdown components={ChakraUIRenderer()}>
-                                    {markdownDocumentation}
-                                </ReactMarkdown>
-                            </Box>
-                        </Box>
-                    </GridItem>
-                </Grid>
+            <Card margin="10px auto" padding="10px">
+                <Heading textAlign={"center"}>Preview</Heading>
+                <MarkdownEditor
+                    height="520px"
+                    value={markdownDocumentation}
+                    onChange={setMarkdownDocumentation}
+                />
             </Card>
         </Box>
     );
