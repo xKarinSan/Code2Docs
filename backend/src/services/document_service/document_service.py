@@ -14,14 +14,14 @@ from langchain.schema.runnable import (
     RunnableLambda,
     RunnableSerializable,
 )
-
+# OPENAI_MODEL
 
 # The `DocumentService` class provides methods for summarizing and documenting code files.
 class DocumentService:
     def __init__(self):
         _ = load_dotenv(find_dotenv())
         self.llm = ChatOpenAI(
-            model="gpt-3.5-turbo-0125",
+            model=os.environ["OPENAI_MODEL"],
             api_key=os.environ["OPENAI_API_KEY"],
             temperature=0,
             max_tokens=2500,
