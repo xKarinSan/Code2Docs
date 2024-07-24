@@ -6,7 +6,6 @@ import {
     Grid,
     GridItem,
     Button,
-    Flex,
     useToast,
     Modal,
     ModalOverlay,
@@ -14,6 +13,7 @@ import {
     ModalHeader,
     ModalBody,
     useDisclosure,
+    Text,
 } from "@chakra-ui/react";
 
 import JSZip from "jszip";
@@ -21,9 +21,11 @@ import { useRef, useState } from "react";
 import { FileNode, buildFileTree } from "../helpers/FileNode";
 import { FileTree } from "../components/global/FileTree";
 import axios from "axios";
+
 import Lottie from "lottie-react";
 import writing from "../assets/writing.json";
 import MarkdownEditor from "@uiw/react-markdown-editor";
+import { CodeBlock } from "react-code-blocks";
 
 export default function DemoPage() {
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -38,6 +40,7 @@ export default function DemoPage() {
     const [currentReadFile, setCurrentReadFile] = useState<FileNode | null>(
         null
     );
+    const [currentReadFilePath, setCurrentReadFilePath] = useState<string>("");
     const [currentReadDirectory, setCurrentReadDirectory] =
         useState<FileNode | null>(null);
     const [markdownDocumentation, setMarkdownDocumentation] = useState("");
@@ -146,13 +149,26 @@ export default function DemoPage() {
         }
         setFileTree(null);
         setCurrentReadFile(null);
+        setCurrentReadFilePath("");
     };
 
     return (
-        <Box width="80%" margin="auto">
+        <Box
+            width={{
+                base: "100%",
+                md: "80%",
+            }}
+            margin="auto"
+            overflow={"scroll"}
+        >
             <Heading textAlign={"center"}>Demo</Heading>
             <Card margin="10px auto">
-                <Grid templateColumns="repeat(2, 1fr)">
+                <Grid
+                    templateColumns={{
+                        base: "repeat(1,1fr)",
+                        md: "repeat(2,1fr)",
+                    }}
+                >
                     <GridItem margin="10px">
                         <Input
                             ref={fileInputRef}
@@ -164,36 +180,56 @@ export default function DemoPage() {
                             onChange={(e) => {
                                 selectFile(e.target.files);
                             }}
+                            alignContent={"center"}
                         />
                     </GridItem>
-                    <GridItem margin="10px">
+                    <GridItem
+                        margin="10px"
+                        display={"flex"}
+                        justifyContent={{
+                            base: "start",
+                            md: "center",
+                        }}
+                    >
                         <Button onClick={removeFile}>Remove zip file</Button>
                     </GridItem>
                 </Grid>
             </Card>
-            <Grid templateColumns="repeat(4, 1fr)" gap={1}>
-                <GridItem colSpan={1}>
-                    <Card overflow={"scroll"} padding="10px" height="500px">
+            <Grid
+                gridTemplateColumns={"49% 49%"}
+                justifyContent={"space-between"}
+                gap={1}
+            >
+                <GridItem>
+                    <Card
+                        overflow="scroll"
+                        height="500px"
+                        width="100%"
+                        padding="10px"
+                    >
                         {fileTree && (
                             <FileTree
                                 node={fileTree}
                                 setReadFile={setCurrentReadFile}
+                                setReadFilePath={setCurrentReadFilePath}
                                 setReadDirectory={setCurrentReadDirectory}
                             />
                         )}
                     </Card>
                 </GridItem>
-                <GridItem colSpan={3}>
-                    <Card
-                        padding="20px"
-                        overflow="scroll"
-                        height="500px"
-                        whiteSpace="pre"
-                    >
-                        {currentReadFile?.content}
+                <GridItem>
+                    <Card overflow="scroll" height="500px" width="100%">
+                        <Text padding="10px">
+                            {currentReadFilePath || "Select a file"}
+                        </Text>
+                        <CodeBlock
+                            text={currentReadFile?.content}
+                            showLineNumbers={true}
+                        />
                     </Card>
                 </GridItem>
             </Grid>
+
             <Modal
                 isOpen={isOpen}
                 onClose={onClose}
@@ -207,45 +243,60 @@ export default function DemoPage() {
                     </ModalBody>
                 </ModalContent>
             </Modal>
-            <Card margin="10px auto" padding="10px" display={"grid"}>
-                <Grid templateColumns="repeat(3, 1fr)" gap={5}>
-                    <GridItem margin="10px">
+            <Card margin="10px auto" padding="5px" display={"grid"}>
+                <Grid
+                    templateColumns={{
+                        base: "repeat(1,1fr)",
+                        md: "repeat(2,1fr)",
+                    }}
+                    gap={5}
+                >
+                    <GridItem margin="10px" alignSelf={"center"}>
                         Selected Folder:
                         {currentReadDirectory ? currentReadDirectory.name : ""}
                     </GridItem>
-                    <GridItem margin="10px" colSpan={2}>
-                        <Flex gap={5}>
-                            <Button onClick={generateDocumentation}>
-                                Write Docs
-                            </Button>
-                            <Input
-                                width="30%"
-                                placeholder="Name of md file"
-                                onChange={(e) => {
-                                    setMarkdownName(e.target.value);
-                                }}
-                                value={markdownName}
-                            ></Input>
-                            <Button
-                                colorScheme="purple"
-                                borderRadius={5}
-                                size="md"
-                                width="200px"
-                                onClick={downloadDocumentation}
-                            >
-                                Download
-                            </Button>
-                        </Flex>
+                    <GridItem margin="10px">
+                        <Button onClick={generateDocumentation}>
+                            Write Docs
+                        </Button>
                     </GridItem>
                 </Grid>
             </Card>
             <Card margin="10px auto" padding="10px">
                 <Heading textAlign={"center"}>Preview</Heading>
-                <MarkdownEditor
-                    height="520px"
-                    value={markdownDocumentation}
-                    onChange={setMarkdownDocumentation}
-                />
+                <Grid
+                    templateColumns={{
+                        base: "repeat(1,1fr)",
+                        md: "repeat(2,1fr)",
+                    }}
+                >
+                    <GridItem margin="10px">
+                        <Input
+                            placeholder="Name of md file"
+                            onChange={(e) => {
+                                setMarkdownName(e.target.value);
+                            }}
+                            value={markdownName}
+                        ></Input>
+                    </GridItem>
+                    <GridItem margin="10px">
+                        <Button
+                            colorScheme="purple"
+                            borderRadius={5}
+                            size="md"
+                            onClick={downloadDocumentation}
+                        >
+                            Download
+                        </Button>
+                    </GridItem>
+                </Grid>
+                <Box margin="10px">
+                    <MarkdownEditor
+                        height="520px"
+                        value={markdownDocumentation}
+                        onChange={setMarkdownDocumentation}
+                    />
+                </Box>
             </Card>
         </Box>
     );

@@ -1,41 +1,81 @@
-import { Box, Text, Icon } from "@chakra-ui/react";
+import React, { useState } from "react";
+import { Box, Icon, Collapse, Text } from "@chakra-ui/react";
 import { FileNode } from "../../helpers/FileNode";
-import { FaFolder, FaFile } from "react-icons/fa";
+import {
+    FaFolder,
+    FaFolderOpen,
+    FaFile,
+    FaChevronRight,
+    FaChevronDown,
+} from "react-icons/fa";
 
 interface FileTreeProps {
     node: FileNode;
     setReadFile: (file: FileNode) => void;
     setReadDirectory: (file: FileNode) => void;
+    setReadFilePath: (filePath: string) => void;
 }
 
-function FileTree({ node, setReadFile, setReadDirectory }: FileTreeProps) {
+function FileTree({
+    node,
+    setReadFile,
+    setReadDirectory,
+    setReadFilePath,
+}: FileTreeProps) {
+    const [isOpen, setIsOpen] = useState(true);
+
     const selectFile = (currentNode: FileNode) => {
-        if (node.children.length > 0) {
+        if (currentNode.isDirectory) {
+            setIsOpen(!isOpen);
             setReadDirectory(currentNode);
-            return;
+        } else {
+            setReadFile(currentNode);
+            setReadFilePath(currentNode.path);
         }
-        setReadFile(currentNode);
     };
+
+    const toggleOpen = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setIsOpen(!isOpen);
+    };
+
     return (
-        <Box ml={1} className="fileTree" margin="10px">
-            <Box
-                display="flex"
-                alignItems="center"
-                onClick={() => {
-                    selectFile(node);
-                }}
-            >
-                <Icon as={node.isDirectory ? FaFolder : FaFile} mr={2} />
-                <Text>{node.name}</Text>
-            </Box>
-            {node.children.map((child, index) => (
-                <FileTree
-                    key={index}
-                    node={child}
-                    setReadFile={setReadFile}
-                    setReadDirectory={setReadDirectory}
+        <Box ml={1} className="fileTree">
+            <Box display="flex" alignItems="center" cursor="pointer">
+                {node.isDirectory && (
+                    <Icon
+                        as={isOpen ? FaChevronDown : FaChevronRight}
+                        mr={2}
+                        onClick={toggleOpen}
+                    />
+                )}
+                <Icon
+                    as={
+                        node.isDirectory
+                            ? isOpen
+                                ? FaFolderOpen
+                                : FaFolder
+                            : FaFile
+                    }
+                    mr={2}
                 />
-            ))}
+                <Text whiteSpace={"nowrap"} onClick={() => selectFile(node)}>
+                    {node.name}
+                </Text>
+            </Box>
+            <Collapse in={isOpen}>
+                <Box ml={4} width="100%" overflow={"scroll"}>
+                    {node.children.map((child, index) => (
+                        <FileTree
+                            key={index}
+                            node={child}
+                            setReadFile={setReadFile}
+                            setReadFilePath={setReadFilePath}
+                            setReadDirectory={setReadDirectory}
+                        />
+                    ))}
+                </Box>
+            </Collapse>
         </Box>
     );
 }
