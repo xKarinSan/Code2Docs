@@ -2,3 +2,4 @@ __pycache__
 file_items
 .env
 *.md
+!readme.md

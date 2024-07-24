@@ -8,7 +8,7 @@ app = FastAPI()
 
 @app.get("/healthcheck")
 def healthcheck():
-    return {"Hello": "World"}
+    return {"message": "Hello World"}
 
 
 app.add_middleware(
