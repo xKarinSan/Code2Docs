@@ -1,4 +1,5 @@
 import {
+    ButtonGroup,
     Card,
     Heading,
     Input,
@@ -26,6 +27,8 @@ import Lottie from "lottie-react";
 import writing from "../assets/writing.json";
 import MarkdownEditor from "@uiw/react-markdown-editor";
 import { CodeBlock } from "react-code-blocks";
+import { DownloadIcon, DeleteIcon } from "@chakra-ui/icons";
+import { FaPencilAlt } from "react-icons/fa";
 
 export default function DemoPage() {
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -191,7 +194,15 @@ export default function DemoPage() {
                             md: "center",
                         }}
                     >
-                        <Button onClick={removeFile}>Remove zip file</Button>
+                        <Button
+                            leftIcon={<DeleteIcon />}
+                            colorScheme="red"
+                            borderRadius={5}
+                            size="md"
+                            onClick={removeFile}
+                        >
+                            Remove zip file
+                        </Button>
                     </GridItem>
                 </Grid>
             </Card>
@@ -207,25 +218,42 @@ export default function DemoPage() {
                         width="100%"
                         padding="10px"
                     >
-                        {fileTree && (
-                            <FileTree
-                                node={fileTree}
-                                setReadFile={setCurrentReadFile}
-                                setReadFilePath={setCurrentReadFilePath}
-                                setReadDirectory={setCurrentReadDirectory}
-                            />
+                        {fileTree ? (
+                            <>
+                                {" "}
+                                <FileTree
+                                    node={fileTree}
+                                    setReadFile={setCurrentReadFile}
+                                    setReadFilePath={setCurrentReadFilePath}
+                                    setReadDirectory={setCurrentReadDirectory}
+                                />
+                            </>
+                        ) : (
+                            <>Upload a zip file.</>
                         )}
                     </Card>
                 </GridItem>
                 <GridItem>
-                    <Card overflow="scroll" height="500px" width="100%">
-                        <Text padding="10px">
-                            {currentReadFilePath || "Select a file"}
-                        </Text>
-                        <CodeBlock
-                            text={currentReadFile?.content}
-                            showLineNumbers={true}
-                        />
+                    <Card
+                        overflow="scroll"
+                        height="500px"
+                        width="100%"
+                        padding="10px"
+                    >
+                        {currentReadFile ? (
+                            <>
+                                {" "}
+                                <Text padding="10px">
+                                    {currentReadFilePath || "Select a file"}
+                                </Text>
+                                <CodeBlock
+                                    text={currentReadFile?.content}
+                                    showLineNumbers={true}
+                                />
+                            </>
+                        ) : (
+                            <>Upload a file</>
+                        )}
                     </Card>
                 </GridItem>
             </Grid>
@@ -256,7 +284,13 @@ export default function DemoPage() {
                         {currentReadDirectory ? currentReadDirectory.name : ""}
                     </GridItem>
                     <GridItem margin="10px">
-                        <Button onClick={generateDocumentation}>
+                        <Button
+                            leftIcon={<FaPencilAlt />}
+                            colorScheme="purple"
+                            borderRadius={5}
+                            size="md"
+                            onClick={generateDocumentation}
+                        >
                             Write Docs
                         </Button>
                     </GridItem>
@@ -280,14 +314,28 @@ export default function DemoPage() {
                         ></Input>
                     </GridItem>
                     <GridItem margin="10px">
-                        <Button
-                            colorScheme="purple"
-                            borderRadius={5}
-                            size="md"
-                            onClick={downloadDocumentation}
-                        >
-                            Download
-                        </Button>
+                        <ButtonGroup>
+                            <Button
+                                leftIcon={<DownloadIcon />}
+                                colorScheme="purple"
+                                borderRadius={5}
+                                size="md"
+                                onClick={downloadDocumentation}
+                            >
+                                Download
+                            </Button>
+                            <Button
+                                leftIcon={<DeleteIcon />}
+                                colorScheme="red"
+                                borderRadius={5}
+                                size="md"
+                                onClick={() => {
+                                    setMarkdownDocumentation("");
+                                }}
+                            >
+                                Clear
+                            </Button>
+                        </ButtonGroup>
                     </GridItem>
                 </Grid>
                 <Box margin="10px">
