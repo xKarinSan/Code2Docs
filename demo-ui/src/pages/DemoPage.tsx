@@ -15,6 +15,7 @@ import {
     ModalBody,
     useDisclosure,
     Text,
+    Image,
 } from "@chakra-ui/react";
 
 import JSZip from "jszip";
@@ -29,6 +30,9 @@ import MarkdownEditor from "@uiw/react-markdown-editor";
 import { CodeBlock } from "react-code-blocks";
 import { DownloadIcon, DeleteIcon } from "@chakra-ui/icons";
 import { FaPencilAlt } from "react-icons/fa";
+
+import imageUploadImg from "../assets/image-upload-concept-landing-page.png";
+import selectFileImg from "../assets/search-concept-yellow-folder-magnifier-icons-hand-drawn-cartoon-art-illustration.png";
 
 export default function DemoPage() {
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -62,6 +66,10 @@ export default function DemoPage() {
             }
             const tree = buildFileTree(extractedFiles);
             setFileTree(tree);
+            toast({
+                title: "File selected!",
+                status: "success",
+            });
         }
     };
 
@@ -153,6 +161,10 @@ export default function DemoPage() {
         setFileTree(null);
         setCurrentReadFile(null);
         setCurrentReadFilePath("");
+        toast({
+            title: "File removed!",
+            status: "info",
+        });
     };
 
     return (
@@ -230,7 +242,27 @@ export default function DemoPage() {
                                 />
                             </>
                         ) : (
-                            <>Upload a zip file.</>
+                            <Box
+                                display="grid"
+                                fontSize={"18px"}
+                                margin="auto"
+                                textAlign={"center"}
+                            >
+                                <Image
+                                    src={imageUploadImg}
+                                    alt={
+                                        "Image by pikisuperstar on Freepik. Souce: https://www.freepik.com/free-vector/image-upload-concept-landing-page_5337069.htm#fromView=search&page=1&position=1&uuid=1cc93512-6c6d-4455-acb0-2c9815533841"
+                                    }
+                                    width={{
+                                        base: "100px",
+                                        sm: "150px",
+                                        md: "200px",
+                                        lg: "300px",
+                                        xl: "400px",
+                                    }}
+                                />
+                                Upload your code
+                            </Box>
                         )}
                     </Card>
                 </GridItem>
@@ -243,7 +275,6 @@ export default function DemoPage() {
                     >
                         {currentReadFile ? (
                             <>
-                                {" "}
                                 <Text padding="10px">
                                     {currentReadFilePath || "Select a file"}
                                 </Text>
@@ -253,7 +284,27 @@ export default function DemoPage() {
                                 />
                             </>
                         ) : (
-                            <>Upload a file</>
+                            <Box
+                                display="grid"
+                                fontSize={"18px"}
+                                margin="auto"
+                                textAlign={"center"}
+                            >
+                                <Image
+                                    src={selectFileImg}
+                                    alt={
+                                        "Image by mamewmy on Freepik. Souce: https://www.freepik.com/free-vector/search-concept-yellow-folder-magnifier-icons-hand-drawn-cartoon-art-illustration_18508166.htm#fromView=search&page=1&position=16&uuid=60aa9ddc-3696-44c7-98d3-ff85fdf748aa"
+                                    }
+                                    width={{
+                                        base: "100px",
+                                        sm: "150px",
+                                        md: "200px",
+                                        lg: "300px",
+                                        xl: "400px",
+                                    }}
+                                />
+                                Select a file
+                            </Box>
                         )}
                     </Card>
                 </GridItem>

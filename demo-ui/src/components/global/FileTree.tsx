@@ -59,6 +59,7 @@ function FileTree({
                 cursor="pointer"
                 borderRadius="5px"
                 padding="5px"
+                margin="2px"
                 background={
                     currentReadDirectory == node ||
                     currentReadFilePath == node.path
