@@ -220,7 +220,6 @@ export default function DemoPage() {
                     >
                         {fileTree ? (
                             <>
-                                {" "}
                                 <FileTree
                                     node={fileTree}
                                     setReadFile={setCurrentReadFile}

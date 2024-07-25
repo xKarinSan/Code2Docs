@@ -26,7 +26,6 @@ function FileTree({
 
     const selectFile = (currentNode: FileNode) => {
         if (currentNode.isDirectory) {
-            setIsOpen(!isOpen);
             setReadDirectory(currentNode);
         } else {
             setReadFile(currentNode);
