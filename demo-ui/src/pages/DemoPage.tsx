@@ -225,6 +225,8 @@ export default function DemoPage() {
                                     setReadFile={setCurrentReadFile}
                                     setReadFilePath={setCurrentReadFilePath}
                                     setReadDirectory={setCurrentReadDirectory}
+                                    currentReadFilePath={currentReadFilePath}
+                                    currentReadDirectory={currentReadDirectory}
                                 />
                             </>
                         ) : (

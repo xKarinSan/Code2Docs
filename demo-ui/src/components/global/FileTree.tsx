@@ -11,9 +11,11 @@ import {
 
 interface FileTreeProps {
     node: FileNode;
-    setReadFile: (file: FileNode) => void;
-    setReadDirectory: (file: FileNode) => void;
+    setReadFile: (file: FileNode | null) => void;
+    setReadDirectory: (file: FileNode | null) => void;
     setReadFilePath: (filePath: string) => void;
+    currentReadFilePath: string;
+    currentReadDirectory: FileNode | null;
 }
 
 function FileTree({
@@ -21,15 +23,26 @@ function FileTree({
     setReadFile,
     setReadDirectory,
     setReadFilePath,
+    currentReadFilePath,
+    currentReadDirectory,
 }: FileTreeProps) {
     const [isOpen, setIsOpen] = useState(true);
 
     const selectFile = (currentNode: FileNode) => {
         if (currentNode.isDirectory) {
-            setReadDirectory(currentNode);
+            if (currentReadDirectory != currentNode) {
+                setReadDirectory(currentNode);
+            } else {
+                setReadDirectory(null);
+            }
         } else {
-            setReadFile(currentNode);
-            setReadFilePath(currentNode.path);
+            if (currentReadFilePath != currentNode.path) {
+                setReadFilePath(currentNode.path);
+                setReadFile(currentNode);
+            } else {
+                setReadFile(null);
+                setReadFilePath("");
+            }
         }
     };
 
@@ -40,7 +53,26 @@ function FileTree({
 
     return (
         <Box ml={1} className="fileTree">
-            <Box display="flex" alignItems="center" cursor="pointer">
+            <Box
+                display="flex"
+                alignItems="center"
+                cursor="pointer"
+                borderRadius="5px"
+                padding="5px"
+                background={
+                    currentReadDirectory == node ||
+                    currentReadFilePath == node.path
+                        ? "#4E35E5"
+                        : ""
+                }
+                color={
+                    currentReadDirectory == node ||
+                    currentReadFilePath == node.path
+                        ? "white"
+                        : "black"
+                }
+                onClick={() => selectFile(node)}
+            >
                 {node.isDirectory && (
                     <Icon
                         as={isOpen ? FaChevronDown : FaChevronRight}
@@ -58,12 +90,12 @@ function FileTree({
                     }
                     mr={2}
                 />
-                <Text whiteSpace={"nowrap"} onClick={() => selectFile(node)}>
+                <Text whiteSpace={"nowrap"} overflow="scroll">
                     {node.name}
                 </Text>
             </Box>
             <Collapse in={isOpen}>
-                <Box ml={4} width="100%" overflow={"scroll"}>
+                <Box ml={4} overflow={"scroll"}>
                     {node.children.map((child, index) => (
                         <FileTree
                             key={index}
@@ -71,6 +103,8 @@ function FileTree({
                             setReadFile={setReadFile}
                             setReadFilePath={setReadFilePath}
                             setReadDirectory={setReadDirectory}
+                            currentReadFilePath={currentReadFilePath}
+                            currentReadDirectory={currentReadDirectory}
                         />
                     ))}
                 </Box>
