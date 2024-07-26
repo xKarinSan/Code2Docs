@@ -65,7 +65,7 @@ function FileTree({
                 background={
                     currentReadDirectory == node ||
                     currentReadFilePath == node.path
-                        ? "#4E35E5"
+                        ? "#0400AF"
                         : ""
                 }
                 color={

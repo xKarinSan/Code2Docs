@@ -55,21 +55,34 @@ export default function DemoPage() {
     const [markdownName, setMarkdownName] = useState("");
 
     const selectFile = async (files: FileList | null) => {
-        if (files) {
-            const contents = await zip.loadAsync(files[0]);
+        toast({
+            title: "Uploading codebase ...",
+            status: "info",
+        });
+        try {
+            if (files) {
+                const contents = await zip.loadAsync(files[0]);
 
-            const extractedFiles = [];
-            for (const [filename, fileData] of Object.entries(contents.files)) {
-                if (!fileData.dir) {
-                    const content = await fileData.async("binarystring");
-                    extractedFiles.push({ filename, content });
+                const extractedFiles = [];
+                for (const [filename, fileData] of Object.entries(
+                    contents.files
+                )) {
+                    if (!fileData.dir) {
+                        const content = await fileData.async("binarystring");
+                        extractedFiles.push({ filename, content });
+                    }
                 }
+                const tree = buildFileTree(extractedFiles);
+                setFileTree(tree);
+                toast({
+                    title: "Codebase uploaded!",
+                    status: "success",
+                });
             }
-            const tree = buildFileTree(extractedFiles);
-            setFileTree(tree);
+        } catch (e) {
             toast({
-                title: "File uploaded!",
-                status: "success",
+                title: "Failed to upload codebase!",
+                status: "error",
             });
         }
     };
@@ -164,7 +177,7 @@ export default function DemoPage() {
         setCurrentReadFile(null);
         setCurrentReadFilePath("");
         toast({
-            title: "File removed!",
+            title: "Codebase removed!",
             status: "info",
         });
     };
@@ -178,7 +191,7 @@ export default function DemoPage() {
             margin="auto"
             overflow={"scroll"}
         >
-            <Heading textAlign={"center"}>Demo</Heading>
+            <Heading textAlign={"center"}>Code2Docs Demo</Heading>
             <Card margin="10px auto">
                 <Grid
                     templateColumns={{
@@ -204,20 +217,21 @@ export default function DemoPage() {
                             color="white"
                             padding="9px"
                             borderRadius="5px"
-                            background="#684FFB"
+                            background="#2809E3"
                             htmlFor="file-upload"
                             width="fit-content"
                             cursor="pointer"
                             margin="0"
                         >
                             <DownloadIcon marginRight={"10px"} />
-                            Upload code (.zip only)
+                            Upload codebase (.zip only)
                         </FormLabel>
                     </GridItem>
                     <GridItem margin="10px">
                         <Button
                             leftIcon={<DeleteIcon />}
-                            colorScheme="red"
+                            background="#C50909"
+                            color="white"
                             borderRadius={5}
                             size="md"
                             onClick={removeFile}
@@ -284,7 +298,8 @@ export default function DemoPage() {
                                 <GridItem margin="10px">
                                     <Button
                                         leftIcon={<FaPencilAlt />}
-                                        colorScheme="purple"
+                                        background="#2809E3"
+                                        color="white"
                                         borderRadius={5}
                                         size="md"
                                         onClick={generateDocumentation}
@@ -342,7 +357,6 @@ export default function DemoPage() {
                     </Card>
                 </GridItem>
             </Grid>
-
             <Modal
                 isOpen={isOpen}
                 onClose={onClose}
@@ -377,7 +391,8 @@ export default function DemoPage() {
                         <ButtonGroup>
                             <Button
                                 leftIcon={<DownloadIcon />}
-                                colorScheme="purple"
+                                background="#2809E3"
+                                color="white"
                                 borderRadius={5}
                                 size="md"
                                 onClick={downloadDocumentation}
@@ -386,7 +401,8 @@ export default function DemoPage() {
                             </Button>
                             <Button
                                 leftIcon={<DeleteIcon />}
-                                colorScheme="red"
+                                background="#C50909"
+                                color="white"
                                 borderRadius={5}
                                 size="md"
                                 onClick={() => {
