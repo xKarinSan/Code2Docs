@@ -16,6 +16,8 @@ import {
     useDisclosure,
     Text,
     Image,
+    FormLabel,
+    Icon,
 } from "@chakra-ui/react";
 
 import JSZip from "jszip";
@@ -67,7 +69,7 @@ export default function DemoPage() {
             const tree = buildFileTree(extractedFiles);
             setFileTree(tree);
             toast({
-                title: "File selected!",
+                title: "File uploaded!",
                 status: "success",
             });
         }
@@ -159,6 +161,7 @@ export default function DemoPage() {
             fileInputRef.current!.value = "";
         }
         setFileTree(null);
+        setCurrentReadDirectory(null);
         setCurrentReadFile(null);
         setCurrentReadFilePath("");
         toast({
@@ -183,37 +186,45 @@ export default function DemoPage() {
                         base: "repeat(1,1fr)",
                         md: "repeat(2,1fr)",
                     }}
+                    width={"fit-content"}
                 >
                     <GridItem margin="10px">
                         <Input
+                            id="file-upload"
                             ref={fileInputRef}
                             width="fit-content"
-                            border="none"
                             type="file"
                             accept=".zip"
                             multiple={true}
                             onChange={(e) => {
                                 selectFile(e.target.files);
                             }}
-                            alignContent={"center"}
+                            display="none"
                         />
+                        <FormLabel
+                            color="white"
+                            padding="9px"
+                            borderRadius="5px"
+                            background="#684FFB"
+                            htmlFor="file-upload"
+                            width="fit-content"
+                            cursor="pointer"
+                            margin="0"
+                        >
+                            <DownloadIcon marginRight={"10px"} />
+                            Upload code (.zip only)
+                        </FormLabel>
                     </GridItem>
-                    <GridItem
-                        margin="10px"
-                        display={"flex"}
-                        justifyContent={{
-                            base: "start",
-                            md: "center",
-                        }}
-                    >
+                    <GridItem margin="10px">
                         <Button
                             leftIcon={<DeleteIcon />}
                             colorScheme="red"
                             borderRadius={5}
                             size="md"
                             onClick={removeFile}
+                            margin="0"
                         >
-                            Remove zip file
+                            Remove Codebase
                         </Button>
                     </GridItem>
                 </Grid>
@@ -224,14 +235,9 @@ export default function DemoPage() {
                 gap={1}
             >
                 <GridItem>
-                    <Card
-                        overflow="scroll"
-                        height="500px"
-                        width="100%"
-                        padding="10px"
-                    >
+                    <Card height="700px" width="100%" overflow={"hidden"}>
                         {fileTree ? (
-                            <>
+                            <Box overflow="scroll" height="600px" width="100%">
                                 <FileTree
                                     node={fileTree}
                                     setReadFile={setCurrentReadFile}
@@ -240,7 +246,7 @@ export default function DemoPage() {
                                     currentReadFilePath={currentReadFilePath}
                                     currentReadDirectory={currentReadDirectory}
                                 />
-                            </>
+                            </Box>
                         ) : (
                             <Box
                                 display="grid"
@@ -264,25 +270,53 @@ export default function DemoPage() {
                                 Upload your code
                             </Box>
                         )}
+                        <Box background="#f7f8fa">
+                            <Grid gap={2} padding="10px">
+                                <GridItem
+                                    margin="10px"
+                                    alignSelf={"center"}
+                                    overflow="scroll"
+                                >
+                                    <b>Selected Folder: </b>
+                                    {currentReadDirectory
+                                        ? currentReadDirectory.name
+                                        : ""}
+                                </GridItem>
+                                <GridItem margin="10px">
+                                    <Button
+                                        leftIcon={<FaPencilAlt />}
+                                        colorScheme="purple"
+                                        borderRadius={5}
+                                        size="md"
+                                        onClick={generateDocumentation}
+                                    >
+                                        Write Docs
+                                    </Button>
+                                </GridItem>
+                            </Grid>
+                        </Box>
                     </Card>
                 </GridItem>
                 <GridItem>
                     <Card
                         overflow="scroll"
-                        height="500px"
+                        height="700px"
                         width="100%"
                         padding="10px"
                     >
                         {currentReadFile ? (
-                            <>
-                                <Text padding="10px">
+                            <Box>
+                                <Text padding="10px" background="#f7f8fa"
+                                marginBottom={"5px"}>
                                     {currentReadFilePath || "Select a file"}
                                 </Text>
-                                <CodeBlock
-                                    text={currentReadFile?.content}
-                                    showLineNumbers={true}
-                                />
-                            </>
+                                <Box height="600px" overflow={"scroll"}>
+                                    <CodeBlock
+                                        text={currentReadFile?.content}
+                                        showLineNumbers={true}
+                                    />
+                                </Box>
+                            </Box>
                         ) : (
                             <Box
                                 display="grid"
@@ -323,31 +357,6 @@ export default function DemoPage() {
                     </ModalBody>
                 </ModalContent>
             </Modal>
-            <Card margin="10px auto" padding="5px" display={"grid"}>
-                <Grid
-                    templateColumns={{
-                        base: "repeat(1,1fr)",
-                        md: "repeat(2,1fr)",
-                    }}
-                    gap={5}
-                >
-                    <GridItem margin="10px" alignSelf={"center"}>
-                        Selected Folder:
-                        {currentReadDirectory ? currentReadDirectory.name : ""}
-                    </GridItem>
-                    <GridItem margin="10px">
-                        <Button
-                            leftIcon={<FaPencilAlt />}
-                            colorScheme="purple"
-                            borderRadius={5}
-                            size="md"
-                            onClick={generateDocumentation}
-                        >
-                            Write Docs
-                        </Button>
-                    </GridItem>
-                </Grid>
-            </Card>
             <Card margin="10px auto" padding="10px">
                 <Heading textAlign={"center"}>Preview</Heading>
                 <Grid

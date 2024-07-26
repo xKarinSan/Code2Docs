@@ -52,14 +52,16 @@ function FileTree({
     };
 
     return (
-        <Box ml={1} className="fileTree">
+        <Box ml={1}>
             <Box
                 display="flex"
                 alignItems="center"
                 cursor="pointer"
                 borderRadius="5px"
                 padding="5px"
+                paddingRight={"10px"}
                 margin="2px"
+                width={"fit-content"}
                 background={
                     currentReadDirectory == node ||
                     currentReadFilePath == node.path
