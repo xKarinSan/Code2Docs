@@ -17,7 +17,6 @@ import {
     Text,
     Image,
     FormLabel,
-    Icon,
 } from "@chakra-ui/react";
 
 import JSZip from "jszip";
@@ -235,7 +234,7 @@ export default function DemoPage() {
                 gap={1}
             >
                 <GridItem>
-                    <Card height="700px" width="100%" overflow={"hidden"}>
+                    <Card height="700px" width="100%" overflow={"scroll"}>
                         {fileTree ? (
                             <Box overflow="scroll" height="600px" width="100%">
                                 <FileTree
@@ -298,18 +297,18 @@ export default function DemoPage() {
                     </Card>
                 </GridItem>
                 <GridItem>
-                    <Card
-                        overflow="scroll"
-                        height="700px"
-                        width="100%"
-                        padding="10px"
-                    >
+                    <Card height="700px" width="100%" overflow={"scroll"}>
                         {currentReadFile ? (
                             <Box>
-                                <Text padding="10px" background="#f7f8fa"
-                                marginBottom={"5px"}>
-                                    {currentReadFilePath || "Select a file"}
-                                </Text>
+                                <Box background="#2809E3" color="white">
+                                    <Text
+                                        padding="10px"
+                                        overflow={"scroll"}
+                                        marginBottom={"5px"}
+                                    >
+                                        {currentReadFilePath || "Select a file"}
+                                    </Text>
+                                </Box>
                                 <Box height="600px" overflow={"scroll"}>
                                     <CodeBlock
                                         text={currentReadFile?.content}
@@ -321,7 +320,7 @@ export default function DemoPage() {
                             <Box
                                 display="grid"
                                 fontSize={"18px"}
-                                margin="auto"
+                                margin="10px auto"
                                 textAlign={"center"}
                             >
                                 <Image
