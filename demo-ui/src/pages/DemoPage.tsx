@@ -1,4 +1,5 @@
 import {
+    ButtonGroup,
     Card,
     Heading,
     Input,
@@ -6,8 +7,6 @@ import {
     Grid,
     GridItem,
     Button,
-    Textarea,
-    Flex,
     useToast,
     Modal,
     ModalOverlay,
@@ -15,6 +14,9 @@ import {
     ModalHeader,
     ModalBody,
     useDisclosure,
+    Text,
+    Image,
+    FormLabel,
 } from "@chakra-ui/react";
 
 import JSZip from "jszip";
@@ -22,11 +24,16 @@ import { useRef, useState } from "react";
 import { FileNode, buildFileTree } from "../helpers/FileNode";
 import { FileTree } from "../components/global/FileTree";
 import axios from "axios";
-import ReactMarkdown from "react-markdown";
-import ChakraUIRenderer from "chakra-ui-markdown-renderer";
-import Lottie from "lottie-react";
 
+import Lottie from "lottie-react";
 import writing from "../assets/writing.json";
+import MarkdownEditor from "@uiw/react-markdown-editor";
+import { CodeBlock } from "react-code-blocks";
+import { DownloadIcon, DeleteIcon } from "@chakra-ui/icons";
+import { FaPencilAlt } from "react-icons/fa";
+
+import imageUploadImg from "../assets/image-upload-concept-landing-page.png";
+import selectFileImg from "../assets/search-concept-yellow-folder-magnifier-icons-hand-drawn-cartoon-art-illustration.png";
 
 export default function DemoPage() {
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -41,24 +48,42 @@ export default function DemoPage() {
     const [currentReadFile, setCurrentReadFile] = useState<FileNode | null>(
         null
     );
+    const [currentReadFilePath, setCurrentReadFilePath] = useState<string>("");
     const [currentReadDirectory, setCurrentReadDirectory] =
         useState<FileNode | null>(null);
     const [markdownDocumentation, setMarkdownDocumentation] = useState("");
     const [markdownName, setMarkdownName] = useState("");
 
     const selectFile = async (files: FileList | null) => {
-        if (files) {
-            const contents = await zip.loadAsync(files[0]);
+        toast({
+            title: "Uploading codebase ...",
+            status: "info",
+        });
+        try {
+            if (files) {
+                const contents = await zip.loadAsync(files[0]);
 
-            const extractedFiles = [];
-            for (const [filename, fileData] of Object.entries(contents.files)) {
-                if (!fileData.dir) {
-                    const content = await fileData.async("binarystring");
-                    extractedFiles.push({ filename, content });
+                const extractedFiles = [];
+                for (const [filename, fileData] of Object.entries(
+                    contents.files
+                )) {
+                    if (!fileData.dir) {
+                        const content = await fileData.async("binarystring");
+                        extractedFiles.push({ filename, content });
+                    }
                 }
+                const tree = buildFileTree(extractedFiles);
+                setFileTree(tree);
+                toast({
+                    title: "Codebase uploaded!",
+                    status: "success",
+                });
             }
-            const tree = buildFileTree(extractedFiles);
-            setFileTree(tree);
+        } catch (e) {
+            toast({
+                title: "Failed to upload codebase!",
+                status: "error",
+            });
         }
     };
 
@@ -105,7 +130,7 @@ export default function DemoPage() {
         await axios
             .post(`${import.meta.env.VITE_API_URL}/demo`, formData)
             .then((res) => {
-                onClose()
+                onClose();
                 setMarkdownDocumentation(res.data.data);
                 toast({
                     title: "Documentation successfully created!",
@@ -113,7 +138,7 @@ export default function DemoPage() {
                 });
             })
             .catch(() => {
-                onClose()
+                onClose();
                 toast({
                     title: "Failed to create documentation!",
                     status: "error",
@@ -148,52 +173,187 @@ export default function DemoPage() {
             fileInputRef.current!.value = "";
         }
         setFileTree(null);
+        setCurrentReadDirectory(null);
         setCurrentReadFile(null);
+        setCurrentReadFilePath("");
+        toast({
+            title: "Codebase removed!",
+            status: "info",
+        });
     };
 
     return (
-        <Box width="80%" margin="auto">
-            <Heading textAlign={"center"}>Demo</Heading>
+        <Box
+            width={{
+                base: "100%",
+                md: "80%",
+            }}
+            margin="auto"
+            overflow={"scroll"}
+        >
+            <Heading textAlign={"center"}>Code2Docs Demo</Heading>
             <Card margin="10px auto">
-                <Grid templateColumns="repeat(2, 1fr)">
+                <Grid
+                    templateColumns={{
+                        base: "repeat(1,1fr)",
+                        md: "repeat(2,1fr)",
+                    }}
+                    width={"fit-content"}
+                >
                     <GridItem margin="10px">
                         <Input
+                            id="file-upload"
                             ref={fileInputRef}
                             width="fit-content"
-                            border="none"
                             type="file"
                             accept=".zip"
                             multiple={true}
                             onChange={(e) => {
                                 selectFile(e.target.files);
                             }}
+                            display="none"
                         />
+                        <FormLabel
+                            color="white"
+                            padding="9px"
+                            borderRadius="5px"
+                            background="#2809E3"
+                            htmlFor="file-upload"
+                            width="fit-content"
+                            cursor="pointer"
+                            margin="0"
+                        >
+                            <DownloadIcon marginRight={"10px"} />
+                            Upload codebase (.zip only)
+                        </FormLabel>
                     </GridItem>
                     <GridItem margin="10px">
-                        <Button onClick={removeFile}>Remove zip file</Button>
+                        <Button
+                            leftIcon={<DeleteIcon />}
+                            background="#C50909"
+                            color="white"
+                            borderRadius={5}
+                            size="md"
+                            onClick={removeFile}
+                            margin="0"
+                        >
+                            Remove Codebase
+                        </Button>
                     </GridItem>
                 </Grid>
             </Card>
-            <Grid templateColumns="repeat(4, 1fr)" gap={1}>
-                <GridItem colSpan={1}>
-                    <Card overflow={"scroll"} padding="10px" height="500px">
-                        {fileTree && (
-                            <FileTree
-                                node={fileTree}
-                                setReadFile={setCurrentReadFile}
-                                setReadDirectory={setCurrentReadDirectory}
-                            />
+            <Grid
+                gridTemplateColumns={"49% 49%"}
+                justifyContent={"space-between"}
+                gap={1}
+            >
+                <GridItem>
+                    <Card height="700px" width="100%" overflow={"scroll"}>
+                        {fileTree ? (
+                            <Box overflow="scroll" height="600px" width="100%">
+                                <FileTree
+                                    node={fileTree}
+                                    setReadFile={setCurrentReadFile}
+                                    setReadFilePath={setCurrentReadFilePath}
+                                    setReadDirectory={setCurrentReadDirectory}
+                                    currentReadFilePath={currentReadFilePath}
+                                    currentReadDirectory={currentReadDirectory}
+                                />
+                            </Box>
+                        ) : (
+                            <Box
+                                display="grid"
+                                fontSize={"18px"}
+                                margin="auto"
+                                textAlign={"center"}
+                            >
+                                <Image
+                                    src={imageUploadImg}
+                                    alt={
+                                        "Image by pikisuperstar on Freepik. Souce: https://www.freepik.com/free-vector/image-upload-concept-landing-page_5337069.htm#fromView=search&page=1&position=1&uuid=1cc93512-6c6d-4455-acb0-2c9815533841"
+                                    }
+                                    width={{
+                                        base: "100px",
+                                        sm: "150px",
+                                        md: "200px",
+                                        lg: "300px",
+                                        xl: "400px",
+                                    }}
+                                />
+                                Upload your code
+                            </Box>
                         )}
+                        <Box background="#f7f8fa">
+                            <Grid gap={2} padding="10px">
+                                <GridItem
+                                    margin="10px"
+                                    alignSelf={"center"}
+                                    overflow="scroll"
+                                >
+                                    <b>Selected Folder: </b>
+                                    {currentReadDirectory
+                                        ? currentReadDirectory.name
+                                        : ""}
+                                </GridItem>
+                                <GridItem margin="10px">
+                                    <Button
+                                        leftIcon={<FaPencilAlt />}
+                                        background="#2809E3"
+                                        color="white"
+                                        borderRadius={5}
+                                        size="md"
+                                        onClick={generateDocumentation}
+                                    >
+                                        Write Docs
+                                    </Button>
+                                </GridItem>
+                            </Grid>
+                        </Box>
                     </Card>
                 </GridItem>
-                <GridItem colSpan={3}>
-                    <Card
-                        padding="20px"
-                        overflow="scroll"
-                        height="500px"
-                        whiteSpace="pre"
-                    >
-                        {currentReadFile?.content}
+                <GridItem>
+                    <Card height="700px" width="100%" overflow={"scroll"}>
+                        {currentReadFile ? (
+                            <Box>
+                                <Box background="#2809E3" color="white">
+                                    <Text
+                                        padding="10px"
+                                        overflow={"scroll"}
+                                        marginBottom={"5px"}
+                                    >
+                                        {currentReadFilePath || "Select a file"}
+                                    </Text>
+                                </Box>
+                                <Box height="600px" overflow={"scroll"}>
+                                    <CodeBlock
+                                        text={currentReadFile?.content}
+                                        showLineNumbers={true}
+                                    />
+                                </Box>
+                            </Box>
+                        ) : (
+                            <Box
+                                display="grid"
+                                fontSize={"18px"}
+                                margin="10px auto"
+                                textAlign={"center"}
+                            >
+                                <Image
+                                    src={selectFileImg}
+                                    alt={
+                                        "Image by mamewmy on Freepik. Souce: https://www.freepik.com/free-vector/search-concept-yellow-folder-magnifier-icons-hand-drawn-cartoon-art-illustration_18508166.htm#fromView=search&page=1&position=16&uuid=60aa9ddc-3696-44c7-98d3-ff85fdf748aa"
+                                    }
+                                    width={{
+                                        base: "100px",
+                                        sm: "150px",
+                                        md: "200px",
+                                        lg: "300px",
+                                        xl: "400px",
+                                    }}
+                                />
+                                Select a file
+                            </Box>
+                        )}
                     </Card>
                 </GridItem>
             </Grid>
@@ -210,65 +370,57 @@ export default function DemoPage() {
                     </ModalBody>
                 </ModalContent>
             </Modal>
-            <Card margin="10px auto" padding="10px" display={"grid"}>
-                <Grid templateColumns="repeat(3, 1fr)" gap={5}>
+            <Card margin="10px auto" padding="10px">
+                <Heading textAlign={"center"}>Preview</Heading>
+                <Grid
+                    templateColumns={{
+                        base: "repeat(1,1fr)",
+                        md: "repeat(2,1fr)",
+                    }}
+                >
                     <GridItem margin="10px">
-                        Selected Folder:
-                        {currentReadDirectory ? currentReadDirectory.name : ""}
+                        <Input
+                            placeholder="Name of md file"
+                            onChange={(e) => {
+                                setMarkdownName(e.target.value);
+                            }}
+                            value={markdownName}
+                        ></Input>
                     </GridItem>
-                    <GridItem margin="10px" colSpan={2}>
-                        <Flex gap={5}>
-                            <Button onClick={generateDocumentation}>
-                                Write Docs
-                            </Button>
-                            <Input
-                                width="30%"
-                                placeholder="Name of md file"
-                                onChange={(e) => {
-                                    setMarkdownName(e.target.value);
-                                }}
-                                value={markdownName}
-                            ></Input>
+                    <GridItem margin="10px">
+                        <ButtonGroup>
                             <Button
-                                colorScheme="purple"
+                                leftIcon={<DownloadIcon />}
+                                background="#2809E3"
+                                color="white"
                                 borderRadius={5}
                                 size="md"
-                                width="200px"
                                 onClick={downloadDocumentation}
                             >
                                 Download
                             </Button>
-                        </Flex>
-                    </GridItem>
-                </Grid>
-            </Card>
-            <Card margin="10px auto" padding="20px" height="600px">
-                <Grid templateColumns="repeat(2, 1fr)" gap={5} height={"100%"}>
-                    <GridItem>
-                        <Box>
-                            <Heading>Edit Preview</Heading>
-                            <Textarea
-                                spellCheck={false}
-                                value={markdownDocumentation}
-                                onChange={(e) => {
-                                    setMarkdownDocumentation(e.target.value);
+                            <Button
+                                leftIcon={<DeleteIcon />}
+                                background="#C50909"
+                                color="white"
+                                borderRadius={5}
+                                size="md"
+                                onClick={() => {
+                                    setMarkdownDocumentation("");
                                 }}
-                                height={500}
-                                resize={"none"}
-                            ></Textarea>
-                        </Box>
-                    </GridItem>
-                    <GridItem flex={1}>
-                        <Box>
-                            <Heading>Preview</Heading>
-                            <Box maxHeight="500px" overflow={"scroll"}>
-                                <ReactMarkdown components={ChakraUIRenderer()}>
-                                    {markdownDocumentation}
-                                </ReactMarkdown>
-                            </Box>
-                        </Box>
+                            >
+                                Clear
+                            </Button>
+                        </ButtonGroup>
                     </GridItem>
                 </Grid>
+                <Box margin="10px">
+                    <MarkdownEditor
+                        height="520px"
+                        value={markdownDocumentation}
+                        onChange={setMarkdownDocumentation}
+                    />
+                </Box>
             </Card>
         </Box>
     );
