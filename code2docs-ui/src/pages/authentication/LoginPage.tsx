@@ -1,9 +1,11 @@
 import { Button } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import { githubAuthURL } from "../../constants";
 export default function LoginPage() {
     const navigate = useNavigate();
     const loginUser = () => {
-        navigate("/");
+        // navigate("/");
+        window.location.assign(githubAuthURL);
     };
 
     return (
