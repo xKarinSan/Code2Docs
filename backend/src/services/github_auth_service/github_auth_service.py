@@ -1,6 +1,6 @@
 import os
-from typing import Dict
-from requests import post
+from typing import Any, Dict
+from requests import get, post
 
 from dotenv import load_dotenv, find_dotenv
 
@@ -25,6 +25,20 @@ class GithubAuthService:
             "https://github.com/login/oauth/access_token" + params, headers=headers
         )
         return res.json()
+
+    def get_github_user_info(self, authToken: str) -> Dict[str, Any] | None:
+        # authorisation -> bearer token
+        headers = {"Authorization": "Bearer " + authToken}
+        res = get("https://api.github.com/user", headers=headers)
+        user_info = {}
+        if res.status_code != 200:
+            user_info["error"] = True
+        else:
+            user_info["error"] = False
+            res = res.json()
+            user_info["username"] = res["name"]
+            user_info["profilePic"] = res["avatar_url"]
+        return user_info
 
 
 github_auth_service = GithubAuthService()
