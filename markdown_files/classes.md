@@ -1,4 +1,8 @@
 ## ClassName
+### AttributeName
+**Description**
+Here is the description of the attributes
+
 
 ### FunctionName(paramater1, parameter2)
 **Description**
