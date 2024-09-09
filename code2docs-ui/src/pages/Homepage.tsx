@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 export default function Homepage() {
     const navigate = useNavigate();
     const logoutUser = () => {
+        localStorage.removeItem("githubAccessToken")
         navigate("/login");
     };
     return (
