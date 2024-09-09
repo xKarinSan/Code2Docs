@@ -5,6 +5,10 @@ import logging
 
 router = APIRouter()
 
+@router.get("/")
+def health():
+    return {"message": "OK"}
+
 
 @router.post("/")
 def document_zip_file(file: UploadFile) -> dict[str, str]:
@@ -15,7 +19,7 @@ def document_zip_file(file: UploadFile) -> dict[str, str]:
                 status_code=400,
                 content={"message": "Invalid files"},
             )
-        logging.info("unzipped_files",unzipped_files)
+        logging.info("unzipped_files", unzipped_files)
         documentation_string = document_service.summarise_files(unzipped_files)
         if not documentation_string:
             return JSONResponse(
