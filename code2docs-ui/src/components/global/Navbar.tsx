@@ -5,19 +5,29 @@ import {
     IconButton,
     useDisclosure,
     useColorModeValue,
+    Image,
     Stack,
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
-import { ReactNode, useEffect,useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { useUserStore } from "../../store/userStore";
+
+import TransparentLogo from "../../assets/TransparentLogo.png";
 
 interface Props {
     children: React.ReactNode;
 }
 
-const LandingPageLinks = ["Home", "About Us", "Highlights", "How We Work", "Demo","Contact Us"];
+const LandingPageLinks = [
+    "Home",
+    "About Us",
+    "Highlights",
+    "How We Work",
+    "Demo",
+    "Contact Us",
+];
 
-const HomepageLinks = ["Home","Codebases","Documentations","Account"];
+const HomepageLinks = ["Home", "Codebases", "Documentations", "Account"];
 
 const NavLink = (props: Props) => {
     const { children } = props;
@@ -40,14 +50,15 @@ const NavLink = (props: Props) => {
 
 export default function Navbar({ children }: { children: ReactNode }) {
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const currentUserToken = useUserStore((state:any)=>state.githubAuthToken)
-    
-    const [links,setLinks] = useState<string[]>([])
+    const currentUserToken = useUserStore(
+        (state: any) => state.githubAuthToken
+    );
 
-    useEffect(()=>{
-        setLinks(currentUserToken?HomepageLinks:LandingPageLinks)
-    },[currentUserToken])
+    const [links, setLinks] = useState<string[]>([]);
 
+    useEffect(() => {
+        setLinks(currentUserToken ? HomepageLinks : LandingPageLinks);
+    }, [currentUserToken]);
 
     return (
         <>
@@ -65,7 +76,15 @@ export default function Navbar({ children }: { children: ReactNode }) {
                         onClick={isOpen ? onClose : onOpen}
                     />
                     <HStack spacing={8} alignItems={"center"}>
-                        <Box>Logo</Box>
+                        <Box>
+                            <Image
+                                src={TransparentLogo}
+                                width={{
+                                    base: "200px",
+                                    md: "350px",
+                                }}
+                            />
+                        </Box>
                         <HStack
                             as={"nav"}
                             spacing={4}
