@@ -4,6 +4,9 @@ import axios from "axios";
 import { getGithubTokenURL } from "./constants.ts";
 import "./main.css";
 
+import { useUserStore } from "./store/userStore.ts";
+
+// pages
 import Homepage from "./pages/Homepage.tsx";
 import RegistrationPage from "./pages/authentication/RegistrationPage.tsx";
 import LoginPage from "./pages/authentication/LoginPage.tsx";
@@ -11,6 +14,8 @@ import ErrorPage from "./pages/authentication/ErrorPage.tsx";
 
 function App() {
     const navigate = useNavigate();
+    const currentUserToken = useUserStore((state: any) => state.githubAuthToken);
+    const setUserToken = useUserStore((state:any) => state.setGithubAuthToken);
 
     useEffect(() => {
         const queryString = window.location.search;
@@ -21,7 +26,7 @@ function App() {
             navigate("/error");
         }
 
-        if (codeParam && !localStorage.getItem("githubAccessToken")) {
+        if (codeParam && !currentUserToken) {
             const getAccessToken = async () => {
                 await axios
                     .get(getGithubTokenURL + codeParam)
@@ -30,20 +35,19 @@ function App() {
                     })
                     .then((data) => {
                         if (data.access_token) {
-                            localStorage.setItem(
-                                "githubAccessToken",
-                                data.access_token
-                            );
+                            console.info(data.access_token)
+                            setUserToken(data.access_token)
+
                             navigate("/home");
                         }
                     });
             };
             getAccessToken();
         }
-        if (localStorage.getItem("githubAccessToken")) {
+        if (currentUserToken) {
             navigate("/home");
         }
-    });
+    }, []);
     return (
         <>
             <Routes>

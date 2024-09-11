@@ -8,17 +8,19 @@ import {
     Stack,
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
-import { ReactNode } from "react";
+import { ReactNode, useEffect,useState } from "react";
+import { useUserStore } from "../../store/userStore";
 
 interface Props {
     children: React.ReactNode;
 }
 
-const Links = ["Home", "About Us", "Highlights", "How We Work", "Demo","Contact Us"];
+const LandingPageLinks = ["Home", "About Us", "Highlights", "How We Work", "Demo","Contact Us"];
+
+const HomepageLinks = ["Home","Codebases","Documentations","Account"];
 
 const NavLink = (props: Props) => {
     const { children } = props;
-
     return (
         <Box
             as="a"
@@ -38,6 +40,14 @@ const NavLink = (props: Props) => {
 
 export default function Navbar({ children }: { children: ReactNode }) {
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const currentUserToken = useUserStore((state:any)=>state.githubAuthToken)
+    
+    const [links,setLinks] = useState<string[]>([])
+
+    useEffect(()=>{
+        setLinks(currentUserToken?HomepageLinks:LandingPageLinks)
+    },[currentUserToken])
+
 
     return (
         <>
@@ -61,7 +71,7 @@ export default function Navbar({ children }: { children: ReactNode }) {
                             spacing={4}
                             display={{ base: "none", md: "flex" }}
                         >
-                            {Links.map((link) => (
+                            {links.map((link) => (
                                 <NavLink key={link}>{link}</NavLink>
                             ))}
                         </HStack>
@@ -71,7 +81,7 @@ export default function Navbar({ children }: { children: ReactNode }) {
                 {isOpen ? (
                     <Box pb={4} display={{ md: "none" }}>
                         <Stack as={"nav"} spacing={4}>
-                            {Links.map((link) => (
+                            {links.map((link) => (
                                 <NavLink key={link}>{link}</NavLink>
                             ))}
                         </Stack>
