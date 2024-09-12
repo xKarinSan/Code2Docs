@@ -1,6 +1,6 @@
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
-import Navbar from "./components/global/Navbar.tsx";
+import GlobalBar from "./components/global/Navbars/GlobalBar.tsx";
 
 import { BrowserRouter } from "react-router-dom";
 
@@ -10,9 +10,9 @@ createRoot(document.getElementById("root")!).render(
     // <StrictMode>
     <ChakraProvider>
         <BrowserRouter>
-            <Navbar>
+            <GlobalBar>
                 <App />
-            </Navbar>
+            </GlobalBar>
         </BrowserRouter>
     </ChakraProvider>
     // </StrictMode>

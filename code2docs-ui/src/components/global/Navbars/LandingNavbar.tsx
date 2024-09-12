@@ -10,9 +10,8 @@ import {
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 import { ReactNode, useEffect, useState } from "react";
-import { useUserStore } from "../../store/userStore";
 
-import TransparentLogo from "../../assets/TransparentLogo.png";
+import TransparentLogo from "../../../assets/TransparentLogo.png";
 
 interface Props {
     children: React.ReactNode;
@@ -48,17 +47,14 @@ const NavLink = (props: Props) => {
     );
 };
 
-export default function Navbar({ children }: { children: ReactNode }) {
+export default function LandingNavbar({ children }: { children: ReactNode }) {
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const currentUserToken = useUserStore(
-        (state: any) => state.githubAuthToken
-    );
 
     const [links, setLinks] = useState<string[]>([]);
 
     useEffect(() => {
-        setLinks(currentUserToken ? HomepageLinks : LandingPageLinks);
-    }, [currentUserToken]);
+        setLinks(LandingPageLinks);
+    }, []);
 
     return (
         <>
