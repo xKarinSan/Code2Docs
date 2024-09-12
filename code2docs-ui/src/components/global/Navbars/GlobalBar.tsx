@@ -1,4 +1,4 @@
-import { ReactNode, useEffect } from "react";
+import { ReactNode } from "react";
 import { useUserStore } from "../../../store/userStore";
 import LandingNavbar from "./LandingNavbar";
 import UserSidebar from "./UserSidebar";
@@ -7,11 +7,6 @@ function GlobalBar({ children }: { children: ReactNode }) {
     const currentUserToken = useUserStore(
         (state: any) => state.githubAuthToken
     );
-
-    // useEffect(()=>{
-
-    // },[currentUserToken])
-
     return (
         <div>
             {currentUserToken ? (
