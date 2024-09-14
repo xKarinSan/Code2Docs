@@ -12,17 +12,16 @@ def health():
 
 
 @router.get("/getAccessToken/")
-def get_user_token(code: str) -> dict[str, str]:
+def get_user_token(code: str) -> dict[str, Any]:
     try:
         get_token_result = github_auth_service.get_github_auth_token(code)
-        return get_token_result
+        return {"access_token":get_token_result["access_token"]}
 
     except HTTPException as he:
         # Re-raise HTTPExceptions as they already have status codes
         raise he
 
     except Exception as e:
-        print(e)
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -30,7 +29,6 @@ def get_user_token(code: str) -> dict[str, str]:
 def get_user_token(
     Authorization: Annotated[str | None, Header()] = None
 ) -> dict[str, Any]:
-    print("Authorization: ", Authorization)
     try:
         user_data = github_auth_service.get_github_user_info(Authorization)
         return user_data

@@ -20,7 +20,9 @@ class GithubAuthService:
             + "&code="
             + code
         )
-        headers = {"Accept": "application/json"}
+        headers = {
+            "Accept": "application/vnd.github+json",
+        }
         res = post(
             "https://github.com/login/oauth/access_token" + params, headers=headers
         )
