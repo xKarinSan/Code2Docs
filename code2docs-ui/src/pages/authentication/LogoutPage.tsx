@@ -6,8 +6,12 @@ export default function LogoutPage() {
     const removeUserToken = useUserStore(
         (state: any) => state.removeGithubAuthToken
     );
+    const removeUserAppToken = useUserStore(
+        (state: any) => state.removeGithubAppToken
+    );
     const logoutUser = () => {
         removeUserToken();
+        removeUserAppToken();
         navigate("/login");
     };
     useEffect(() => {

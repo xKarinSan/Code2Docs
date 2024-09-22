@@ -26,15 +26,11 @@ class GithubAuthService:
         res = post(
             "https://github.com/login/oauth/access_token" + params, headers=headers
         )
-        print(res.json())
         return res.json()
     
     def get_github_install_token(self, installation_id: str) -> Dict[str, Any]:
         # installation ID is now Client ID
         installation_token = generate_jwt()
-        print("code:", installation_id)
-        # print("self.github_installation_id :", self.github_installation_id)
-        print("installation_token: ", installation_token)
         headers = {
             "Authorization": "Bearer " + installation_token,
             "Accept": "application/vnd.github+json",
@@ -48,7 +44,6 @@ class GithubAuthService:
                 "X-GitHub-Api-Version": "2022-11-28",
             },
         )
-        print("[get_github_install_token] res:", res.json())
         return {"token": res.json()["token"], "bearer_token": installation_token}
 
     def get_github_user_info(self, authToken: str) -> Dict[str, Any] | None:

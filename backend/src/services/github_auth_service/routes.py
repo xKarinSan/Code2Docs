@@ -30,10 +30,18 @@ def get_user_token(code: str) -> dict[str, Any]:
 
 @router.get("/installationToken/")
 def get_user_installation(installation_id: str) -> dict[str, Any]:
-    # print("[get_user_installation] access_token:",access_token)
-    get_token_result = github_auth_service.get_github_install_token(installation_id)
+    try:
 
-    return {"token": get_token_result["token"]}
+        get_token_result = github_auth_service.get_github_install_token(installation_id)
+        return {"token": get_token_result["token"]}
+    
+    except HTTPException as he:
+        # Re-raise HTTPExceptions as they already have status codes
+        raise he
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 
 @router.get("/getUserInfo")
