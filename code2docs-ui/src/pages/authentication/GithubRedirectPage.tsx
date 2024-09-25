@@ -54,6 +54,8 @@ function GithubRedirectPage() {
                     });
             };
             getAccessToken();
+        }
+        if (!currentUserAppToken) {
             window.location.assign(githubAppInstallURL);
         }
         if (installationIdParam && !currentUserAppToken) {

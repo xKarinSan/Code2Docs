@@ -11,7 +11,7 @@ export default function LogoutPage() {
     );
     const logoutUser = () => {
         removeUserToken();
-        removeUserAppToken();
+        // removeUserAppToken();
         navigate("/login");
     };
     useEffect(() => {
