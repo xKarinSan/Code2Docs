@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 import axios from "axios";
 import { useEffect } from "react";
@@ -16,6 +17,9 @@ function GithubRedirectPage() {
     );
     const currentUserAppToken = useUserStore(
         (state: any) => state.githubAppToken
+    );
+    const currentUserAuthRefreshToken = useUserStore(
+        (state: any) => state.githubAuthRefreshToken
     );
     const setUserAuthToken = useUserStore(
         (state: any) => state.setGithubAuthToken
@@ -47,6 +51,12 @@ function GithubRedirectPage() {
                     .then((data) => {
                         if (data.access_token) {
                             setUserAuthToken(data.access_token);
+                        }
+                        if (data.refresh_token) {
+                            Cookies.set(
+                                "code2docs_github_auth_refresh_token",
+                                data.refresh_token
+                            );
                         }
                     })
                     .catch(() => {

@@ -1,5 +1,5 @@
-from fastapi import APIRouter, HTTPException, Header, status
-from fastapi.responses import RedirectResponse
+from fastapi import APIRouter, HTTPException, Header, status, Response
+from fastapi.responses import RedirectResponse, JSONResponse
 
 from typing import Annotated, Any
 
@@ -14,11 +14,17 @@ def health():
 
 
 @router.get("/getAccessToken/")
-def get_user_token(code: str) -> dict[str, Any]:
+def get_user_token(code: str, response: Response) -> dict[str, Any]:
     try:
         get_token_result = github_auth_service.get_github_auth_token(code)
-        if "access_token" in get_token_result:
-            return {"access_token": get_token_result["access_token"]}
+        response.set_cookie(
+            key="code2docs_auth_refresh_token", value=get_token_result["refresh_token"]
+        )
+        if "access_token" in get_token_result and "refresh_token" in get_token_result:
+            return {
+                "access_token": get_token_result["access_token"],
+                "refresh_token": get_token_result["refresh_token"],
+            }
 
     except HTTPException as he:
         # Re-raise HTTPExceptions as they already have status codes
@@ -34,14 +40,13 @@ def get_user_installation(installation_id: str) -> dict[str, Any]:
 
         get_token_result = github_auth_service.get_github_install_token(installation_id)
         return {"token": get_token_result["token"]}
-    
+
     except HTTPException as he:
         # Re-raise HTTPExceptions as they already have status codes
         raise he
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 
 @router.get("/getUserInfo")
