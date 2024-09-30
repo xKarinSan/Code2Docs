@@ -38,6 +38,7 @@ function GithubRedirectPage() {
             navigate("/error");
         }
         if (currentUserAppToken && currentUserAuthToken) {
+            // user token
             navigate("/home");
         }
 
@@ -49,13 +50,15 @@ function GithubRedirectPage() {
                         return res.data;
                     })
                     .then((data) => {
-                        if (data.access_token) {
+                        if (data.access_token && data.refresh_token && data.app_install_jwt) {
                             setUserAuthToken(data.access_token);
-                        }
-                        if (data.refresh_token) {
                             Cookies.set(
                                 "code2docs_github_auth_refresh_token",
                                 data.refresh_token
+                            );
+                            Cookies.set(
+                                "code2docs_github_jwt",
+                                data.app_install_jwt
                             );
                         }
                     })
@@ -76,6 +79,7 @@ function GithubRedirectPage() {
                         return res.data;
                     })
                     .then((data) => {
+                        console.log("data:",data)
                         if (data.token) {
                             setUserAppToken(data.token);
                             navigate("/home");

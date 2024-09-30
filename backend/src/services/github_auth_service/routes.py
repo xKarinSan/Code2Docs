@@ -4,6 +4,7 @@ from fastapi.responses import RedirectResponse, JSONResponse
 from typing import Annotated, Any
 
 from src.services.github_auth_service.github_auth_service import github_auth_service
+from src.services.utils.jwt_utils import generate_jwt
 
 router = APIRouter()
 
@@ -21,9 +22,11 @@ def get_user_token(code: str, response: Response) -> dict[str, Any]:
             key="code2docs_auth_refresh_token", value=get_token_result["refresh_token"]
         )
         if "access_token" in get_token_result and "refresh_token" in get_token_result:
+            jwt = generate_jwt()
             return {
                 "access_token": get_token_result["access_token"],
                 "refresh_token": get_token_result["refresh_token"],
+                "app_install_jwt": jwt
             }
 
     except HTTPException as he:

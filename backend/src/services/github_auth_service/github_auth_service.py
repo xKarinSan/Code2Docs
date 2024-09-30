@@ -31,7 +31,6 @@ class GithubAuthService:
         return res.json()
     
     # to refresh jwt
-    
 
     # used to trigger refresh
     def check_github_app_installations(self, installation_id: str, jwt: str) -> bool:
@@ -51,7 +50,6 @@ class GithubAuthService:
     def get_github_install_token(self, installation_id: str) -> Dict[str, Any]:
         # installation ID is now Client ID
         installation_token = generate_jwt()
-        print("[get_github_install_token] JWT", installation_token)
         headers = {
             "Authorization": "Bearer " + installation_token,
             "Accept": "application/vnd.github+json",
@@ -65,7 +63,7 @@ class GithubAuthService:
                 "X-GitHub-Api-Version": "2022-11-28",
             },
         )
-        print("[get_github_install_token]", res.json())
+        # print("[get_github_install_token]", res.json())
         return {"token": res.json()["token"], "bearer_token": installation_token}
 
     def get_github_user_info(self, authToken: str) -> Dict[str, Any] | None:
