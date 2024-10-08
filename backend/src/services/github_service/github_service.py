@@ -76,9 +76,11 @@ class GithubAuthService:
         else:
             user_info["error"] = False
             res = res.json()
-            user_info["username"] = res["name"]
-            user_info["profilePic"] = res["avatar_url"]
+            print("[get_github_user_info]",res)
+            user_info["username"] = res["login"]
+            user_info["displayName"] = res["name"]
+            user_info["profilePicUrl"] = res["avatar_url"]
         return user_info
 
 
-github_auth_service = GithubAuthService()
+github_service = GithubAuthService()

@@ -12,21 +12,31 @@ import { useUserStore } from "../../store/userStore.ts";
 
 function GithubRedirectPage() {
     const navigate = useNavigate();
+    // auth token
     const currentUserAuthToken = useUserStore(
         (state: any) => state.githubAuthToken
-    );
-    const currentUserAppToken = useUserStore(
-        (state: any) => state.githubAppToken
-    );
-    const currentUserAuthRefreshToken = useUserStore(
-        (state: any) => state.githubAuthRefreshToken
     );
     const setUserAuthToken = useUserStore(
         (state: any) => state.setGithubAuthToken
     );
+    // app token
+    const currentUserAppToken = useUserStore(
+        (state: any) => state.githubAppToken
+    );
     const setUserAppToken = useUserStore(
         (state: any) => state.setGithubAppToken
     );
+    // username (unique)
+    const setUsername = useUserStore((state: any) => state.setGithubUsername);
+    // profile pic url
+    const setProfilePicUrl = useUserStore(
+        (state: any) => state.setGithubProfilePicUrl
+    );
+    // displayname
+    const setDisplayName = useUserStore(
+        (state: any) => state.setGithubDisplayName
+    );
+
     useEffect(() => {
         const queryString = window.location.search;
         const urlParams = new URLSearchParams(queryString);
@@ -43,30 +53,37 @@ function GithubRedirectPage() {
         }
 
         if (codeParam && !currentUserAuthToken) {
-            const getAccessToken = async () => {
+            const authenticateUser = async () => {
                 await axios
                     .get(getGithubTokenURL + codeParam)
                     .then((res) => {
                         return res.data;
                     })
                     .then((data) => {
-                        if (data.access_token && data.refresh_token && data.app_install_jwt) {
-                            setUserAuthToken(data.access_token);
-                            Cookies.set(
-                                "code2docs_github_auth_refresh_token",
-                                data.refresh_token
-                            );
-                            Cookies.set(
-                                "code2docs_github_jwt",
-                                data.app_install_jwt
-                            );
-                        }
+                        const {
+                            access_token,
+                            refresh_token,
+                            app_install_jwt,
+                            username,
+                            display_name,
+                            profile_pic_url,
+                        } = data;
+                        console.log("data", data);
+                        setUserAuthToken(access_token);
+                        setUsername(username);
+                        setDisplayName(display_name);
+                        setProfilePicUrl(profile_pic_url);
+                        Cookies.set(
+                            "code2docs_github_auth_refresh_token",
+                            refresh_token
+                        );
+                        Cookies.set("code2docs_github_jwt", app_install_jwt);
                     })
                     .catch(() => {
                         navigate("/error");
                     });
             };
-            getAccessToken();
+            authenticateUser();
         }
         if (!currentUserAppToken) {
             window.location.assign(githubAppInstallURL);
@@ -79,7 +96,7 @@ function GithubRedirectPage() {
                         return res.data;
                     })
                     .then((data) => {
-                        console.log("data:",data)
+                        console.log("data:", data);
                         if (data.token) {
                             setUserAppToken(data.token);
                             navigate("/home");

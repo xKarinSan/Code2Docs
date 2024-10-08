@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request
 from src.services.document_service.app import document_service_app
-from src.services.github_auth_service.app import github_auth_service_app
+from src.services.github_service.app import github_service_app
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
@@ -26,7 +26,7 @@ app.add_middleware(
 )
 
 app.mount("/demo", document_service_app)
-app.mount("/gh", github_auth_service_app)
+app.mount("/gh", github_service_app)
 
 if __name__ == "__main__":
     # uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

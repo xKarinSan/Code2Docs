@@ -3,7 +3,7 @@ from fastapi.responses import RedirectResponse, JSONResponse
 
 from typing import Annotated, Any
 
-from src.services.github_auth_service.github_auth_service import github_auth_service
+from src.services.github_service.github_service import github_service
 from src.services.utils.jwt_utils import generate_jwt
 
 router = APIRouter()
@@ -14,19 +14,27 @@ def health():
     return {"message": "Auth OK"}
 
 
-@router.get("/getAccessToken/")
-def get_user_token(code: str, response: Response) -> dict[str, Any]:
+@router.get("/login/")
+def get_user_login(code: str, response: Response) -> dict[str, Any]:
     try:
-        get_token_result = github_auth_service.get_github_auth_token(code)
+        get_token_result = github_service.get_github_auth_token(code)
         response.set_cookie(
             key="code2docs_auth_refresh_token", value=get_token_result["refresh_token"]
         )
         if "access_token" in get_token_result and "refresh_token" in get_token_result:
             jwt = generate_jwt()
+            user_info = github_service.get_github_user_info(
+                get_token_result["access_token"]
+            )
+            print("user_info", user_info)
+
             return {
+                "username": user_info["username"],
+                "display_name": user_info["displayName"],
+                "profile_pic_url": user_info["profilePicUrl"],
                 "access_token": get_token_result["access_token"],
                 "refresh_token": get_token_result["refresh_token"],
-                "app_install_jwt": jwt
+                "app_install_jwt": jwt,
             }
 
     except HTTPException as he:
@@ -37,11 +45,11 @@ def get_user_token(code: str, response: Response) -> dict[str, Any]:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/installationToken/")
+@router.get("/install/")
 def get_user_installation(installation_id: str) -> dict[str, Any]:
     try:
 
-        get_token_result = github_auth_service.get_github_install_token(installation_id)
+        get_token_result = github_service.get_github_install_token(installation_id)
         return {"token": get_token_result["token"]}
 
     except HTTPException as he:
@@ -53,14 +61,12 @@ def get_user_installation(installation_id: str) -> dict[str, Any]:
 
 
 @router.get("/getUserInfo")
-def get_user_token(
+def get_user_login(
     Authorization: Annotated[str | None, Header()] = None
 ) -> dict[str, Any]:
     try:
-        user_data = github_auth_service.get_github_user_info(Authorization)
-        # print("user_data",user_data)
+        user_data = github_service.get_github_user_info(Authorization)
         if "access_token" in user_data:
-            # access auth
             return
         return user_data
 
