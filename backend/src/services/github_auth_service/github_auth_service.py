@@ -3,6 +3,7 @@ from typing import Any, Dict
 from requests import get, post
 
 from dotenv import load_dotenv, find_dotenv
+from src.services.utils.jwt_utils import generate_jwt
 
 
 class GithubAuthService:
@@ -20,11 +21,50 @@ class GithubAuthService:
             + "&code="
             + code
         )
-        headers = {"Accept": "application/json"}
+        headers = {
+            "Accept": "application/vnd.github+json",
+        }
         res = post(
             "https://github.com/login/oauth/access_token" + params, headers=headers
         )
+        print("[get_github_auth_token]", res.json())
         return res.json()
+    
+    # to refresh jwt
+
+    # used to trigger refresh
+    def check_github_app_installations(self, installation_id: str, jwt: str) -> bool:
+        headers = {
+            "Authorization": "Bearer " + jwt,
+            "Accept": "application/vnd.github+json",
+        }
+        res = get("https://api.github.com/app/installations", headers=headers)
+
+        login_tokens = set()
+        for row in res:
+            login_tokens.add(res)
+
+        return installation_id in login_tokens
+
+    # takes in installation ID 
+    def get_github_install_token(self, installation_id: str) -> Dict[str, Any]:
+        # installation ID is now Client ID
+        installation_token = generate_jwt()
+        headers = {
+            "Authorization": "Bearer " + installation_token,
+            "Accept": "application/vnd.github+json",
+        }
+
+        res = post(
+            f"https://api.github.com/app/installations/{installation_id}/access_tokens",
+            headers={
+                "Authorization": f"Bearer {installation_token}",
+                "Accept": "application/vnd.github.v3+json",
+                "X-GitHub-Api-Version": "2022-11-28",
+            },
+        )
+        # print("[get_github_install_token]", res.json())
+        return {"token": res.json()["token"], "bearer_token": installation_token}
 
     def get_github_user_info(self, authToken: str) -> Dict[str, Any] | None:
         # authorisation -> bearer token
