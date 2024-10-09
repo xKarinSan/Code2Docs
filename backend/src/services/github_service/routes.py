@@ -60,20 +60,41 @@ def get_user_installation(installation_id: str) -> dict[str, Any]:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/getUserInfo")
-def get_user_login(
-    Authorization: Annotated[str | None, Header()] = None
+@router.get("/repos/u/{username}")
+def get_user_repositories(
+    username: str,
+    Authorization: Annotated[str | None, Header()] = None,
+    page_num: int = 1,
 ) -> dict[str, Any]:
     try:
-        user_data = github_service.get_github_user_info(Authorization)
-        if "access_token" in user_data:
-            return
-        return user_data
+        get_repository_result = github_service.get_github_user_repos(
+            Authorization, username, page_num
+        )
+
+        return get_repository_result
 
     except HTTPException as he:
         # Re-raise HTTPExceptions as they already have status codes
         raise he
 
     except Exception as e:
-        print(e)
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# @router.get("/getUserInfo")
+# def get_user_login(
+#     Authorization: Annotated[str | None, Header()] = None
+# ) -> dict[str, Any]:
+#     try:
+#         user_data = github_service.get_github_user_info(Authorization)
+#         if "access_token" in user_data:
+#             return
+#         return user_data
+
+#     except HTTPException as he:
+#         # Re-raise HTTPExceptions as they already have status codes
+#         raise he
+
+#     except Exception as e:
+#         print(e)
+#         raise HTTPException(status_code=500, detail=str(e))

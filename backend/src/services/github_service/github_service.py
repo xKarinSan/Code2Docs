@@ -87,11 +87,11 @@ class GithubAuthService:
         res = get(
             f"https://api.github.com/search/repositories?q=user:{username}&page={page_num}"
         )
-        res = res.json()
         user_repos_res = {}
         if res.status_code != 200:
             user_repos_res["error"] = True
         else:
+            res = res.json()
             user_repos_res["error"] = False
             user_repos_res["repos"] = res["items"]
 
