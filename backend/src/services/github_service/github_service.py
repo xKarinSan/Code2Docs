@@ -29,8 +29,6 @@ class GithubAuthService:
         )
         print("[get_github_auth_token]", res.json())
         return res.json()
-    
-    # to refresh jwt
 
     # used to trigger refresh
     def check_github_app_installations(self, installation_id: str, jwt: str) -> bool:
@@ -46,7 +44,7 @@ class GithubAuthService:
 
         return installation_id in login_tokens
 
-    # takes in installation ID 
+    # takes in installation ID
     def get_github_install_token(self, installation_id: str) -> Dict[str, Any]:
         # installation ID is now Client ID
         installation_token = generate_jwt()
@@ -76,11 +74,28 @@ class GithubAuthService:
         else:
             user_info["error"] = False
             res = res.json()
-            print("[get_github_user_info]",res)
+            print("[get_github_user_info]", res)
             user_info["username"] = res["login"]
             user_info["displayName"] = res["name"]
             user_info["profilePicUrl"] = res["avatar_url"]
         return user_info
+
+    def get_github_user_repos(
+        self, authToken: str, username: str, page_num: int = 1
+    ) -> Dict[str, Any]:
+        headers = {"Authorization": "Bearer " + authToken}
+        res = get(
+            f"https://api.github.com/search/repositories?q=user:{username}&page={page_num}"
+        )
+        res = res.json()
+        user_repos_res = {}
+        if res.status_code != 200:
+            user_repos_res["error"] = True
+        else:
+            user_repos_res["error"] = False
+            user_repos_res["repos"] = res["items"]
+
+        return user_repos_res
 
 
 github_service = GithubAuthService()
