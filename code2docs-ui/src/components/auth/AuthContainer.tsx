@@ -1,5 +1,5 @@
 import { Button, Card, Heading, Link, Text } from "@chakra-ui/react";
-import { githubAuthURL } from "../../constants";
+import { githubAuthURL } from "../../global/constants";
 import { useNavigate } from "react-router-dom";
 function AuthContainer({ isLogin }: { isLogin: boolean }) {
     const navigate = useNavigate();

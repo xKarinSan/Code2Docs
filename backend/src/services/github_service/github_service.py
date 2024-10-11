@@ -27,7 +27,6 @@ class GithubAuthService:
         res = post(
             "https://github.com/login/oauth/access_token" + params, headers=headers
         )
-        print("[get_github_auth_token]", res.json())
         return res.json()
 
     # used to trigger refresh
@@ -48,11 +47,6 @@ class GithubAuthService:
     def get_github_install_token(self, installation_id: str) -> Dict[str, Any]:
         # installation ID is now Client ID
         installation_token = generate_jwt()
-        headers = {
-            "Authorization": "Bearer " + installation_token,
-            "Accept": "application/vnd.github+json",
-        }
-
         res = post(
             f"https://api.github.com/app/installations/{installation_id}/access_tokens",
             headers={
@@ -61,7 +55,6 @@ class GithubAuthService:
                 "X-GitHub-Api-Version": "2022-11-28",
             },
         )
-        # print("[get_github_install_token]", res.json())
         return {"token": res.json()["token"], "bearer_token": installation_token}
 
     def get_github_user_info(self, authToken: str) -> Dict[str, Any] | None:
@@ -74,7 +67,6 @@ class GithubAuthService:
         else:
             user_info["error"] = False
             res = res.json()
-            print("[get_github_user_info]", res)
             user_info["username"] = res["login"]
             user_info["displayName"] = res["name"]
             user_info["profilePicUrl"] = res["avatar_url"]
@@ -83,9 +75,14 @@ class GithubAuthService:
     def get_github_user_repos(
         self, authToken: str, username: str, page_num: int = 1
     ) -> Dict[str, Any]:
-        headers = {"Authorization": "Bearer " + authToken}
+        headers = {
+            "Authorization": authToken,
+            "Accept": "application/vnd.github.v3+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+        }
         res = get(
-            f"https://api.github.com/search/repositories?q=user:{username}&page={page_num}"
+            f"https://api.github.com/search/repositories?q=user:{username}&page={page_num}",
+            headers=headers,
         )
         user_repos_res = {}
         if res.status_code != 200:

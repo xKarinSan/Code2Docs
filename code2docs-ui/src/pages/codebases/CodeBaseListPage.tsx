@@ -2,22 +2,36 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useUserStore } from "../../store/userStore";
 
-import { getUserGithubRepoURL } from "../../constants";
+import { getUserGithubRepoURL } from "../../global/constants";
+import {
+    Card,
+    Heading,
+    TableContainer,
+    Table,
+    Thead,
+    Tbody,
+    Tr,
+    Th,
+    Td,
+} from "@chakra-ui/react";
 function CodeBaseListPage() {
     const githubUsername = useUserStore((state: any) => state.githubUsername);
-    const githubAppToken = useUserStore((state: any) => state.githubAppToken);
+    const githubAuthToken = useUserStore((state: any) => state.githubAuthToken);
 
     const [codebases, setCodebases] = useState([]);
-    const getUserRepos = async (pageNumber: number = 1) => {
+    const getUserRepos = async (pageNumber: number = 3) => {
         const config = {
             headers: {
-                Authorization: `Bearer ${githubAppToken}`,
+                Authorization: `Bearer ${githubAuthToken}`,
             },
         };
         console.log(`githubUsername ${githubUsername}`);
+        console.log(
+            `${getUserGithubRepoURL}${githubUsername}?page_num=${pageNumber}`
+        );
         await axios
             .get(
-                `${getUserGithubRepoURL}${githubUsername}?page_num=${pageNumber}`,
+                `${getUserGithubRepoURL}${githubUsername.toLowerCase()}?page_num=${pageNumber}`,
                 config
             )
             .then((res) => {
@@ -33,7 +47,46 @@ function CodeBaseListPage() {
     useEffect(() => {
         getUserRepos();
     }, []);
-    return <div>Codebases</div>;
+    return (
+        <div>
+            <Heading>Codebases</Heading>
+            <Card margin={5}>
+                <TableContainer>
+                    <Table variant="simple">
+                        <Thead>
+                            <Th>Codebase Name</Th>
+                            <Th> Link</Th>
+                        </Thead>
+                        {codebases ? (
+                            <>
+                                <Tbody>
+                                    {codebases.map((codebase) => {
+                                        const { name, private: isPrivate } =
+                                            codebase;
+                                        return (
+                                            <>
+                                                <Tr>
+                                                    <Td>
+                                                        {name}{" "}
+                                                        {isPrivate
+                                                            ? "Private"
+                                                            : "Public"}
+                                                    </Td>
+                                                    <Td></Td>
+                                                </Tr>
+                                            </>
+                                        );
+                                    })}
+                                </Tbody>
+                            </>
+                        ) : (
+                            <></>
+                        )}
+                    </Table>
+                </TableContainer>
+            </Card>
+        </div>
+    );
 }
 
 export default CodeBaseListPage;
