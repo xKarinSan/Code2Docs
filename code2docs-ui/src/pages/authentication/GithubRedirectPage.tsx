@@ -73,10 +73,6 @@ function GithubRedirectPage() {
                         setUsername(username);
                         setDisplayName(display_name);
                         setProfilePicUrl(profile_pic_url);
-                        // Cookies.set(
-                        //     "code2docs_github_auth_refresh_token",
-                        //     refresh_token
-                        // );
                         Cookies.set("code2docs_github_jwt", app_install_jwt);
                     })
                     .catch(() => {

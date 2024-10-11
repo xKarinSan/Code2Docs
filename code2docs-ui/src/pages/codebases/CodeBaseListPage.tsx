@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useUserStore } from "../../store/userStore";
-
+import { type GithubRepoLink } from "../../global/types";
 import { getUserGithubRepoURL } from "../../global/constants";
 import {
     Card,
@@ -13,12 +13,13 @@ import {
     Tr,
     Th,
     Td,
+    Link,
 } from "@chakra-ui/react";
 function CodeBaseListPage() {
     const githubUsername = useUserStore((state: any) => state.githubUsername);
     const githubAuthToken = useUserStore((state: any) => state.githubAuthToken);
 
-    const [codebases, setCodebases] = useState([]);
+    const [codebases, setCodebases] = useState<GithubRepoLink[]>();
     const getUserRepos = async (pageNumber: number = 3) => {
         const config = {
             headers: {
@@ -39,8 +40,18 @@ function CodeBaseListPage() {
             })
             .then((data) => {
                 const { repos } = data;
-                console.log(`Repos`, repos);
-                setCodebases(repos);
+                let githubRepos: GithubRepoLink[] = [];
+                repos.forEach((element: any) => {
+                    const { name, full_name, html_url, visibility } = element;
+                    githubRepos.push({
+                        displayName: name,
+                        fullRepoName: full_name,
+                        repoUrl: html_url,
+                        visibility,
+                    });
+                });
+                console.log("repos", repos);
+                setCodebases(githubRepos);
             });
     };
 
@@ -55,28 +66,44 @@ function CodeBaseListPage() {
                     <Table variant="simple">
                         <Thead>
                             <Th>Codebase Name</Th>
-                            <Th> Link</Th>
+                            <Th>Link</Th>
+                            <Th>Original URL</Th>
                         </Thead>
                         {codebases ? (
                             <>
                                 <Tbody>
-                                    {codebases.map((codebase) => {
-                                        const { name, private: isPrivate } =
-                                            codebase;
-                                        return (
-                                            <>
-                                                <Tr>
-                                                    <Td>
-                                                        {name}{" "}
-                                                        {isPrivate
-                                                            ? "Private"
-                                                            : "Public"}
-                                                    </Td>
-                                                    <Td></Td>
-                                                </Tr>
-                                            </>
-                                        );
-                                    })}
+                                    {codebases.map(
+                                        (codebase: GithubRepoLink) => {
+                                            const {
+                                                displayName,
+                                                visibility,
+                                                repoUrl,
+                                                fullRepoName,
+                                            } = codebase;
+                                            return (
+                                                <>
+                                                    <Tr>
+                                                        <Td>
+                                                            {displayName}{" "}
+                                                            {visibility ==
+                                                            "private"
+                                                                ? "Private"
+                                                                : "Public"}
+                                                        </Td>
+                                                        <Td>{fullRepoName}</Td>
+                                                        <Td>
+                                                            <Link
+                                                                href={repoUrl}
+                                                                target="_blank"
+                                                            >
+                                                                Original Repo
+                                                            </Link>
+                                                        </Td>
+                                                    </Tr>
+                                                </>
+                                            );
+                                        }
+                                    )}
                                 </Tbody>
                             </>
                         ) : (
