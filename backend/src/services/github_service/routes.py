@@ -26,7 +26,6 @@ def get_user_login(code: str, response: Response) -> dict[str, Any]:
             user_info = github_service.get_github_user_info(
                 get_token_result["access_token"]
             )
-            print("user_info", user_info)
 
             return {
                 "username": user_info["username"],

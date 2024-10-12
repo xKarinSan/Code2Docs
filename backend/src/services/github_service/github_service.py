@@ -76,7 +76,7 @@ class GithubAuthService:
         self, authToken: str, username: str, page_num: int = 1, per_page: int = 30
     ) -> Dict[str, Any]:
         try:
-            if per_page < 30:
+            if per_page < 1:
                 per_page = 30
             if per_page > 100:
                 per_page = 100
@@ -104,7 +104,6 @@ class GithubAuthService:
 
             return user_repos_res
         except Exception as e:
-            print(str(e))
             user_repos_res["error"] = True
             return user_repos_res
 

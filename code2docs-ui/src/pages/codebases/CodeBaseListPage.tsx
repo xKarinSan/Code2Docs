@@ -4,6 +4,7 @@ import { useUserStore } from "../../store/userStore";
 import { type GithubRepoLink } from "../../global/types";
 import { getUserGithubRepoURL } from "../../global/constants";
 import {
+    Badge,
     ButtonGroup,
     IconButton,
     Card,
@@ -24,9 +25,14 @@ import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
 function CodeBaseListPage() {
     const githubUsername = useUserStore((state: any) => state.githubUsername);
     const githubAuthToken = useUserStore((state: any) => state.githubAuthToken);
+
     const [codebases, setCodebases] = useState<GithubRepoLink[]>();
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const [pageNumber, setPageNumber] = useState<number>(1);
+    const [pageCount, setPageCount] = useState<number>(0);
+
     const getUserRepos = async () => {
+        setIsLoading(true);
         const config = {
             headers: {
                 Authorization: `Bearer ${githubAuthToken}`,
@@ -34,14 +40,15 @@ function CodeBaseListPage() {
         };
         await axios
             .get(
-                `${getUserGithubRepoURL}${githubUsername.toLowerCase()}?page_num=${pageNumber}`,
+                `${getUserGithubRepoURL}${githubUsername.toLowerCase()}?page_num=${pageNumber}&per_page=30`,
                 config
             )
             .then((res) => {
                 return res.data;
             })
-            .then((data) => {
-                const { repos } = data;
+            .then((data: any) => {
+                const { repos, pages_count } = data;
+                setPageCount(pages_count);
                 let githubRepos: GithubRepoLink[] = [];
                 repos.forEach((element: any) => {
                     const { name, full_name, html_url, visibility } = element;
@@ -53,11 +60,12 @@ function CodeBaseListPage() {
                     });
                 });
                 setCodebases(githubRepos);
+                setIsLoading(false);
             });
     };
 
     const goToNextPage = () => {
-        setPageNumber(pageNumber + 1);
+        setPageNumber(pageNumber + 1 > pageCount ? pageCount : pageNumber + 1);
     };
     const goToPreviousPage = () => {
         setPageNumber(pageNumber - 1 < 1 ? 1 : pageNumber - 1);
@@ -76,7 +84,7 @@ function CodeBaseListPage() {
                             <Th>Link</Th>
                             <Th>Original URL</Th>
                         </Thead>
-                        {codebases ? (
+                        {!isLoading && codebases ? (
                             <>
                                 <Tbody>
                                     {codebases.map(
@@ -90,12 +98,21 @@ function CodeBaseListPage() {
                                             return (
                                                 <>
                                                     <Tr>
-                                                        <Td>
+                                                        <Td textAlign={"left"}>
                                                             {displayName}{" "}
-                                                            {visibility ==
-                                                            "private"
-                                                                ? "Private"
-                                                                : "Public"}
+                                                            <Badge
+                                                                colorScheme={
+                                                                    visibility ==
+                                                                    "private"
+                                                                        ? "red"
+                                                                        : "green"
+                                                                }
+                                                            >
+                                                                {visibility ==
+                                                                "private"
+                                                                    ? "Private"
+                                                                    : "Public"}
+                                                            </Badge>
                                                         </Td>
                                                         <Td>{fullRepoName}</Td>
                                                         <Td>
@@ -114,14 +131,35 @@ function CodeBaseListPage() {
                                 </Tbody>
                             </>
                         ) : (
-                            <></>
+                            <>
+                                <Tbody>
+                                    {isLoading ? (
+                                        <Tr>
+                                            <Td colSpan={3}>
+                                                <Card
+                                                    margin="5px auto"
+                                                    padding="25px"
+                                                    textAlign={"center"}
+                                                >
+                                                    Loading ...
+                                                </Card>
+                                            </Td>
+                                        </Tr>
+                                    ) : (
+                                        <></>
+                                    )}
+                                </Tbody>
+                            </>
                         )}
                     </Table>
                 </TableContainer>
-                <Stack direction="column" margin="auto">
+
+                <Stack direction="column" margin="5px auto">
                     <ButtonGroup>
                         <IconButton
-                            colorScheme="teal"
+                            background={"black"}
+                            color={"white"}
+                            isDisabled={pageNumber == 1}
                             aria-label="Previous Page"
                             size="lg"
                             icon={<FaAngleLeft />}
@@ -131,7 +169,9 @@ function CodeBaseListPage() {
                             {pageNumber}
                         </Text>
                         <IconButton
-                            colorScheme="teal"
+                            background={"black"}
+                            color={"white"}
+                            isDisabled={pageNumber == pageCount}
                             aria-label="Next Page"
                             size="lg"
                             icon={<FaAngleRight />}

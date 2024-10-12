@@ -11,12 +11,6 @@ app = FastAPI()
 def healthcheck():
     return {"message": "Hello World"}
 
-@app.middleware("http")
-async def test_middleware(request: Request, call_next):
-    print("i'm  triggered")
-    response = await call_next(request)
-    return response
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
