@@ -4,8 +4,11 @@ import { useUserStore } from "../../store/userStore";
 import { type GithubRepoLink } from "../../global/types";
 import { getUserGithubRepoURL } from "../../global/constants";
 import {
+    ButtonGroup,
+    IconButton,
     Card,
     Heading,
+    Stack,
     TableContainer,
     Table,
     Thead,
@@ -14,22 +17,21 @@ import {
     Th,
     Td,
     Link,
+    Text,
 } from "@chakra-ui/react";
+import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
+
 function CodeBaseListPage() {
     const githubUsername = useUserStore((state: any) => state.githubUsername);
     const githubAuthToken = useUserStore((state: any) => state.githubAuthToken);
-
     const [codebases, setCodebases] = useState<GithubRepoLink[]>();
-    const getUserRepos = async (pageNumber: number = 3) => {
+    const [pageNumber, setPageNumber] = useState<number>(1);
+    const getUserRepos = async () => {
         const config = {
             headers: {
                 Authorization: `Bearer ${githubAuthToken}`,
             },
         };
-        console.log(`githubUsername ${githubUsername}`);
-        console.log(
-            `${getUserGithubRepoURL}${githubUsername}?page_num=${pageNumber}`
-        );
         await axios
             .get(
                 `${getUserGithubRepoURL}${githubUsername.toLowerCase()}?page_num=${pageNumber}`,
@@ -50,14 +52,19 @@ function CodeBaseListPage() {
                         visibility,
                     });
                 });
-                console.log("repos", repos);
                 setCodebases(githubRepos);
             });
     };
 
+    const goToNextPage = () => {
+        setPageNumber(pageNumber + 1);
+    };
+    const goToPreviousPage = () => {
+        setPageNumber(pageNumber - 1 < 1 ? 1 : pageNumber - 1);
+    };
     useEffect(() => {
         getUserRepos();
-    }, []);
+    }, [pageNumber]);
     return (
         <div>
             <Heading>Codebases</Heading>
@@ -111,6 +118,27 @@ function CodeBaseListPage() {
                         )}
                     </Table>
                 </TableContainer>
+                <Stack direction="column" margin="auto">
+                    <ButtonGroup>
+                        <IconButton
+                            colorScheme="teal"
+                            aria-label="Previous Page"
+                            size="lg"
+                            icon={<FaAngleLeft />}
+                            onClick={goToPreviousPage}
+                        />
+                        <Text margin="auto" width="50px" textAlign={"center"}>
+                            {pageNumber}
+                        </Text>
+                        <IconButton
+                            colorScheme="teal"
+                            aria-label="Next Page"
+                            size="lg"
+                            icon={<FaAngleRight />}
+                            onClick={goToNextPage}
+                        />
+                    </ButtonGroup>
+                </Stack>
             </Card>
         </div>
     );

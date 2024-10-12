@@ -65,16 +65,15 @@ def get_user_repositories(
     username: str,
     Authorization: Annotated[str | None, Header()] = None,
     page_num: int = 1,
+    per_page: int = 30,
 ) -> dict[str, Any]:
     try:
         get_repository_result = github_service.get_github_user_repos(
-            Authorization, username, page_num
+            Authorization, username, page_num, per_page
         )
-
         return get_repository_result
 
     except HTTPException as he:
-        # Re-raise HTTPExceptions as they already have status codes
         raise he
 
     except Exception as e:

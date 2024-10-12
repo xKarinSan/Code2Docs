@@ -73,26 +73,40 @@ class GithubAuthService:
         return user_info
 
     def get_github_user_repos(
-        self, authToken: str, username: str, page_num: int = 1
+        self, authToken: str, username: str, page_num: int = 1, per_page: int = 30
     ) -> Dict[str, Any]:
-        headers = {
-            "Authorization": authToken,
-            "Accept": "application/vnd.github.v3+json",
-            "X-GitHub-Api-Version": "2022-11-28",
-        }
-        res = get(
-            f"https://api.github.com/search/repositories?q=user:{username}&page={page_num}",
-            headers=headers,
-        )
-        user_repos_res = {}
-        if res.status_code != 200:
-            user_repos_res["error"] = True
-        else:
-            res = res.json()
-            user_repos_res["error"] = False
-            user_repos_res["repos"] = res["items"]
+        try:
+            if per_page < 30:
+                per_page = 30
+            if per_page > 100:
+                per_page = 100
+            headers = {
+                "Authorization": authToken,
+                "Accept": "application/vnd.github.v3+json",
+                "X-GitHub-Api-Version": "2022-11-28",
+            }
+            res = get(
+                f"https://api.github.com/search/repositories?q=user:{username}&page={page_num}&per_page={per_page}",
+                headers=headers,
+            )
+            user_repos_res = {}
+            if res.status_code != 200:
+                user_repos_res["error"] = True
+            else:
+                res = res.json()
+                extra_page = 1 if res["total_count"] % page_num != 0 else 0
 
-        return user_repos_res
+                user_repos_res["error"] = False
+                user_repos_res["repos"] = res["items"]
+                user_repos_res["pages_count"] = (
+                    res["total_count"] // per_page
+                ) + extra_page
+
+            return user_repos_res
+        except Exception as e:
+            print(str(e))
+            user_repos_res["error"] = True
+            return user_repos_res
 
 
 github_service = GithubAuthService()
