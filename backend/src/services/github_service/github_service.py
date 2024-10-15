@@ -6,9 +6,8 @@ from dotenv import load_dotenv, find_dotenv
 from src.services.utils.jwt_utils import generate_jwt
 
 
-class GithubAuthService:
+class GithubService:
     def __init__(self):
-        _ = load_dotenv(find_dotenv())
         self.github_client_id = os.environ["GITHUB_CLIENT_ID"]
         self.github_client_secret = os.environ["GITHUB_CLIENT_SECRET"]
 
@@ -107,5 +106,5 @@ class GithubAuthService:
             user_repos_res["error"] = True
             return user_repos_res
 
-
-github_service = GithubAuthService()
+load_dotenv(find_dotenv())
+github_service = GithubService()
