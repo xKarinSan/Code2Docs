@@ -7,11 +7,13 @@ const githubAppInstallURL = `https://github.com/apps/${
 // backend URLs
 const backendURL = import.meta.env.VITE_API_URL;
 const getGithubTokenURL = backendURL + "/gh/login/?code=";
+const getGithubInstallationCheck = backendURL +"/gh/install/check/"
 const getGithubAppTokenURL = backendURL + "/gh/install/?installation_id=";
 const getUserGithubRepoURL = backendURL + "/gh/repos/u/";
 
 export {
     githubAuthURL,
+    getGithubInstallationCheck,
     getGithubTokenURL,
     githubAppInstallURL,
     getGithubAppTokenURL,

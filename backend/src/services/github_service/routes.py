@@ -17,6 +17,7 @@ def health():
 @router.get("/login/")
 def get_user_login(code: str, response: Response) -> dict[str, Any]:
     try:
+        print("[GET] /login/")
         get_token_result = github_service.get_github_auth_token(code)
         response.set_cookie(
             key="code2docs_auth_refresh_token", value=get_token_result["refresh_token"]
@@ -47,8 +48,9 @@ def get_user_login(code: str, response: Response) -> dict[str, Any]:
 @router.get("/install/")
 def get_user_installation(installation_id: str) -> dict[str, Any]:
     try:
-
+        print("[GET] /install/")
         get_token_result = github_service.get_github_install_token(installation_id)
+        print("get_token_result", get_token_result)
         return {"token": get_token_result["token"]}
 
     except HTTPException as he:
@@ -56,21 +58,24 @@ def get_user_installation(installation_id: str) -> dict[str, Any]:
         raise he
 
     except Exception as e:
+        print(e)
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/install/check/{username}")
 def get_user_installation(username: str) -> dict[str, Any]:
     try:
+        print("[GET] /install/check/{username}")
         get_installation_result = github_service.get_github_install_status(username)
-        return {"installed": get_installation_result}
+        return {"installation_id": get_installation_result}
 
     except HTTPException as he:
         # Re-raise HTTPExceptions as they already have status codes
         raise he
 
     except Exception as e:
-        return {"installed": False}
+        print(e)
+        return {"installation_id": None}
 
 
 @router.get("/repos/u/{username}")

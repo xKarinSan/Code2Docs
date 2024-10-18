@@ -5,6 +5,7 @@ import axios from "axios";
 import { useEffect } from "react";
 import {
     githubAppInstallURL,
+    getGithubInstallationCheck,
     getGithubTokenURL,
     getGithubAppTokenURL,
 } from "../../global/constants.ts";
@@ -28,6 +29,7 @@ function GithubRedirectPage() {
     );
     // username (unique)
     const setUsername = useUserStore((state: any) => state.setGithubUsername);
+    const username = useUserStore((state: any) => state.githubUsername);
     // profile pic url
     const setProfilePicUrl = useUserStore(
         (state: any) => state.setGithubProfilePicUrl
@@ -35,6 +37,13 @@ function GithubRedirectPage() {
     // displayname
     const setDisplayName = useUserStore(
         (state: any) => state.setGithubDisplayName
+    );
+
+    const setInstallationId = useUserStore(
+        (state: any) => state.setGithubInstallationId
+    );
+    const installationId = useUserStore(
+        (state: any) => state.githubInstallationId
     );
 
     useEffect(() => {
@@ -51,6 +60,9 @@ function GithubRedirectPage() {
             // user token
             navigate("/home");
         }
+        if (installationIdParam) {
+            setInstallationId(installationIdParam);
+        }
 
         if (codeParam && !currentUserAuthToken) {
             const authenticateUser = async () => {
@@ -62,18 +74,14 @@ function GithubRedirectPage() {
                     .then((data) => {
                         const {
                             access_token,
-                            refresh_token,
-                            app_install_jwt,
                             username,
                             display_name,
                             profile_pic_url,
                         } = data;
-                        console.log("data", data);
                         setUserAuthToken(access_token);
                         setUsername(username);
                         setDisplayName(display_name);
                         setProfilePicUrl(profile_pic_url);
-                        Cookies.set("code2docs_github_jwt", app_install_jwt);
                     })
                     .catch(() => {
                         navigate("/error");
@@ -81,13 +89,29 @@ function GithubRedirectPage() {
             };
             authenticateUser();
         }
-        if (!currentUserAppToken) {
-            window.location.assign(githubAppInstallURL);
+        if (!installationId || installationId == -1) {
+            const confirmInstall = async () => {
+                await axios
+                    .get(getGithubInstallationCheck + username)
+                    .then((res) => {
+                        return res.data;
+                    })
+                    .then((data) => {
+                        const { installation_id } = data;
+                        if (installation_id == -1) {
+                            window.location.assign(githubAppInstallURL);
+                        } else {
+                            setInstallationId(installation_id);
+                        }
+                    });
+            };
+            confirmInstall();
         }
-        if (installationIdParam && !currentUserAppToken) {
+
+        if (installationId != -1) {
             const getAppAccessToken = async () => {
                 await axios
-                    .get(getGithubAppTokenURL + installationIdParam)
+                    .get(getGithubAppTokenURL + installationId)
                     .then((res) => {
                         return res.data;
                     })

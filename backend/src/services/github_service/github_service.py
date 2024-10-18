@@ -44,8 +44,11 @@ class GithubService:
 
     # takes in installation ID
     def get_github_install_token(self, installation_id: str) -> Dict[str, Any]:
+        print("installation_id",installation_id)
         # installation ID is now Client ID
         generated_jwt = generate_jwt()
+        print("generated_jwt",generated_jwt)
+
         res = post(
             f"https://api.github.com/app/installations/{installation_id}/access_tokens",
             headers={
@@ -54,9 +57,11 @@ class GithubService:
                 "X-GitHub-Api-Version": "2022-11-28",
             },
         )
-        return {"token": res.json()["token"], "bearer_token": generated_jwt}
+        res = res.json()
+        print(res)
+        return {"token": res["token"], "bearer_token": generated_jwt}
 
-    def get_github_install_status(self, username: str) -> bool:
+    def get_github_install_status(self, username: str) -> int:
         if not username:
             return False
         # call the API endpoint:  https://api.github.com/users/{username}/installation
@@ -72,10 +77,11 @@ class GithubService:
             },
         )
         res = res.json()
-        download_users = set()
+        download_users = {}
         for installation in res:
-            download_users.add(installation["account"]["login"])
-        return username in download_users
+            download_users[installation["account"]["login"]] = installation["id"]
+
+        return download_users[username] if username in download_users else -1
 
     def get_github_user_info(self, authToken: str) -> Dict[str, Any] | None:
         # authorisation -> bearer token

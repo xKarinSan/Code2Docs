@@ -6,9 +6,10 @@ export const useUserStore = create(
         (set) => ({
             githubAuthToken: "",
             githubAppToken: "",
-            githubUsername:"",
-            githubProfilePictureUrl:"",
-            githubDisplayName:"",
+            githubInstallationId: -1,
+            githubUsername: "",
+            githubProfilePictureUrl: "",
+            githubDisplayName: "",
 
             setGithubAuthToken: (token: string) =>
                 set({ githubAuthToken: token }),
@@ -16,14 +17,19 @@ export const useUserStore = create(
             setGithubAppToken: (token: string) =>
                 set({ githubAppToken: token }),
             removeGithubAppToken: () => set({ githubAppToken: "" }),
-            
+
+            setGithubInstallationId: (installation_id: number) =>
+                set({ githubInstallationId: installation_id }),
+            removeGithubInstallationId: () => set({ githubInstallationId: "" }),
+
             setGithubUsername: (username: string) =>
                 set({ githubUsername: username }),
             removeGithubUsername: () => set({ githubUsername: "" }),
 
             setGithubProfilePicUrl: (profilePicUrl: string) =>
                 set({ githubProfilePictureUrl: profilePicUrl }),
-            removeGithubProfilePicUrl: () => set({ githubProfilePictureUrl: "" }),
+            removeGithubProfilePicUrl: () =>
+                set({ githubProfilePictureUrl: "" }),
 
             setGithubDisplayName: (displayName: string) =>
                 set({ githubDisplayName: displayName }),
