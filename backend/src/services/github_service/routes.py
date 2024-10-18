@@ -59,6 +59,20 @@ def get_user_installation(installation_id: str) -> dict[str, Any]:
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.get("/install/check/{username}")
+def get_user_installation(username: str) -> dict[str, Any]:
+    try:
+        get_installation_result = github_service.get_github_install_status(username)
+        return {"installed": get_installation_result}
+
+    except HTTPException as he:
+        # Re-raise HTTPExceptions as they already have status codes
+        raise he
+
+    except Exception as e:
+        return {"installed": False}
+
+
 @router.get("/repos/u/{username}")
 def get_user_repositories(
     username: str,

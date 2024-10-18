@@ -29,7 +29,7 @@ class GithubService:
         return res.json()
 
     # used to trigger refresh
-    def check_github_app_installations(self, installation_id: str, jwt: str) -> bool:
+    def check_github_app_installations(self, jwt: str) -> bool:
         headers = {
             "Authorization": "Bearer " + jwt,
             "Accept": "application/vnd.github+json",
@@ -45,16 +45,37 @@ class GithubService:
     # takes in installation ID
     def get_github_install_token(self, installation_id: str) -> Dict[str, Any]:
         # installation ID is now Client ID
-        installation_token = generate_jwt()
+        generated_jwt = generate_jwt()
         res = post(
             f"https://api.github.com/app/installations/{installation_id}/access_tokens",
             headers={
-                "Authorization": f"Bearer {installation_token}",
+                "Authorization": f"Bearer {generated_jwt}",
                 "Accept": "application/vnd.github.v3+json",
                 "X-GitHub-Api-Version": "2022-11-28",
             },
         )
-        return {"token": res.json()["token"], "bearer_token": installation_token}
+        return {"token": res.json()["token"], "bearer_token": generated_jwt}
+
+    def get_github_install_status(self, username: str) -> bool:
+        if not username:
+            return False
+        # call the API endpoint:  https://api.github.com/users/{username}/installation
+        # just add the jwt as the bearer token
+        generated_jwt = generate_jwt()
+
+        res = get(
+            f"https://api.github.com/app/installations",
+            headers={
+                "Authorization": f"Bearer {generated_jwt}",
+                "Accept": "application/vnd.github.v3+json",
+                "X-GitHub-Api-Version": "2022-11-28",
+            },
+        )
+        res = res.json()
+        download_users = set()
+        for installation in res:
+            download_users.add(installation["account"]["login"])
+        return username in download_users
 
     def get_github_user_info(self, authToken: str) -> Dict[str, Any] | None:
         # authorisation -> bearer token
@@ -105,6 +126,7 @@ class GithubService:
         except Exception as e:
             user_repos_res["error"] = True
             return user_repos_res
+
 
 load_dotenv(find_dotenv())
 github_service = GithubService()
