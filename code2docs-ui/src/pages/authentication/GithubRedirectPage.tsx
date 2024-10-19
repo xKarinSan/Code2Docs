@@ -1,13 +1,10 @@
 import { useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
-
 import axios from "axios";
 import { useEffect } from "react";
 import {
     githubAppInstallURL,
     getGithubInstallationCheck,
     getGithubTokenURL,
-    getGithubAppTokenURL,
 } from "../../global/constants.ts";
 import { useUserStore } from "../../store/userStore.ts";
 
@@ -102,31 +99,14 @@ function GithubRedirectPage() {
                             window.location.assign(githubAppInstallURL);
                         } else {
                             setInstallationId(installation_id);
+                            navigate("/home");
                         }
                     });
             };
             confirmInstall();
         }
-
         if (installationId != -1) {
-            const getAppAccessToken = async () => {
-                await axios
-                    .get(getGithubAppTokenURL + installationId)
-                    .then((res) => {
-                        return res.data;
-                    })
-                    .then((data) => {
-                        console.log("data:", data);
-                        if (data.token) {
-                            setUserAppToken(data.token);
-                            navigate("/home");
-                        }
-                    })
-                    .catch(() => {
-                        navigate("/error");
-                    });
-            };
-            getAppAccessToken();
+            navigate("/home");
         }
     }, []);
     return <div></div>;
