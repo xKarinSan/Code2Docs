@@ -19,9 +19,6 @@ def get_user_login(code: str, response: Response) -> dict[str, Any]:
     try:
         print("[GET] /login/")
         get_token_result = github_service.get_github_auth_token(code)
-        response.set_cookie(
-            key="code2docs_auth_refresh_token", value=get_token_result["refresh_token"]
-        )
         if "access_token" in get_token_result and "refresh_token" in get_token_result:
             jwt = generate_jwt()
             user_info = github_service.get_github_user_info(
@@ -96,22 +93,3 @@ def get_user_repositories(
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
-
-# @router.get("/getUserInfo")
-# def get_user_login(
-#     Authorization: Annotated[str | None, Header()] = None
-# ) -> dict[str, Any]:
-#     try:
-#         user_data = github_service.get_github_user_info(Authorization)
-#         if "access_token" in user_data:
-#             return
-#         return user_data
-
-#     except HTTPException as he:
-#         # Re-raise HTTPExceptions as they already have status codes
-#         raise he
-
-#     except Exception as e:
-#         print(e)
-#         raise HTTPException(status_code=500, detail=str(e))
