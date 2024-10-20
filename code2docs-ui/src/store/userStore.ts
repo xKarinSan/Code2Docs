@@ -5,7 +5,6 @@ export const useUserStore = create(
     persist(
         (set) => ({
             githubAuthToken: "",
-            githubAppToken: "",
             githubInstallationId: -1,
             githubUsername: "",
             githubProfilePictureUrl: "",
@@ -14,13 +13,10 @@ export const useUserStore = create(
             setGithubAuthToken: (token: string) =>
                 set({ githubAuthToken: token }),
             removeGithubAuthToken: () => set({ githubAuthToken: "" }),
-            setGithubAppToken: (token: string) =>
-                set({ githubAppToken: token }),
-            removeGithubAppToken: () => set({ githubAppToken: "" }),
 
             setGithubInstallationId: (installation_id: number) =>
                 set({ githubInstallationId: installation_id }),
-            removeGithubInstallationId: () => set({ githubInstallationId: "" }),
+            removeGithubInstallationId: () => set({ githubInstallationId: -1 }),
 
             setGithubUsername: (username: string) =>
                 set({ githubUsername: username }),

@@ -6,12 +6,24 @@ export default function LogoutPage() {
     const removeUserToken = useUserStore(
         (state: any) => state.removeGithubAuthToken
     );
-    const removeUserAppToken = useUserStore(
-        (state: any) => state.removeGithubAppToken
+    const removeInstallationId = useUserStore(
+        (state: any) => state.removeGithubInstallationId
+    );
+    const removeUsername = useUserStore(
+        (state: any) => state.removeGithubUsername
+    );
+    const removeProfielPic = useUserStore(
+        (state: any) => state.removeGithubProfilePicUrl
+    );
+    const removeDisplayName = useUserStore(
+        (state: any) => state.removeGithubDisplayName
     );
     const logoutUser = () => {
         removeUserToken();
-        // removeUserAppToken();
+        removeInstallationId();
+        removeUsername();
+        removeProfielPic();
+        removeDisplayName();
         navigate("/login");
     };
     useEffect(() => {

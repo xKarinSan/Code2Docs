@@ -17,13 +17,6 @@ function GithubRedirectPage() {
     const setUserAuthToken = useUserStore(
         (state: any) => state.setGithubAuthToken
     );
-    // app token
-    const currentUserAppToken = useUserStore(
-        (state: any) => state.githubAppToken
-    );
-    const setUserAppToken = useUserStore(
-        (state: any) => state.setGithubAppToken
-    );
     // username (unique)
     const setUsername = useUserStore((state: any) => state.setGithubUsername);
     const username = useUserStore((state: any) => state.githubUsername);
@@ -53,7 +46,7 @@ function GithubRedirectPage() {
         if (errorParam) {
             navigate("/error");
         }
-        if (currentUserAppToken && currentUserAuthToken) {
+        if (currentUserAuthToken) {
             // user token
             navigate("/home");
         }
