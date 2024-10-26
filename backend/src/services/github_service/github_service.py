@@ -26,7 +26,8 @@ class GithubService:
         res = post(
             "https://github.com/login/oauth/access_token" + params, headers=headers
         )
-        return res.json()
+        res = res.json()
+        return res
 
     # used to trigger refresh
     def check_github_app_installations(self, jwt: str) -> bool:
