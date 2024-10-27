@@ -83,12 +83,34 @@ function IndividualCodebasePage() {
                     if (reader) {
                         const { done, value } = await reader.read();
                         if (done) break;
-                        console.log(value);
+                        // console.log(value);
                         dataArr.push(value);
                     }
                 }
+                // turn it into zip
+                const zip = new JSZip();
+                const blob = new Blob(dataArr);
+                
+                // Load the generated zip file
+                const contents = await zip.loadAsync(blob);
+                const extractedFiles = [];
+                for (const [filename, fileData] of Object.entries(
+                    contents.files
+                )) {
+                    console.log("filename", filename);
+                    if (!fileData.dir) {
+                        const content = await fileData.async("binarystring");
+                        extractedFiles.push({ filename, content });
+                    }
+                }
+                const tree = buildFileTree(extractedFiles);
+                setFileTree(tree);
+                toast({
+                    title: "Codebase uploaded!",
+                    status: "success",
+                });
+                setIsLoading(false);
             });
-            setIsLoading(false);
         } catch (e) {
             toast({
                 title: "Loading failed.",
