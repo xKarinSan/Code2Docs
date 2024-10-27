@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Header, status, Response
-from fastapi.responses import RedirectResponse, JSONResponse
+from fastapi.responses import RedirectResponse, JSONResponse, StreamingResponse
 
 from typing import Annotated, Any
 
@@ -87,6 +87,29 @@ def get_user_repositories(
             Authorization, username, page_num, per_page
         )
         return get_repository_result
+
+    except HTTPException as he:
+        raise he
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/repos/zip/{username}/{reponame}")
+def get_zipped_user_repo(
+    username: str,
+    reponame: str,
+    Authorization: Annotated[str | None, Header()] = None,
+) -> StreamingResponse:
+    try:
+        get_streamed_repo = github_service.get_user_repo_in_zip(
+            Authorization, username, reponame
+        )
+        return StreamingResponse(
+            get_streamed_repo,
+            media_type="application/zip",
+            headers={"Content-Disposition": f'attachment; filename="{reponame}.zip"'},
+        )
 
     except HTTPException as he:
         raise he

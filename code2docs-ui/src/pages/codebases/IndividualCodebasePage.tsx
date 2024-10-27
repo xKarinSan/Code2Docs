@@ -24,6 +24,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { FileNode, buildFileTree } from "../../helpers/FileNode";
 import { FileTree } from "../../components/documentation/FileTree";
+import { useUserStore } from "../../store/userStore";
 
 import Lottie from "lottie-react";
 import writing from "../../assets/writing.json";
@@ -34,9 +35,14 @@ import { FaPencilAlt } from "react-icons/fa";
 
 import imageUploadImg from "../../assets/image-upload-concept-landing-page.png";
 import selectFileImg from "../../assets/search-concept-yellow-folder-magnifier-icons-hand-drawn-cartoon-art-illustration.png";
+import { getUserGithubRepoZippedURL } from "../../global/constants";
 
 function IndividualCodebasePage() {
+    const githubAuthToken = useUserStore((state: any) => state.githubAuthToken);
+
     const codebaseInfo = useParams();
+    const [repoName, setRepoName] = useState<string | undefined>("");
+
     const [isLoading, setIsLoading] = useState(false);
 
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -53,17 +59,42 @@ function IndividualCodebasePage() {
     const [currentReadDirectory, setCurrentReadDirectory] =
         useState<FileNode | null>(null);
 
-    const loadCodebaseContents = () => {
+    const loadCodebaseContents = async () => {
         try {
             const { username, repository } = codebaseInfo;
-            console.log("username",username)
-            console.log("repository",repository)
-
+            setRepoName(repository);
+            await fetch(
+                `${getUserGithubRepoZippedURL}${username}/${repository}`,
+                {
+                    headers: {
+                        authorization: `Bearer ${githubAuthToken}`,
+                    },
+                }
+            ).then(async (res) => {
+                if (!res.ok) {
+                    toast({
+                        title: "Loading failed.",
+                        status: "error",
+                    });
+                }
+                const reader = res.body?.getReader();
+                const dataArr: Uint8Array[] = [];
+                while (true) {
+                    if (reader) {
+                        const { done, value } = await reader.read();
+                        if (done) break;
+                        console.log(value);
+                        dataArr.push(value);
+                    }
+                }
+            });
+            setIsLoading(false);
         } catch (e) {
             toast({
                 title: "Loading failed.",
                 status: "error",
             });
+            setIsLoading(false);
         }
     };
     useEffect(() => {
@@ -77,7 +108,7 @@ function IndividualCodebasePage() {
     return (
         <Box margin="auto" overflow={"scroll"}>
             <Heading margin={5} textAlign={"center"}>
-                Individual codebase page
+                {repoName}
             </Heading>
             <Grid
                 gridTemplateColumns={"49% 49%"}

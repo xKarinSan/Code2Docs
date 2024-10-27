@@ -45,10 +45,10 @@ class GithubService:
 
     # takes in installation ID
     def get_github_install_token(self, installation_id: str) -> Dict[str, Any]:
-        print("installation_id",installation_id)
+        print("installation_id", installation_id)
         # installation ID is now Client ID
         generated_jwt = generate_jwt()
-        print("generated_jwt",generated_jwt)
+        print("generated_jwt", generated_jwt)
 
         res = post(
             f"https://api.github.com/app/installations/{installation_id}/access_tokens",
@@ -59,7 +59,6 @@ class GithubService:
             },
         )
         res = res.json()
-        print(res)
         return {"token": res["token"], "bearer_token": generated_jwt}
 
     def get_github_install_status(self, username: str) -> int:
@@ -84,6 +83,10 @@ class GithubService:
 
         return download_users[username] if username in download_users else -1
 
+    """
+    Gets the basic info of an authenticated user
+    """
+
     def get_github_user_info(self, authToken: str) -> Dict[str, Any] | None:
         # authorisation -> bearer token
         headers = {"Authorization": "Bearer " + authToken}
@@ -98,6 +101,10 @@ class GithubService:
             user_info["displayName"] = res["name"]
             user_info["profilePicUrl"] = res["avatar_url"]
         return user_info
+
+    """
+    Gets the repos of an authenticated user
+    """
 
     def get_github_user_repos(
         self, authToken: str, username: str, page_num: int = 1, per_page: int = 30
@@ -133,6 +140,22 @@ class GithubService:
         except Exception as e:
             user_repos_res["error"] = True
             return user_repos_res
+
+    def get_user_repo_in_zip(self, authToken: str, username: str, reponame: str):
+        headers = {
+            "Authorization": authToken,
+            "Accept": "application/vnd.github.v3+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+        }
+        res = get(
+            f"https://api.github.com/repos/{username}/{reponame}/zipball",
+            headers=headers,
+            stream=True,
+        )
+        res.headers["Content-Type"] = "application/zip"
+        res.headers["Content-Disposition"] = f"attachment; filename=${reponame}.zip"
+
+        return res
 
 
 load_dotenv(find_dotenv())
