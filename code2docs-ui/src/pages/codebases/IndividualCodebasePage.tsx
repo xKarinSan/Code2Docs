@@ -1,36 +1,25 @@
 import {
-    ButtonGroup,
     Card,
     Heading,
-    Input,
     Box,
     Grid,
     GridItem,
     Button,
     useToast,
-    Modal,
-    ModalOverlay,
-    ModalContent,
-    ModalHeader,
-    ModalBody,
-    useDisclosure,
+    Breadcrumb,
+    BreadcrumbItem,
     Text,
     Image,
-    FormLabel,
+    BreadcrumbLink,
 } from "@chakra-ui/react";
 import JSZip from "jszip";
 
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 import { FileNode, buildFileTree } from "../../helpers/FileNode";
 import { FileTree } from "../../components/documentation/FileTree";
 import { useUserStore } from "../../store/userStore";
-
-import Lottie from "lottie-react";
-import writing from "../../assets/writing.json";
-import MarkdownEditor from "@uiw/react-markdown-editor";
 import { CodeBlock } from "react-code-blocks";
-import { DownloadIcon, DeleteIcon } from "@chakra-ui/icons";
 import { FaPencilAlt } from "react-icons/fa";
 
 import imageUploadImg from "../../assets/image-upload-concept-landing-page.png";
@@ -43,9 +32,7 @@ function IndividualCodebasePage() {
     const codebaseInfo = useParams();
     const [repoName, setRepoName] = useState<string | undefined>("");
 
-    const [isLoading, setIsLoading] = useState(false);
-
-    const { isOpen, onOpen, onClose } = useDisclosure();
+    const [isLoading, setIsLoading] = useState(true);
     const toast = useToast({
         duration: 5000,
         isClosable: true,
@@ -90,7 +77,7 @@ function IndividualCodebasePage() {
                 // turn it into zip
                 const zip = new JSZip();
                 const blob = new Blob(dataArr);
-                
+
                 // Load the generated zip file
                 const contents = await zip.loadAsync(blob);
                 const extractedFiles = [];
@@ -128,139 +115,177 @@ function IndividualCodebasePage() {
     const generateDocumentation = async () => {};
 
     return (
-        <Box margin="auto" overflow={"scroll"}>
-            <Heading margin={5} textAlign={"center"}>
-                {repoName}
-            </Heading>
-            <Grid
-                gridTemplateColumns={"49% 49%"}
-                justifyContent={"space-between"}
-                gap={1}
-            >
-                <GridItem>
-                    <Card height="700px" width="100%" overflow={"scroll"}>
-                        {fileTree ? (
-                            <Box overflow="scroll" height="600px" width="100%">
-                                <FileTree
-                                    node={fileTree}
-                                    setReadFile={setCurrentReadFile}
-                                    setReadFilePath={setCurrentReadFilePath}
-                                    setReadDirectory={setCurrentReadDirectory}
-                                    currentReadFilePath={currentReadFilePath}
-                                    currentReadDirectory={currentReadDirectory}
-                                />
-                            </Box>
-                        ) : (
-                            <Box
-                                display="grid"
-                                fontSize={"18px"}
-                                margin="auto"
-                                textAlign={"center"}
-                            >
-                                <Image
-                                    src={imageUploadImg}
-                                    alt={
-                                        "Image by pikisuperstar on Freepik. Souce: https://www.freepik.com/free-vector/image-upload-concept-landing-page_5337069.htm#fromView=search&page=1&position=1&uuid=1cc93512-6c6d-4455-acb0-2c9815533841"
-                                    }
-                                    width={{
-                                        base: "100px",
-                                        sm: "150px",
-                                        md: "200px",
-                                        lg: "300px",
-                                        xl: "400px",
-                                    }}
-                                />
-                                Upload your code
-                            </Box>
-                        )}
-                        <Box background="#f7f8fa">
-                            <Grid gap={2} padding="10px">
-                                <GridItem
-                                    margin="10px"
-                                    alignSelf={"center"}
-                                    overflow="scroll"
+        <>
+            {" "}
+            {isLoading ? (
+                <>Loading ...</>
+            ) : (
+                <>
+                    {" "}
+                    <Box margin="auto" overflow={"scroll"}>
+                        <Heading margin={5} textAlign={"center"}>
+                            {repoName}
+                        </Heading>
+                        <Breadcrumb>
+                            <BreadcrumbItem>
+                                <NavLink to="/home">
+                                    <BreadcrumbLink>Home</BreadcrumbLink>
+                                </NavLink>
+                            </BreadcrumbItem>
+                            <BreadcrumbItem>
+                                <BreadcrumbLink>{repoName}</BreadcrumbLink>
+                            </BreadcrumbItem>
+                        </Breadcrumb>
+                        <Grid
+                            gridTemplateColumns={"49% 49%"}
+                            justifyContent={"space-between"}
+                            gap={1}
+                        >
+                            <GridItem>
+                                <Card
+                                    height="700px"
+                                    width="100%"
+                                    overflow={"scroll"}
                                 >
-                                    <b>Selected Folder: </b>
-                                    {currentReadDirectory
-                                        ? currentReadDirectory.name
-                                        : ""}
-                                </GridItem>
-                                <GridItem margin="10px">
-                                    <Button
-                                        leftIcon={<FaPencilAlt />}
-                                        background="#2809E3"
-                                        color="white"
-                                        borderRadius={5}
-                                        size="md"
-                                        onClick={generateDocumentation}
-                                    >
-                                        Write Docs
-                                    </Button>
-                                </GridItem>
-                            </Grid>
-                        </Box>
-                    </Card>
-                </GridItem>
-                <GridItem>
-                    <Card height="700px" width="100%" overflow={"scroll"}>
-                        {currentReadFile ? (
-                            <Box>
-                                <Box background="#2809E3" color="white">
-                                    <Text
-                                        padding="10px"
-                                        overflow={"scroll"}
-                                        marginBottom={"5px"}
-                                    >
-                                        {currentReadFilePath || "Select a file"}
-                                    </Text>
-                                </Box>
-                                <Box height="600px" overflow={"scroll"}>
-                                    <CodeBlock
-                                        text={currentReadFile?.content}
-                                        showLineNumbers={true}
-                                    />
-                                </Box>
-                            </Box>
-                        ) : (
-                            <Box
-                                display="grid"
-                                fontSize={"18px"}
-                                margin="10px auto"
-                                textAlign={"center"}
-                            >
-                                <Image
-                                    src={selectFileImg}
-                                    alt={
-                                        "Image by mamewmy on Freepik. Souce: https://www.freepik.com/free-vector/search-concept-yellow-folder-magnifier-icons-hand-drawn-cartoon-art-illustration_18508166.htm#fromView=search&page=1&position=16&uuid=60aa9ddc-3696-44c7-98d3-ff85fdf748aa"
-                                    }
-                                    width={{
-                                        base: "100px",
-                                        sm: "150px",
-                                        md: "200px",
-                                        lg: "300px",
-                                        xl: "400px",
-                                    }}
-                                />
-                                Select a file
-                            </Box>
-                        )}
-                    </Card>
-                </GridItem>
-            </Grid>
-            <Modal
-                isOpen={isOpen}
-                onClose={onClose}
-                closeOnOverlayClick={false}
-            >
-                <ModalOverlay />
-                <ModalContent>
-                    <ModalHeader>Writing in progress ...</ModalHeader>
-                    <ModalBody pb={6}>
-                        <Lottie animationData={writing} loop={true} />
-                    </ModalBody>
-                </ModalContent>
-            </Modal>
-        </Box>
+                                    {fileTree ? (
+                                        <Box
+                                            overflow="scroll"
+                                            height="600px"
+                                            width="100%"
+                                        >
+                                            <FileTree
+                                                node={fileTree}
+                                                setReadFile={setCurrentReadFile}
+                                                setReadFilePath={
+                                                    setCurrentReadFilePath
+                                                }
+                                                setReadDirectory={
+                                                    setCurrentReadDirectory
+                                                }
+                                                currentReadFilePath={
+                                                    currentReadFilePath
+                                                }
+                                                currentReadDirectory={
+                                                    currentReadDirectory
+                                                }
+                                            />
+                                        </Box>
+                                    ) : (
+                                        <Box
+                                            display="grid"
+                                            fontSize={"18px"}
+                                            margin="auto"
+                                            textAlign={"center"}
+                                        >
+                                            <Image
+                                                src={imageUploadImg}
+                                                alt={
+                                                    "Image by pikisuperstar on Freepik. Souce: https://www.freepik.com/free-vector/image-upload-concept-landing-page_5337069.htm#fromView=search&page=1&position=1&uuid=1cc93512-6c6d-4455-acb0-2c9815533841"
+                                                }
+                                                width={{
+                                                    base: "100px",
+                                                    sm: "150px",
+                                                    md: "200px",
+                                                    lg: "300px",
+                                                    xl: "400px",
+                                                }}
+                                            />
+                                            Upload your code
+                                        </Box>
+                                    )}
+                                    <Box background="#f7f8fa">
+                                        <Grid gap={2} padding="10px">
+                                            <GridItem
+                                                margin="10px"
+                                                alignSelf={"center"}
+                                                overflow="scroll"
+                                            >
+                                                <b>Selected Folder: </b>
+                                                {currentReadDirectory
+                                                    ? currentReadDirectory.name
+                                                    : ""}
+                                            </GridItem>
+                                            <GridItem margin="10px">
+                                                <Button
+                                                    leftIcon={<FaPencilAlt />}
+                                                    background="#2809E3"
+                                                    color="white"
+                                                    borderRadius={5}
+                                                    size="md"
+                                                    onClick={
+                                                        generateDocumentation
+                                                    }
+                                                >
+                                                    Write Docs
+                                                </Button>
+                                            </GridItem>
+                                        </Grid>
+                                    </Box>
+                                </Card>
+                            </GridItem>
+                            <GridItem>
+                                <Card
+                                    height="700px"
+                                    width="100%"
+                                    overflow={"scroll"}
+                                >
+                                    {currentReadFile ? (
+                                        <Box>
+                                            <Box
+                                                background="#2809E3"
+                                                color="white"
+                                            >
+                                                <Text
+                                                    padding="10px"
+                                                    overflow={"scroll"}
+                                                    marginBottom={"5px"}
+                                                >
+                                                    {currentReadFilePath ||
+                                                        "Select a file"}
+                                                </Text>
+                                            </Box>
+                                            <Box
+                                                height="600px"
+                                                overflow={"scroll"}
+                                            >
+                                                <CodeBlock
+                                                    text={
+                                                        currentReadFile?.content
+                                                    }
+                                                    showLineNumbers={true}
+                                                />
+                                            </Box>
+                                        </Box>
+                                    ) : (
+                                        <Box
+                                            display="grid"
+                                            fontSize={"18px"}
+                                            margin="10px auto"
+                                            textAlign={"center"}
+                                        >
+                                            <Image
+                                                src={selectFileImg}
+                                                alt={
+                                                    "Image by mamewmy on Freepik. Souce: https://www.freepik.com/free-vector/search-concept-yellow-folder-magnifier-icons-hand-drawn-cartoon-art-illustration_18508166.htm#fromView=search&page=1&position=16&uuid=60aa9ddc-3696-44c7-98d3-ff85fdf748aa"
+                                                }
+                                                width={{
+                                                    base: "100px",
+                                                    sm: "150px",
+                                                    md: "200px",
+                                                    lg: "300px",
+                                                    xl: "400px",
+                                                }}
+                                            />
+                                            Select a file
+                                        </Box>
+                                    )}
+                                </Card>
+                            </GridItem>
+                        </Grid>
+                    </Box>
+                </>
+            )}
+        </>
     );
 }
 

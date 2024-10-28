@@ -19,8 +19,10 @@ import {
     Td,
     Link,
     Text,
+    Icon,
 } from "@chakra-ui/react";
-import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
+import { FaAngleLeft, FaAngleRight, FaExternalLinkAlt } from "react-icons/fa";
+import { NavLink } from "react-router-dom";
 
 function CodeBaseListPage() {
     const githubUsername = useUserStore((state: any) => state.githubUsername);
@@ -99,8 +101,16 @@ function CodeBaseListPage() {
                                                 <>
                                                     <Tr>
                                                         <Td textAlign={"left"}>
-                                                            {displayName}{" "}
+                                                            <NavLink
+                                                                to={
+                                                                    "/codebases/" +
+                                                                    fullRepoName
+                                                                }
+                                                            >
+                                                                {displayName}
+                                                            </NavLink>
                                                             <Badge
+                                                                margin={2}
                                                                 colorScheme={
                                                                     visibility ==
                                                                     "private"
@@ -114,13 +124,31 @@ function CodeBaseListPage() {
                                                                     : "Public"}
                                                             </Badge>
                                                         </Td>
-                                                        <Td>{fullRepoName}</Td>
+                                                        <Td>
+                                                            <NavLink
+                                                                to={
+                                                                    "/codebases/" +
+                                                                    fullRepoName
+                                                                }
+                                                            >
+                                                                {fullRepoName}
+                                                            </NavLink>
+                                                        </Td>
                                                         <Td>
                                                             <Link
                                                                 href={repoUrl}
                                                                 target="_blank"
                                                             >
                                                                 Original Repo
+                                                                Link
+                                                                <Icon
+                                                                    margin={
+                                                                        "0 5px 0"
+                                                                    }
+                                                                    as={
+                                                                        FaExternalLinkAlt
+                                                                    }
+                                                                />
                                                             </Link>
                                                         </Td>
                                                     </Tr>
