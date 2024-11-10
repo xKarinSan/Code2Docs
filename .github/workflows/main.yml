@@ -1,0 +1,217 @@
+
+# on:
+#   push:
+#     branches: [dev]
+#   workflow_call:
+#     secrets:
+#       AWS_ACCESS_KEY_ID:
+#         required: true
+#       AWS_SECRET_ACCESS_KEY:
+#         required: true
+#       AWS_DEFAULT_REGION:
+#         required: true
+#       LAMBDA_FUNCTION_NAME:
+#         required: true
+#       BUCKET_NAME:
+#         required: true
+
+      
+# jobs:
+#   backend-deployment:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
+
+#       - name: Set up Python
+#         uses: actions/setup-python@v4
+#         with:
+#           python-version: '3.x'
+
+#       - name: Install dependencies
+#         working-directory: ./backend
+#         run: |
+#           pip install -r requirements.txt
+
+
+#       - name: Install dependencies & move the server code inside the dependencies
+#         run: |
+#           pip3 install -t dependencies -r ./backend/requirements.txt --platform manylinux2014_x86_64
+#           cp -a ./backend ./dependencies 
+#           pip install -r requirements.txt --platform manylinux2014_x86_64 --no-deps --target ./python
+
+#       - name: Zip the dependencies
+#         run: |
+#           (cd dependencies; zip -r9 project_artifact.zip -r .)
+
+#       - name: Upload zip file artifact
+#         uses: actions/upload-artifact@v3
+#         with:
+#           name: project_artifact
+#           path: ./dependencies/project_artifact.zip
+
+
+#       - name: Install AWS CLI
+#         uses: unfor19/install-aws-cli-action@v1
+#         with:
+#           version: 1
+#         env:
+#           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+
+#       - name: Download project_artifact.zip
+#         uses: actions/download-artifact@v3
+#         with:
+#           name: project_artifact
+
+#       - name: Upload to S3
+#         run: aws s3 cp project_artifact.zip s3://${{ secrets.BUCKET_NAME }}/project_artifact.zip
+#         env:
+#           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+
+#       - name: Deploy new Lambda
+#         run: aws lambda update-function-code --function-name ${{ secrets.LAMBDA_FUNCTION_NAME }} --s3-bucket ${{ secrets.BUCKET_NAME }} --s3-key project_artifact.zip
+#         env:
+#           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+
+
+
+
+name: backend deployment
+on:
+  push:
+    branches: [dev]
+  workflow_call:
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+      AWS_DEFAULT_REGION:
+        required: true
+      LAMBDA_FUNCTION_NAME:
+        required: true
+      BUCKET_NAME:
+        required: true
+  
+jobs:
+  CI:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: |
+          pip install -r requirements.txt
+          pip install python-multipart
+          pip install pyjwt[crypto]
+
+      - name: Install dependencies & move the server code inside the dependencies
+        run: |
+          pip3 install -t dependencies -r ./backend/requirements.txt python-multipart pyjwt[crypto]
+          cp -a ./backend ./dependencies
+
+      - name: Zip the dependencies
+        run: |
+          (cd dependencies; zip -r9 backend.zip -r .)
+
+      - name: Upload zip file artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: backend
+          path: ./dependencies/backend.zip
+
+
+
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     # Check out repo so workflow has access
+  #     - uses: actions/checkout@v4
+
+  #     # step 1: setup python; environment for use in actions
+  #     - name: Python setup
+  #       uses: actions/setup-python@v4
+  #       with:
+  #         python-version: "3.12"
+  #         # architecture has to be same as lambda function
+  #         # architecture: x86
+      
+  #     # step 2: install virtual env
+  #     - name: Install python venv
+  #       run: pip3 install virtualenv
+
+  #     # step 3: setup env
+  #     - name: Setup virtual env
+  #       uses: actions/cache@v4
+  #       id: cache-env
+  #       with:
+  #         path: venv
+  #         # cache key depends on requirements.txt
+  #         key: ${{ runner.os }}-venv-${{ hashFiles('**/requirements*.txt') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-venv-
+
+  #     # step 4: build a venv if it doesn't exist
+  #     - name: Activate Virtual env
+  #       run: python -m venv venv && source venv/bin/activate && pip3 install -r ./backend/requirements.txt
+  #     # step 5: run tests
+
+  #     # step 6: archive of dependencies
+  #     - name: Create archive
+  #       run: |
+  #         cd ./venv/lib/python3.12/site-packages
+  #         zip -r9 ../../../../api.zip .
+
+  #     - name: Add api files to main zip
+  #       run: cd ./backend && zip -g ../backend.zip -r .
+
+  #     - name: upload zip file artifact
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: backend
+  #         path: backend.zip
+  CD:
+    runs-on: ubuntu-latest
+    needs: [CI]
+    steps:
+    # 1. install AWS CLI
+      - name: Install AWS CLI
+        uses: unfor19/install-aws-cli-action@v1
+        with:
+          version: 1
+        env: 
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+
+    # 2. Download lambda zip
+      - name: Download lambda zip
+        uses: actions/download-artifact@v3
+        with:
+          name: backend
+
+    # 3. Upload the zip to S3
+      - name: Upload to s3
+        run: aws s3 cp backend.zip s3://${{ secrets.BUCKET_NAME }}/backend.zip
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+
+    # 4. Deploy to lambda
+      - name: Deploy to Lambda
+        run: aws lambda update-function-code --function-name ${{ secrets.LAMBDA_FUNCTION_NAME }} --s3-bucket ${{ secrets.BUCKET_NAME }} --s3-key backend.zip
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}

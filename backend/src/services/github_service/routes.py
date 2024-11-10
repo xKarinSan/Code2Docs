@@ -3,8 +3,8 @@ from fastapi.responses import RedirectResponse, JSONResponse, StreamingResponse
 
 from typing import Annotated, Any
 
-from src.services.github_service.github_service import github_service
-from src.services.utils.jwt_utils import generate_jwt
+from backend.src.services.github_service.github_service import github_service
+from backend.src.services.utils.jwt_utils import generate_jwt
 
 router = APIRouter()
 

@@ -3,7 +3,7 @@ from typing import Any, Dict
 from requests import get, post
 
 from dotenv import load_dotenv, find_dotenv
-from src.services.utils.jwt_utils import generate_jwt
+from backend.src.services.utils.jwt_utils import generate_jwt
 
 
 class GithubService:
