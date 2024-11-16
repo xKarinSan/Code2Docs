@@ -105,6 +105,7 @@ def get_zipped_user_repo(
         get_streamed_repo = github_service.get_user_repo_in_zip(
             Authorization, username, reponame
         )
+        print("get_streamed_repo", get_streamed_repo)
         return StreamingResponse(
             get_streamed_repo,
             media_type="application/zip",
