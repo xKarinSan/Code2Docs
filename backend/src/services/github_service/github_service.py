@@ -155,7 +155,7 @@ class GithubService:
         res.headers["Content-Type"] = "application/zip"
         res.headers["Content-Disposition"] = f"attachment; filename=${reponame}.zip"
 
-        return res
+        return res.content
 
 
 load_dotenv(find_dotenv())
