@@ -58,6 +58,7 @@ function IndividualCodebasePage() {
                     },
                 }
             ).then(async (res) => {
+                console.log("res", res);
                 if (!res.ok) {
                     toast({
                         title: "Loading failed.",
@@ -99,6 +100,7 @@ function IndividualCodebasePage() {
                 setIsLoading(false);
             });
         } catch (e) {
+            console.log("E", e);
             toast({
                 title: "Loading failed.",
                 status: "error",

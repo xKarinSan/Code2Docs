@@ -102,7 +102,10 @@ def get_zipped_user_repo(
     Authorization: Annotated[str | None, Header()] = None,
 ) -> StreamingResponse:
     try:
-        repo_content = github_service.get_user_repo_in_zip(Authorization, username, reponame)
+        repo_content = github_service.get_user_repo_in_zip(
+            Authorization, username, reponame
+        )
+        print("reponame:", reponame)
         return StreamingResponse(
             repo_content,
             media_type="application/zip",
