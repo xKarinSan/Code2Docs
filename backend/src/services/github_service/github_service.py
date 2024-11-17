@@ -154,6 +154,8 @@ class GithubService:
         )
         res.headers["Content-Type"] = "application/zip"
         res.headers["Content-Disposition"] = f"attachment; filename=${reponame}.zip"
+        print('res:',res.headers)
+        print('res:',res.content)
 
         # return res
         for chunk in res.iter_content(chunk_size=8192):  # Adjust chunk size as needed

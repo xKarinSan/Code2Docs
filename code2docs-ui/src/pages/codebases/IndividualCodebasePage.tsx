@@ -78,6 +78,7 @@ function IndividualCodebasePage() {
                 // turn it into zip
                 const zip = new JSZip();
                 const blob = new Blob(dataArr);
+                console.log("blob",blob)
 
                 // Load the generated zip file
                 const contents = await zip.loadAsync(blob);
