@@ -71,7 +71,7 @@ function IndividualCodebasePage() {
                     if (reader) {
                         const { done, value } = await reader.read();
                         if (done) break;
-                        // console.log(value);
+                        console.log(value);
                         dataArr.push(value);
                     }
                 }

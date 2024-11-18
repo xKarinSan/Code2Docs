@@ -14,7 +14,7 @@ def health():
     return {"message": "Auth OK"}
 
 
-@router.get("/login/")
+@router.get("/login")
 def get_user_login(code: str, response: Response) -> dict[str, Any]:
     try:
         print("[GET] /login/")
@@ -42,7 +42,7 @@ def get_user_login(code: str, response: Response) -> dict[str, Any]:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/install/")
+@router.get("/install")
 def get_user_installation(installation_id: str) -> dict[str, Any]:
     try:
         print("[GET] /install/")
@@ -101,6 +101,7 @@ def get_zipped_user_repo(
     reponame: str,
     Authorization: Annotated[str | None, Header()] = None,
 ) -> StreamingResponse:
+    
     try:
         repo_content = github_service.get_user_repo_in_zip(
             Authorization, username, reponame
