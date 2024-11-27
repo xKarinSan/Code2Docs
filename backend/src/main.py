@@ -27,7 +27,6 @@ app.mount("/demo", document_service_app)
 app.mount("/gh", github_service_app)
 
 if __name__ == "__main__":
-    # uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
-    uvicorn.run(app)
+    uvicorn.run("main:app", port=8000, reload=True)
 
 handler = Mangum(app)
