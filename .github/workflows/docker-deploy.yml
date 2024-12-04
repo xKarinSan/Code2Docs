@@ -20,6 +20,19 @@ on:
         required: true
       DOCKER_IMAGE_NAME:
         required: true
+      
+      OPENAI_API_KEY:
+        required: true
+      OPENAI_MODEL:
+        required: true
+
+      GITHUB_CLIENT_ID:
+        required: true
+      GITHUB_CLIENT_SECRET:
+        required: true
+      GITHUB_APP_ID:
+        required: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -42,7 +55,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-          
+
       - name: Set up Docker Build
         uses: docker/setup-buildx-action@v1
 
@@ -54,11 +67,14 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker build -t ${{ secrets.AWS_ECS_REPO }}/${{ secrets.AWS_ECS_IMAGE_NAME }}:latest ./backend
+          docker build -t ${{ secrets.AWS_ECS_REPO }}/${{ secrets.AWS_ECS_IMAGE_NAME }}:latest ./backend \
+          --build-arg BOTO_REGION_NAME_ARG=${{ secrets.BOTO_REGION_NAME }} \
+          --build-arg BOTO_SECRET_NAME_ARG=${{ secrets.BOTO_SECRET_NAME }} \
+          --build-arg BOTO_SECRET_KEYNAME_ARG=${{ secrets.BOTO_SECRET_KEYNAME }} \
+          --build-arg OPENAI_API_KEY_ARG=${{ secrets.OPENAI_API_KEY }} \
+          --build-arg OPENAI_MODEL_ARG=${{ secrets.OPENAI_MODEL }} \
+          --build-arg GITHUB_CLIENT_ID_ARG=${{ secrets.GH_CLIENT_ID }} \
+          --build-arg GITHUB_CLIENT_SECRET_ARG=${{ secrets.GH_CLIENT_SECRET }} \
+          --build-arg GITHUB_APP_ID_ARG=${{ secrets.GH_APP_ID }}
           docker push ${{ secrets.AWS_ECS_REPO }}/${{ secrets.AWS_ECS_IMAGE_NAME }}:latest
 
-        # uses: docker/build-push-action@v2
-        # with:
-        #   context: ./backend
-        #   push: true
-        #   tags: code2docs-backend
