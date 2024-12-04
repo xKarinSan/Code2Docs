@@ -4,6 +4,16 @@ on:
     branches: [dev-docker]
   workflow_call:
     secrets:
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+      AWS_DEFAULT_REGION:
+        required: true
+      AWS_ECS_REPO:
+        required: true
+      AWS_ECS_IMAGE_NAME:
+        required: true
       DOCKER_HUB_USERNAME:
         required: true
       DOCKER_HUB_ACCESS_TOKEN:
@@ -17,7 +27,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Docker Buildx
+      - name: Install AWS CLI
+        uses: unfor19/install-aws-cli-action@v1
+        with:
+          version: 1
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+
+      - name: Login to AWS
+        run: aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin ${{ secrets.AWS_ECS_REPO }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+          
+      - name: Set up Docker Build
         uses: docker/setup-buildx-action@v1
 
       - name: Login to Docker Hub
@@ -28,8 +54,8 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/code2docs-backend:latest ./backend
-          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/code2docs-backend:latest
+          docker build -t ${{ secrets.AWS_ECS_REPO }}/${{ secrets.AWS_ECS_IMAGE_NAME }}:latest ./backend
+          docker push ${{ secrets.AWS_ECS_REPO }}/${{ secrets.AWS_ECS_IMAGE_NAME }}:latest
 
         # uses: docker/build-push-action@v2
         # with:
