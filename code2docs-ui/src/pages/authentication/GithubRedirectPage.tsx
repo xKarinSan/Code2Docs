@@ -53,15 +53,21 @@ function GithubRedirectPage() {
         if (installationIdParam) {
             setInstallationId(installationIdParam);
         }
+        console.log(codeParam)
+        console.log(installationIdParam)
+        console.log(currentUserAuthToken)
 
         if (codeParam && !currentUserAuthToken) {
             const authenticateUser = async () => {
+                console.log("[authenticateUser]")
                 await axios
                     .get(getGithubTokenURL + codeParam)
                     .then((res) => {
+                        console.log("[res]",res)
                         return res.data;
                     })
                     .then((data) => {
+                        console.log("[data]",data)
                         const {
                             access_token,
                             username,
@@ -73,7 +79,8 @@ function GithubRedirectPage() {
                         setDisplayName(display_name);
                         setProfilePicUrl(profile_pic_url);
                     })
-                    .catch(() => {
+                    .catch((e) => {
+                        console.log("e",e)
                         navigate("/error");
                     });
             };

@@ -17,7 +17,6 @@ def health():
 @router.get("/login")
 def get_user_login(code: str, response: Response) -> dict[str, Any]:
     try:
-        print("[GET] /login/")
         get_token_result = github_service.get_github_auth_token(code)
         if "access_token" in get_token_result and "refresh_token" in get_token_result:
             jwt = generate_jwt()
@@ -47,7 +46,6 @@ def get_user_installation(installation_id: str) -> dict[str, Any]:
     try:
         print("[GET] /install/")
         get_token_result = github_service.get_github_install_token(installation_id)
-        print("get_token_result", get_token_result)
         return {"token": get_token_result["token"]}
 
     except HTTPException as he:

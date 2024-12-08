@@ -26,6 +26,7 @@ class GithubService:
         res = post(
             "https://github.com/login/oauth/access_token" + params, headers=headers
         )
+        print("[get_github_auth_token]",res)
         res = res.json()
         return res
 
@@ -58,6 +59,7 @@ class GithubService:
                 "X-GitHub-Api-Version": "2022-11-28",
             },
         )
+        print("res",res)
         res = res.json()
         return {"token": res["token"], "bearer_token": generated_jwt}
 
