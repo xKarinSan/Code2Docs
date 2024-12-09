@@ -2,11 +2,9 @@ FROM python:3.13
 
 WORKDIR /backend
 
-COPY . /backend/
-
 RUN pip3 install python-multipart
 RUN pip3 install pyjwt[crypto]
-RUN pip3 install --no-cache-dir -r requirements.txt
+RUN pip3 install pipreqs
 
 ARG BOTO_REGION_NAME_ARG
 ENV BOTO_REGION_NAME=${BOTO_REGION_NAME_ARG}
@@ -31,6 +29,10 @@ ENV GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET_ARG}
 
 ARG GITHUB_APP_ID_ARG
 ENV GITHUB_APP_ID=${GITHUB_APP_ID_ARG}
+
+COPY . /backend/
+RUN pipreqs --force
+RUN pip3 install --no-cache-dir -r requirements.txt
 
 CMD ["uvicorn", "src.main:app", "--reload", "--port=8000", "--host=0.0.0.0"]
 EXPOSE 8000
