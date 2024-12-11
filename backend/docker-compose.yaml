@@ -3,7 +3,7 @@ version: "3"
 services:
     code2docs-backend:
         build: .
-        image: code2docs-backend-dev-main:latest
+        image: kallenl/code2docs-backend-dev-main:latest
         command: sh -c "uvicorn src.main:app --reload --port=8000 --host=0.0.0.0"
         ports:
             - 8000:8000
