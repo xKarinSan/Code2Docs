@@ -24,6 +24,7 @@ app.add_middleware(
 )
 
 app.mount("/demo", document_service_app)
+app.mount("/doc",document_service_app)
 app.mount("/gh", github_service_app)
 
 if __name__ == "__main__":
