@@ -1,9 +1,8 @@
 import os
 from io import BytesIO
 from pathlib import Path
-from typing import BinaryIO, Dict
+from typing import BinaryIO, Dict, List
 from zipfile import ZipFile
-
 from dotenv import load_dotenv, find_dotenv
 from langchain.schema.output_parser import StrOutputParser
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -14,7 +13,9 @@ from langchain.schema.runnable import (
     RunnableLambda,
     RunnableSerializable,
 )
+
 # OPENAI_MODEL
+
 
 # The `DocumentService` class provides methods for summarizing and documenting code files.
 class DocumentService:
@@ -191,7 +192,7 @@ class DocumentService:
             | StrOutputParser()
         )
 
-    def summarise_files(self, unzipped_files: Dict[str, str]) -> str | None:
+    def summarise_files_demo(self, unzipped_files: Dict[str, str]) -> str | None:
         """
         The function `summarise_files` processes unzipped files in parallel to create summaries and write
         them to files.
@@ -213,7 +214,7 @@ class DocumentService:
             results = parallel_chain.invoke({key: key for key in unzipped_files})
 
             summaries = []
-            for i, (key, value) in enumerate(results.items()):
+            for _, (_, value) in enumerate(results.items()):
                 # self.write_result_to_file(value,f"summary_{i}")
                 summaries.append(value)
 
@@ -223,14 +224,35 @@ class DocumentService:
         except Exception as e:
             print(e)
             return None
-        
+
+    def summarise_files(self, unzipped_files: Dict[str, str]) -> List[str] | None:
+        try:
+            parallel_tasks = {
+                key: self.create_summary_chain(content)
+                for key, content in unzipped_files.items()
+            }
+            parallel_chain = RunnableParallel(**parallel_tasks)
+            results = parallel_chain.invoke({key: key for key in unzipped_files})
+
+            summaries = []
+            for _, (_, value) in enumerate(results.items()):
+                # self.write_result_to_file(value,f"summary_{i}")
+                summaries.append(value)
+
+            full_summary = "\n\n".join(summaries)
+            # self.write_result_to_file(full_summary,"result")
+            return summaries
+        except Exception as e:
+            print(e)
+            return None
+
     # def write_result_to_file(self, result: str, file_name: str):
     #     """
     #     NOTE: THIS IS TO BE REMOVED DURING PRODUCTION
 
     #     The function `_write_result_to_file` writes the given result to a file with the specified file name
     #     in Markdown format.
-        
+
     #     :param result: The `result` parameter in the `_write_result_to_file` method is a string that
     #     contains the data or content that you want to write to a file
     #     :type result: str

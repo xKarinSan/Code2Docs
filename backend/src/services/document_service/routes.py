@@ -20,7 +20,7 @@ def document_zip_file(file: UploadFile) -> dict[str, str]:
                 content={"message": "Invalid files"},
             )
         logging.info("unzipped_files", unzipped_files)
-        documentation_string = document_service.summarise_files(unzipped_files)
+        documentation_string = document_service.summarise_files_demo(unzipped_files)
         if not documentation_string:
             return JSONResponse(
                 status_code=500,
