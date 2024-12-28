@@ -2,7 +2,7 @@ FROM python:3.13
 
 WORKDIR /backend
 
-RUN pip install --no-cache-dir python-multipart pyjwt[crypto] pipreqs
+RUN pip install --no-cache-dir python-multipart pyjwt[crypto] pipreqs psycopg2
 
 ARG BOTO_REGION_NAME_ARG
 ENV BOTO_REGION_NAME=${BOTO_REGION_NAME_ARG}

@@ -13,6 +13,7 @@ def get_db():
     db = session()
     try:
         yield db
+    except:
+        yield None
     finally:
         db.close()
-
