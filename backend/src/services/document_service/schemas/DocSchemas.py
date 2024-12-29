@@ -2,24 +2,25 @@ from pydantic import BaseModel
 from datetime import datetime
 
 
-class _CodebaseBaseSchema(BaseModel):
-    user_id: str
-    codebase_name: str
+class _DocBaseSchema(BaseModel):
+    docset_id: int
+    doc_name: str
+    contents: str
 
     class Config:
         from_attributes = True
 
 
-class Codebase(_CodebaseBaseSchema):
-    codebase_id: int
-    date_uploaded: datetime
+class DocSet(_DocBaseSchema):
+    doc_id: int
+    date_generated: datetime
 
     class Config:
         from_attributes = True
 
 
 # for creation
-class CreateCodebase(_CodebaseBaseSchema):
+class CreateDocSet(_DocBaseSchema):
     class Config:
         from_attributes = True
 

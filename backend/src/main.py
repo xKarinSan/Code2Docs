@@ -9,6 +9,8 @@ from backend.src.services.codebase_service.app import codebase_service_app
 from backend.src.services.db_service.db import Base, engine
 from mangum import Mangum
 
+# add the schemas
+from backend.src.services.db_service.models import DocModel, DocSetModel, CodebaseModel
 import uvicorn
 
 app = FastAPI()

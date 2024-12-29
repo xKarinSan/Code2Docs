@@ -9,5 +9,6 @@ class DocSetModel(Base):
     codebase_id = Column(Integer, ForeignKey("codebase.codebase_id"))
     date_generated = Column(DateTime, nullable=False)
     docset_name = Column(String, nullable=False)
-    codebase = relationship("CodebaseModel", back_populates="codebase")
-    codebase = relationship("DocModel", back_populates="doc")
+    
+    codebase = relationship("CodebaseModel", back_populates="docsets")
+    docs = relationship("DocModel", back_populates="docset")

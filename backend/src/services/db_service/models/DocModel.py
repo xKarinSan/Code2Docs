@@ -8,6 +8,7 @@ class DocModel(Base):
     doc_id = Column(Integer, primary_key=True, index=True)
     docset_id = Column(Integer, ForeignKey("docset.docset_id"))
     date_generated = Column(DateTime, nullable=False)
-    docset_name = Column(String, nullable=False)
+    doc_name = Column(String, nullable=False)
     contents = Column(String, nullable=False)
-    docset = relationship("DocSetModel", foreign_keys="docset")
+    
+    docset = relationship("DocSetModel", back_populates="docs")
