@@ -25,4 +25,17 @@ class CreateDocSet(_DocSetBaseSchema):
     class Config:
         from_attributes = True
 
-    pass
+
+# for querying
+class _DocSetQuery(BaseModel):
+    user_id: str
+
+    class Config:
+        from_attributes = True
+
+
+class DocSetQueryById(_DocSetQuery):
+    docset_id: int
+
+    class Config:
+        from_attributes = True

@@ -9,5 +9,4 @@ class CodebaseModel(Base):
     user_id = Column(String, nullable=False)
     date_uploaded = Column(DateTime)
     codebase_name = Column(String, nullable=False)
-    
     docsets = relationship("DocSetModel", back_populates="codebase")
