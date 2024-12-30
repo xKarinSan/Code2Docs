@@ -19,7 +19,6 @@ from backend.src.services.db_service.db import get_db
 from backend.src.services.codebase_service.codebase_service import codebase_service
 from backend.src.services.db_service.models.DocModel import DocModel
 from backend.src.services.db_service.models.DocSetModel import DocSetModel
-from backend.src.services.document_service.schemas.DocSetSchemas import DocSet
 import json
 
 # OPENAI_MODEL
@@ -273,29 +272,5 @@ class DocumentService:
     #     with open(f"{file_name}.md", "w") as file:
     #         file.write(result)
 
-    # ================ for creating document sets ================
-    def create_new_document_set(self, docset: Dict[str, str]) -> Dict[str, Any]:
-        # check if user is allowed to access codebase
-        db_session = next(get_db())
-        authorised_codebase = codebase_service.get_codebase_by_id(
-            docset["codebase_id"], docset["user_id"]
-        )
-        # if authorised_codebase is None:
-        #     return
-        # create the codebase
-        new_docset_dict = {
-            "codebase_id": docset["codebase_id"],
-            "date_generated": datetime.now(),
-            "docset_name": docset["docset_name"],
-        }
-        new_docset = DocSetModel(**new_docset_dict)
-        db_session.add(new_docset)
-        db_session.commit()
-        db_session.refresh(new_docset)
-        return json.loads(DocSet(**new_docset.__dict__).model_dump_json())
 
-    def view_document_set_by_id(self, user_id: str, docset_id: str) -> Dict[str, Any]:
-        return
-
-
-document_service = DocumentService()
+doc_gen_service = DocumentService()

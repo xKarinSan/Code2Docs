@@ -38,7 +38,7 @@ def get_all_codebases() -> dict[str, list[Codebase]]:
 
 
 @router.get("/u/{userId}")
-def get_all_codebases(userId: str) -> dict[str, Any]:
+def get_user_codebases(userId: str) -> dict[str, Any]:
     try:
         all_codebases = codebase_service.get_all_user_codebases(userId)
         return JSONResponse(status_code=200, content=all_codebases)
