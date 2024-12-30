@@ -11,7 +11,7 @@ class _DocBaseSchema(BaseModel):
         from_attributes = True
 
 
-class DocSet(_DocBaseSchema):
+class Docs(_DocBaseSchema):
     doc_id: int
     date_generated: datetime
 
@@ -20,7 +20,7 @@ class DocSet(_DocBaseSchema):
 
 
 # for creation
-class CreateDocSet(_DocBaseSchema):
+class CreateDocs(_DocBaseSchema):
     class Config:
         from_attributes = True
 

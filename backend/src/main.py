@@ -3,9 +3,10 @@ import sys
 sys.path.append("../")
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from backend.src.services.document_service.app import document_service_app
+from backend.src.services.doc_gen_service.app import doc_gen_service_app
 from backend.src.services.github_service.app import github_service_app
 from backend.src.services.codebase_service.app import codebase_service_app
+from backend.src.services.docs_service.app import docs_service_app
 from backend.src.services.db_service.db import Base, engine
 from mangum import Mangum
 
@@ -29,10 +30,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.mount("/demo", document_service_app)
-app.mount("/doc", document_service_app)
+app.mount("/demo", doc_gen_service_app)
+app.mount("/docgen", doc_gen_service_app)
 app.mount("/gh", github_service_app)
 app.mount("/codebase", codebase_service_app)
+app.mount("/docs", docs_service_app)
 
 if __name__ == "__main__":
     Base.metadata.create_all(bind=engine)
