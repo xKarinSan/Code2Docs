@@ -47,6 +47,8 @@ class DocsService:
                 )
                 .first()
             )
+            if docset is None:
+                return None
             return json.loads(DocSet(**docset.__dict__).model_dump_json())
         except:
             return None
@@ -119,6 +121,30 @@ class DocsService:
             ]
         except:
             return []
+
+    def get_docs_by_id(self, doc_id: int, user_id: str) -> Dict[str, Any]:
+        db_session = next(get_db())
+        current_doc = (
+            db_session.query(DocModel)
+            .join(DocSetModel, DocSetModel.docset_id == DocModel.docset_id)
+            .join(CodebaseModel, DocSetModel.codebase_id == CodebaseModel.codebase_id)
+            .filter(CodebaseModel.user_id == user_id, DocModel.doc_id == doc_id)
+            .first()
+        )
+        if current_doc is None:
+            return None
+        return json.loads(Docs(**current_doc.__dict__).model_dump_json())
+
+    def get_docs_by_user(self, user_id: str) -> List[Docs]:
+        db_session = next(get_db())
+        user_docs = (
+            db_session.query(DocModel)
+            .join(DocSetModel, DocSetModel.docset_id == DocModel.docset_id)
+            .join(CodebaseModel, DocSetModel.codebase_id == CodebaseModel.codebase_id)
+            .filter(CodebaseModel.user_id == user_id)
+            .all()
+        )
+        return [json.loads(Docs(**doc.__dict__).model_dump_json()) for doc in user_docs]
 
 
 docs_service = DocsService()

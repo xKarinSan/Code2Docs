@@ -74,3 +74,29 @@ def get_docs_from_docset(docset_id: int, user_id: str):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/{doc_id}/u/{user_id}")
+def get_docs_by_id(doc_id: int, user_id: str):
+    try:
+        current_doc = docs_service.get_docs_by_id(doc_id, user_id)
+        return JSONResponse(status_code=200, content=current_doc)
+    except HTTPException as he:
+        # Re-raise HTTPExceptions as they already have status codes
+        raise he
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/u/{user_id}")
+def get_docs_by_id(user_id: str):
+    try:
+        current_doc = docs_service.get_docs_by_user(user_id)
+        return JSONResponse(status_code=200, content=current_doc)
+    except HTTPException as he:
+        # Re-raise HTTPExceptions as they already have status codes
+        raise he
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
