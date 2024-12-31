@@ -21,6 +21,8 @@ class Docs(_DocBaseSchema):
 
 # for creation
 class CreateDocs(_DocBaseSchema):
+    user_id: str
+
     class Config:
         from_attributes = True
 

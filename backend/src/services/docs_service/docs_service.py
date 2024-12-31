@@ -3,6 +3,7 @@ from typing import Dict, Any, List
 from datetime import datetime
 from backend.src.services.db_service.models.DocSetModel import DocSetModel
 from backend.src.services.db_service.models.CodebaseModel import CodebaseModel
+from backend.src.services.db_service.models.DocModel import DocModel
 
 from backend.src.services.docs_service.schemas.DocSchemas import Docs
 from backend.src.services.docs_service.schemas.DocSetSchemas import DocSet
@@ -11,7 +12,7 @@ from backend.src.services.db_service.db import get_db
 
 
 class DocsService:
-    # ================ for creating document sets ================
+    # ================ for document sets ================
     def create_new_docset(self, docset: Dict[str, str]) -> Dict[str, Any]:
         # check if user is allowed to access codebase
         db_session = next(get_db())
@@ -19,8 +20,8 @@ class DocsService:
             docset["codebase_id"], docset["user_id"]
         )
         if authorised_codebase is None:
-            return
-        # create the codebase
+            return None
+
         new_docset_dict = {
             "codebase_id": docset["codebase_id"],
             "date_generated": datetime.now(),
@@ -65,6 +66,34 @@ class DocsService:
             ]
         except:
             return []
+
+    # ================ for documents themselves ================
+    def create_new_doc(self, create_doc_dict: Dict[str, str]) -> Dict[str, Any]:
+        # check if user is allowed to access docset
+        db_session = next(get_db())
+        authorised_docset = (
+            db_session.query(DocSetModel)
+            .join(CodebaseModel)
+            .filter(
+                CodebaseModel.user_id == create_doc_dict["user_id"],
+                DocSetModel.docset_id == create_doc_dict["docset_id"],
+            )
+            .first()
+        )
+        if authorised_docset is None:
+            return None
+        # create the codebase
+        new_doc_dict = {
+            "docset_id": create_doc_dict["docset_id"],
+            "date_generated": datetime.now(),
+            "doc_name": create_doc_dict["doc_name"],
+            "contents": create_doc_dict["contents"],
+        }
+        new_docset = DocModel(**new_doc_dict)
+        db_session.add(new_docset)
+        db_session.commit()
+        db_session.refresh(new_docset)
+        return json.loads(Docs(**new_docset.__dict__).model_dump_json())
 
 
 docs_service = DocsService()
