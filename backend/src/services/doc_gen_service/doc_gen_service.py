@@ -152,12 +152,14 @@ class DocumentService:
                 for file_name in read_zip_file.namelist():
                     if any(file_name.endswith(ext) for ext in self.code_extensions):
                         with read_zip_file.open(file_name) as curr_file:
-                            content = curr_file.read().decode("utf-8")
+                            content = curr_file.read()
+                            # .decode("utf-8")
                             directory = str(Path(file_name).parent) or "."
                             path_key = f"{directory}/{file_name.replace(' ', '_')}"
                             files[path_key] = content
             return files
-        except Exception:
+        except Exception as e:
+            print("E:", e)
             return None
 
     def get_file_summary(self, file_contents: str) -> PromptTemplate:
@@ -243,12 +245,13 @@ class DocumentService:
             results = parallel_chain.invoke({key: key for key in unzipped_files})
 
             summaries = []
-            for _, (_, value) in enumerate(results.items()):
+            print(results.items())
+            for _, (file_name, contents) in enumerate(results.items()):
                 # self.write_result_to_file(value,f"summary_{i}")
-                summaries.append(value)
+                summaries.append({"file_name": file_name, "contents": contents})
 
-            full_summary = "\n\n".join(summaries)
-            # self.write_result_to_file(full_summary,"result")
+            # full_summary = "\n\n".join(summaries)
+            # self.write_result_to_file(full_summary, "result")
             return summaries
         except Exception as e:
             print(e)
