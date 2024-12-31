@@ -1,6 +1,7 @@
 import json
 from typing import Dict, Any, List
 from datetime import datetime
+from backend.src.services.db_service.models.DocModel import DocModel
 from backend.src.services.db_service.models.DocSetModel import DocSetModel
 from backend.src.services.db_service.models.CodebaseModel import CodebaseModel
 from backend.src.services.db_service.models.DocModel import DocModel
@@ -38,7 +39,9 @@ class DocsService:
             db_session = next(get_db())
             docset = (
                 db_session.query(DocSetModel)
-                .join(CodebaseModel)
+                .join(
+                    CodebaseModel, DocSetModel.codebase_id == CodebaseModel.codebase_id
+                )
                 .filter(
                     CodebaseModel.user_id == user_id, DocSetModel.docset_id == docset_id
                 )
@@ -94,6 +97,28 @@ class DocsService:
         db_session.commit()
         db_session.refresh(new_docset)
         return json.loads(Docs(**new_docset.__dict__).model_dump_json())
+
+    def get_docs_from_docset(self, docset_id: int, user_id: str) -> List[Docs]:
+        try:
+            db_session = next(get_db())
+            docs_from_docsets = (
+                db_session.query(DocModel)
+                .join(DocSetModel, DocSetModel.docset_id == DocModel.docset_id)
+                .join(
+                    CodebaseModel, CodebaseModel.codebase_id == DocSetModel.codebase_id
+                )
+                .filter(
+                    CodebaseModel.user_id == user_id,
+                    DocSetModel.docset_id == docset_id,
+                )
+                .all()
+            )
+            return [
+                json.loads(Docs(**doc.__dict__).model_dump_json())
+                for doc in docs_from_docsets
+            ]
+        except:
+            return []
 
 
 docs_service = DocsService()
