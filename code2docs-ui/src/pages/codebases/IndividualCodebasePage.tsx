@@ -11,8 +11,17 @@ import {
     Text,
     Image,
     BreadcrumbLink,
+    Modal,
+    ModalOverlay,
+    ModalContent,
+    ModalHeader,
+    ModalBody,
+    useDisclosure,
 } from "@chakra-ui/react";
 import JSZip from "jszip";
+import Lottie from "lottie-react";
+import writing from "../../assets/writing.json";
+import axios from "axios";
 
 import { useEffect, useState } from "react";
 import { NavLink, useParams } from "react-router-dom";
@@ -27,7 +36,11 @@ import selectFileImg from "../../assets/search-concept-yellow-folder-magnifier-i
 import { getUserGithubRepoZippedURL } from "../../global/constants";
 
 function IndividualCodebasePage() {
+    const { isOpen, onOpen, onClose } = useDisclosure();
     const githubAuthToken = useUserStore((state: any) => state.githubAuthToken);
+    const githubInstallationId = useUserStore(
+        (state: any) => state.githubInstallationId
+    );
 
     const codebaseInfo = useParams();
     const [repoName, setRepoName] = useState<string | undefined>("");
@@ -78,7 +91,7 @@ function IndividualCodebasePage() {
                 // turn it into zip
                 const zip = new JSZip();
                 const blob = new Blob(dataArr);
-                console.log("blob",blob)
+                console.log("blob", blob);
 
                 // Load the generated zip file
                 const contents = await zip.loadAsync(blob);
@@ -114,8 +127,70 @@ function IndividualCodebasePage() {
         loadCodebaseContents();
         console.log(codebaseInfo);
     }, []);
+    const createZipFile = async () => {
+        const zip = new JSZip();
+        const addToZip = (node: FileNode, currentPath: string = "") => {
+            const newPath = currentPath
+                ? `${currentPath}/${node.name}`
+                : node.name;
 
-    const generateDocumentation = async () => {};
+            if (node.isDirectory) {
+                // Create a folder in the zip
+                zip.folder(newPath);
+
+                // Recursively add children
+                node.children.forEach((child) => addToZip(child, newPath));
+            } else {
+                // Add file to the zip
+                zip.file(newPath, node.content || "");
+            }
+        };
+
+        // Start with the root node (currentReadDirectory)
+        if (currentReadDirectory) {
+            addToZip(currentReadDirectory);
+        }
+
+        // Generate the zip file
+        const content = await zip.generateAsync({ type: "blob" });
+        return content;
+    };
+    const generateDocumentation = async () => {
+        if (!currentReadDirectory) {
+            toast({
+                title: "Please select a folder!",
+                status: "error",
+            });
+            return;
+        }
+        onOpen();
+        const zipBlob = await createZipFile();
+        const formData = new FormData();
+        // use axios
+        formData.append("file", zipBlob, "archive.zip");
+        await axios
+            .post(
+                `${
+                    import.meta.env.VITE_API_URL
+                }/docgen/upload/${githubInstallationId}`,
+                formData
+            )
+            .then((res) => {
+                console.log("res", res);
+                onClose();
+            })
+            .catch(() => {
+                onClose();
+                toast({
+                    title: "Failed to create documentation!",
+                    status: "error",
+                });
+            });
+        toast({
+            title: "Documentation successfully created!",
+            status: "success",
+        });
+    };
 
     return (
         <>
@@ -285,6 +360,24 @@ function IndividualCodebasePage() {
                                 </Card>
                             </GridItem>
                         </Grid>
+                        <Modal
+                            isOpen={isOpen}
+                            onClose={onClose}
+                            closeOnOverlayClick={false}
+                        >
+                            <ModalOverlay />
+                            <ModalContent>
+                                <ModalHeader>
+                                    Writing in progress ...
+                                </ModalHeader>
+                                <ModalBody pb={6}>
+                                    <Lottie
+                                        animationData={writing}
+                                        loop={true}
+                                    />
+                                </ModalBody>
+                            </ModalContent>
+                        </Modal>
                     </Box>
                 </>
             )}
