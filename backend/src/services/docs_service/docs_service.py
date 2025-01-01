@@ -73,6 +73,24 @@ class DocsService:
         except:
             return []
 
+    def get_user_docsets(self, user_id: str) -> List[DocSet]:
+        try:
+            with get_db_session() as db_session:
+                user_docsets = (
+                    db_session.query(DocSetModel)
+                    .join(CodebaseModel)
+                    .filter(
+                        CodebaseModel.user_id == user_id,
+                    )
+                    .all()
+                )
+                return [
+                    json.loads(DocSet(**docset.__dict__).model_dump_json())
+                    for docset in user_docsets
+                ]
+        except:
+            return []
+
     # ================ for documents themselves ================
     def create_new_doc(self, create_doc_dict: Dict[str, str]) -> Dict[str, Any]:
         # check if user is allowed to access docset
