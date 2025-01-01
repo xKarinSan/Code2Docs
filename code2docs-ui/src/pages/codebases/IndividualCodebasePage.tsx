@@ -100,7 +100,6 @@ function IndividualCodebasePage() {
                 for (const [filename, fileData] of Object.entries(
                     contents.files
                 )) {
-                    console.log("filename", filename);
                     if (!fileData.dir) {
                         const content = await fileData.async("binarystring");
                         extractedFiles.push({ filename, content });

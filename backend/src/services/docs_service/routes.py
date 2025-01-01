@@ -36,6 +36,19 @@ def get_docset_by_id(docset_id: int, user_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.get("/set/u/{user_id}")
+def get_user_docsets(user_id: str):
+    try:
+        current_docset = docs_service.get_user_docsets(user_id)
+        return JSONResponse(status_code=200, content=current_docset)
+    except HTTPException as he:
+        # Re-raise HTTPExceptions as they already have status codes
+        raise he
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.get("/set/c/{codebase_id}/u/{user_id}")
 def get_docsets_in_codebase(codebase_id: int, user_id: str):
     try:
