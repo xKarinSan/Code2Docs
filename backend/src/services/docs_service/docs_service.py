@@ -39,10 +39,12 @@ class DocsService:
                 docset = (
                     db_session.query(DocSetModel)
                     .join(
-                        CodebaseModel, DocSetModel.codebase_id == CodebaseModel.codebase_id
+                        CodebaseModel,
+                        DocSetModel.codebase_id == CodebaseModel.codebase_id,
                     )
                     .filter(
-                        CodebaseModel.user_id == user_id, DocSetModel.docset_id == docset_id
+                        CodebaseModel.user_id == user_id,
+                        DocSetModel.docset_id == docset_id,
                     )
                     .first()
                 )
@@ -99,14 +101,16 @@ class DocsService:
             db_session.refresh(new_docset)
             return json.loads(Docs(**new_docset.__dict__).model_dump_json())
 
-    def get_docs_from_docset(self, docset_id: int, user_id: str) -> List[Docs]:
+    # also return the docset
+    def get_docs_from_docset(self, docset_id: int, user_id: str) -> Dict[str, Any]:
         try:
             with get_db_session() as db_session:
                 docs_from_docsets = (
                     db_session.query(DocModel)
                     .join(DocSetModel, DocSetModel.docset_id == DocModel.docset_id)
                     .join(
-                        CodebaseModel, CodebaseModel.codebase_id == DocSetModel.codebase_id
+                        CodebaseModel,
+                        CodebaseModel.codebase_id == DocSetModel.codebase_id,
                     )
                     .filter(
                         CodebaseModel.user_id == user_id,
@@ -114,10 +118,28 @@ class DocsService:
                     )
                     .all()
                 )
-                return [
-                    json.loads(Docs(**doc.__dict__).model_dump_json())
-                    for doc in docs_from_docsets
-                ]
+
+                docset = (
+                    db_session.query(DocSetModel)
+                    .join(
+                        CodebaseModel,
+                        DocSetModel.codebase_id == CodebaseModel.codebase_id,
+                    )
+                    .filter(
+                        CodebaseModel.user_id == user_id,
+                        DocSetModel.docset_id == docset_id,
+                    )
+                    .first()
+                )
+                if docset is None:
+                    return []
+                return {
+                    "doc_set": json.loads(DocSet(**docset.__dict__).model_dump_json()),
+                    "docs": [
+                        json.loads(Docs(**doc.__dict__).model_dump_json())
+                        for doc in docs_from_docsets
+                    ],
+                }
         except:
             return []
 
@@ -126,7 +148,9 @@ class DocsService:
             current_doc = (
                 db_session.query(DocModel)
                 .join(DocSetModel, DocSetModel.docset_id == DocModel.docset_id)
-                .join(CodebaseModel, DocSetModel.codebase_id == CodebaseModel.codebase_id)
+                .join(
+                    CodebaseModel, DocSetModel.codebase_id == CodebaseModel.codebase_id
+                )
                 .filter(CodebaseModel.user_id == user_id, DocModel.doc_id == doc_id)
                 .first()
             )
@@ -140,12 +164,19 @@ class DocsService:
                 user_docs = (
                     db_session.query(DocModel)
                     .join(DocSetModel, DocSetModel.docset_id == DocModel.docset_id)
-                    .join(CodebaseModel, DocSetModel.codebase_id == CodebaseModel.codebase_id)
+                    .join(
+                        CodebaseModel,
+                        DocSetModel.codebase_id == CodebaseModel.codebase_id,
+                    )
                     .filter(CodebaseModel.user_id == user_id)
                     .all()
                 )
-                return [json.loads(Docs(**doc.__dict__).model_dump_json()) for doc in user_docs]
+                return [
+                    json.loads(Docs(**doc.__dict__).model_dump_json())
+                    for doc in user_docs
+                ]
         except:
             return []
+
 
 docs_service = DocsService()

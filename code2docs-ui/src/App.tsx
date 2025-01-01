@@ -13,6 +13,7 @@ import CodeBaseListPage from "./pages/codebases/CodeBaseListPage.tsx";
 import IndividualCodebasePage from "./pages/codebases/IndividualCodebasePage.tsx";
 // ======== documentation ========
 import DocumentationListPage from "./pages/documentations/DocumentationListPage.tsx";
+import IndividualDocumentationPage from "./pages/documentations/IndividualDocumentationPage.tsx";
 // ======== user ========
 import UserAccountPage from "./pages/user/UserAccountPage.tsx";
 
@@ -41,6 +42,10 @@ function App() {
                 <Route
                     path="/documentations"
                     element={<DocumentationListPage />}
+                />
+                <Route
+                    path="/documentations/:docset_id"
+                    element={<IndividualDocumentationPage />}
                 />
 
                 {/* user */}
