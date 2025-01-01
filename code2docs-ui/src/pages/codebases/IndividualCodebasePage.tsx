@@ -24,7 +24,7 @@ import writing from "../../assets/writing.json";
 import axios from "axios";
 
 import { useEffect, useState } from "react";
-import { NavLink, useParams } from "react-router-dom";
+import { NavLink, useParams, useNavigate } from "react-router-dom";
 import { FileNode, buildFileTree } from "../../helpers/FileNode";
 import { FileTree } from "../../components/documentation/FileTree";
 import { useUserStore } from "../../store/userStore";
@@ -36,6 +36,7 @@ import selectFileImg from "../../assets/search-concept-yellow-folder-magnifier-i
 import { getUserGithubRepoZippedURL } from "../../global/constants";
 
 function IndividualCodebasePage() {
+    const navigate = useNavigate();
     const { isOpen, onOpen, onClose } = useDisclosure();
     const githubAuthToken = useUserStore((state: any) => state.githubAuthToken);
     const githubInstallationId = useUserStore(
@@ -167,7 +168,7 @@ function IndividualCodebasePage() {
         const zipBlob = await createZipFile();
         const formData = new FormData();
         // use axios
-        formData.append("file", zipBlob, "archive.zip");
+        formData.append("file", zipBlob, `${currentReadDirectory.name}.zip`);
         await axios
             .post(
                 `${
@@ -176,8 +177,9 @@ function IndividualCodebasePage() {
                 formData
             )
             .then((res) => {
-                console.log("res", res);
+                const { docset_id } = res.data;
                 onClose();
+                navigate(`/documentations/${docset_id}`);
             })
             .catch(() => {
                 onClose();

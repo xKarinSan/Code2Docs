@@ -67,6 +67,7 @@ def upload_doc(new_docs: CreateDocs):
 def get_docs_from_docset(docset_id: int, user_id: str):
     try:
         authorised_docs = docs_service.get_docs_from_docset(docset_id, user_id)
+        print("authorised_docs", authorised_docs)
         return JSONResponse(status_code=200, content=authorised_docs)
     except HTTPException as he:
         # Re-raise HTTPExceptions as they already have status codes

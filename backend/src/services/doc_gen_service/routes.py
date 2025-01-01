@@ -95,7 +95,7 @@ def document_zip_file(file: UploadFile, user_id: str) -> dict[str, str]:
                 }
             )
 
-        return JSONResponse(status_code=200, content=resultant_docs)
+        return JSONResponse(status_code=200, content=new_docset)
 
     except HTTPException as he:
         # Re-raise HTTPExceptions as they already have status codes
