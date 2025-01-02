@@ -104,7 +104,9 @@ export default function LandingNavbar({ children }: { children: ReactNode }) {
                 ) : null}
             </Box>
 
-            <Box p={4}>{children}</Box>
+            <Box p={4}>
+                {children}
+            </Box>
         </>
     );
 }
