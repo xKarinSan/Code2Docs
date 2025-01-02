@@ -212,6 +212,13 @@ function IndividualCodebasePage() {
                                 </NavLink>
                             </BreadcrumbItem>
                             <BreadcrumbItem>
+                                <NavLink to="/codebases">
+                                    <BreadcrumbLink>
+                                        Codebases
+                                    </BreadcrumbLink>
+                                </NavLink>
+                            </BreadcrumbItem>
+                            <BreadcrumbItem>
                                 <BreadcrumbLink>{repoName}</BreadcrumbLink>
                             </BreadcrumbItem>
                         </Breadcrumb>

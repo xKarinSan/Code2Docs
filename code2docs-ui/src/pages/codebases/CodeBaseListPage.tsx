@@ -5,6 +5,9 @@ import { type GithubRepoLink } from "../../global/types";
 import { getUserGithubRepoURL } from "../../global/constants";
 import {
     Badge,
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
     ButtonGroup,
     IconButton,
     Card,
@@ -78,7 +81,17 @@ function CodeBaseListPage() {
     return (
         <div>
             <Heading>Codebases</Heading>
-            <Card margin={5}>
+            <Breadcrumb>
+                <BreadcrumbItem>
+                    <NavLink to="/home">
+                        <BreadcrumbLink>Home</BreadcrumbLink>
+                    </NavLink>
+                </BreadcrumbItem>
+                <BreadcrumbItem>
+                    <BreadcrumbLink>Codebases</BreadcrumbLink>
+                </BreadcrumbItem>
+            </Breadcrumb>
+            <Card>
                 <TableContainer>
                     <Table variant="simple">
                         <Thead>
