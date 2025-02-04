@@ -4,3 +4,4 @@ langchain_core==0.2.23
 langchain_openai==0.1.17
 python-dotenv==1.0.1
 uvicorn==0.30.3
+PyJWT==2.9.0
