@@ -79,10 +79,8 @@ export default function LandingNavbar({ children }: { children: ReactNode }) {
                         <Box>
                             <Image
                                 src={TransparentLogo}
-                                width={{
-                                    base: "200px",
-                                    md: "350px",
-                                }}
+                                margin={"auto"}
+                                width={{ base: "80px", md: "100px" }}
                             />
                         </Box>
                         <HStack

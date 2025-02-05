@@ -1,6 +1,9 @@
-import { Box, Button, Card, Heading, Link, Text } from "@chakra-ui/react";
+import { Box, Button, Image, Heading, Link, Text } from "@chakra-ui/react";
 import { githubAuthURL } from "../../global/constants";
 import { useNavigate } from "react-router-dom";
+import TransparentLogo from "../../assets/TransparentLogo.png";
+import TransparentLogoWithSlogan from "../../assets/TransparentLogoWithSlogan.png";
+
 function AuthContainer({ isLogin }: { isLogin: boolean }) {
     const navigate = useNavigate();
     const authenticateGithubUser = () => {
@@ -21,6 +24,11 @@ function AuthContainer({ isLogin }: { isLogin: boolean }) {
                 lg: "40%",
             }}
         >
+            <Image
+                src={TransparentLogoWithSlogan}
+                margin={"auto"}
+                width={{ base: "250px", md: "450px" }}
+            />
             <Heading margin="5px auto" variant={"h3"} textAlign={"center"}>
                 {isLogin ? "Welcome Back" : "Registration"}
             </Heading>
