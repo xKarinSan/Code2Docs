@@ -58,7 +58,11 @@ export default function LandingNavbar({ children }: { children: ReactNode }) {
 
     return (
         <>
-            <Box bg={"white"} px={4}>
+            <Box
+                bg={"white"}
+                px={4}
+                boxShadow={"0px 1px 3px rgba(0, 0, 0, 0.25)"}
+            >
                 <Flex
                     h={16}
                     alignItems={"center"}
@@ -104,9 +108,7 @@ export default function LandingNavbar({ children }: { children: ReactNode }) {
                 ) : null}
             </Box>
 
-            <Box p={4}>
-                {children}
-            </Box>
+            <Box p={4}>{children}</Box>
         </>
     );
 }
