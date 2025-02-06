@@ -18,6 +18,7 @@ import IndividualDocumentationPage from "./pages/documentations/IndividualDocume
 import UserAccountPage from "./pages/user/UserAccountPage.tsx";
 
 // ======== etc ========
+import Landingpage from "./pages/Landingpage.tsx";
 import Homepage from "./pages/Homepage.tsx";
 
 function App() {
@@ -53,6 +54,7 @@ function App() {
 
                 {/* etc */}
                 <Route path="/home" element={<Homepage />} />
+                <Route path="/" element={<Landingpage />} />
             </Routes>
         </>
     );

@@ -294,7 +294,7 @@ function IndividualCodebasePage() {
                                             <GridItem margin="10px">
                                                 <Button
                                                     leftIcon={<FaPencilAlt />}
-                                                    background="#2809E3"
+                                                    background="black"
                                                     color="white"
                                                     borderRadius={5}
                                                     size="md"
