@@ -20,11 +20,9 @@ import {
     Tr,
     Th,
     Td,
-    Link,
     Text,
-    Icon,
 } from "@chakra-ui/react";
-import { FaAngleLeft, FaAngleRight, FaExternalLinkAlt } from "react-icons/fa";
+import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 
 function CodeBaseListPage() {
@@ -36,37 +34,49 @@ function CodeBaseListPage() {
     const [pageNumber, setPageNumber] = useState<number>(1);
     const [pageCount, setPageCount] = useState<number>(0);
 
+    const [repoCache, setRepoCache] = useState<
+        Record<number, GithubRepoLink[]>
+    >({});
+
     const getUserRepos = async () => {
+        if (repoCache[pageNumber]) {
+            setCodebases(repoCache[pageNumber]); // Load from cache
+            return;
+        }
+
         setIsLoading(true);
-        const config = {
-            headers: {
-                Authorization: `Bearer ${githubAuthToken}`,
-            },
-        };
-        await axios
-            .get(
-                `${getUserGithubRepoURL}${githubUsername.toLowerCase()}?page_num=${pageNumber}&per_page=30`,
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${githubAuthToken}`,
+                },
+            };
+            const res = await axios.get(
+                `${getUserGithubRepoURL}${githubUsername.toLowerCase()}?page_num=${pageNumber}&per_page=10`,
                 config
-            )
-            .then((res) => {
-                return res.data;
-            })
-            .then((data: any) => {
-                const { repos, pages_count } = data;
-                setPageCount(pages_count);
-                let githubRepos: GithubRepoLink[] = [];
-                repos.forEach((element: any) => {
-                    const { name, full_name, html_url, visibility } = element;
-                    githubRepos.push({
-                        displayName: name,
-                        fullRepoName: full_name,
-                        repoUrl: html_url,
-                        visibility,
-                    });
-                });
-                setCodebases(githubRepos);
-                setIsLoading(false);
-            });
+            );
+
+            const { repos, pages_count } = res.data;
+            setPageCount(pages_count);
+            const githubRepos: GithubRepoLink[] = repos.map(
+                ({ name, full_name, html_url, visibility }: any) => ({
+                    displayName: name,
+                    fullRepoName: full_name,
+                    repoUrl: html_url,
+                    visibility,
+                })
+            );
+
+            setCodebases(githubRepos);
+            setRepoCache((prevCache) => ({
+                ...prevCache,
+                [pageNumber]: githubRepos,
+            }));
+        } catch (error) {
+            console.error("Error fetching repos:", error);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const goToNextPage = () => {
@@ -96,8 +106,8 @@ function CodeBaseListPage() {
                     <Table variant="simple">
                         <Thead>
                             <Th>Codebase Name</Th>
-                            <Th>Link</Th>
-                            <Th>Original URL</Th>
+                            {/* <Th>Link</Th> */}
+                            {/* <Th>Original URL</Th> */}
                         </Thead>
                         {!isLoading && codebases ? (
                             <>
@@ -107,7 +117,7 @@ function CodeBaseListPage() {
                                             const {
                                                 displayName,
                                                 visibility,
-                                                repoUrl,
+                                                // repoUrl,
                                                 fullRepoName,
                                             } = codebase;
                                             return (
@@ -136,33 +146,6 @@ function CodeBaseListPage() {
                                                                     ? "Private"
                                                                     : "Public"}
                                                             </Badge>
-                                                        </Td>
-                                                        <Td>
-                                                            <NavLink
-                                                                to={
-                                                                    "/codebases/" +
-                                                                    fullRepoName
-                                                                }
-                                                            >
-                                                                {fullRepoName}
-                                                            </NavLink>
-                                                        </Td>
-                                                        <Td>
-                                                            <Link
-                                                                href={repoUrl}
-                                                                target="_blank"
-                                                            >
-                                                                Original Repo
-                                                                Link
-                                                                <Icon
-                                                                    margin={
-                                                                        "0 5px 0"
-                                                                    }
-                                                                    as={
-                                                                        FaExternalLinkAlt
-                                                                    }
-                                                                />
-                                                            </Link>
                                                         </Td>
                                                     </Tr>
                                                 </>

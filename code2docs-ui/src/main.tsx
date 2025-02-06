@@ -14,12 +14,25 @@ const theme = extendTheme({
         body: `'Raleway', sans-serif`,
     },
     components: {
+        TableContainer: {
+            baseStyle: {
+                width: "80vw",
+
+            },
+        },
         Table: {
             variants: {
                 simple: {
                     th: {
                         textTransform: "none",
                     },
+                },
+            },
+        },
+        Breadcrumb: {
+            baseStyle: {
+                container: {
+                    my: 2,
                 },
             },
         },
