@@ -1,32 +1,41 @@
 import { useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
-
 import axios from "axios";
 import { useEffect } from "react";
 import {
     githubAppInstallURL,
+    getGithubInstallationCheck,
     getGithubTokenURL,
-    getGithubAppTokenURL,
-} from "../../constants.ts";
+} from "../../global/constants.ts";
 import { useUserStore } from "../../store/userStore.ts";
 
 function GithubRedirectPage() {
     const navigate = useNavigate();
+    // auth token
     const currentUserAuthToken = useUserStore(
         (state: any) => state.githubAuthToken
-    );
-    const currentUserAppToken = useUserStore(
-        (state: any) => state.githubAppToken
-    );
-    const currentUserAuthRefreshToken = useUserStore(
-        (state: any) => state.githubAuthRefreshToken
     );
     const setUserAuthToken = useUserStore(
         (state: any) => state.setGithubAuthToken
     );
-    const setUserAppToken = useUserStore(
-        (state: any) => state.setGithubAppToken
+    // username (unique)
+    const setUsername = useUserStore((state: any) => state.setGithubUsername);
+    const username = useUserStore((state: any) => state.githubUsername);
+    // profile pic url
+    const setProfilePicUrl = useUserStore(
+        (state: any) => state.setGithubProfilePicUrl
     );
+    // displayname
+    const setDisplayName = useUserStore(
+        (state: any) => state.setGithubDisplayName
+    );
+
+    const setInstallationId = useUserStore(
+        (state: any) => state.setGithubInstallationId
+    );
+    const installationId = useUserStore(
+        (state: any) => state.githubInstallationId
+    );
+
     useEffect(() => {
         const queryString = window.location.search;
         const urlParams = new URLSearchParams(queryString);
@@ -37,59 +46,67 @@ function GithubRedirectPage() {
         if (errorParam) {
             navigate("/error");
         }
-        if (currentUserAppToken && currentUserAuthToken) {
+        if (currentUserAuthToken) {
             // user token
             navigate("/home");
         }
+        if (installationIdParam) {
+            setInstallationId(installationIdParam);
+        }
+        console.log(codeParam)
+        console.log(installationIdParam)
+        console.log(currentUserAuthToken)
 
         if (codeParam && !currentUserAuthToken) {
-            const getAccessToken = async () => {
+            const authenticateUser = async () => {
+                console.log("[authenticateUser]")
                 await axios
                     .get(getGithubTokenURL + codeParam)
                     .then((res) => {
+                        console.log("[res]",res)
                         return res.data;
                     })
                     .then((data) => {
-                        if (data.access_token && data.refresh_token && data.app_install_jwt) {
-                            setUserAuthToken(data.access_token);
-                            Cookies.set(
-                                "code2docs_github_auth_refresh_token",
-                                data.refresh_token
-                            );
-                            Cookies.set(
-                                "code2docs_github_jwt",
-                                data.app_install_jwt
-                            );
-                        }
+                        console.log("[data]",data)
+                        const {
+                            access_token,
+                            username,
+                            display_name,
+                            profile_pic_url,
+                        } = data;
+                        setUserAuthToken(access_token);
+                        setUsername(username);
+                        setDisplayName(display_name);
+                        setProfilePicUrl(profile_pic_url);
                     })
-                    .catch(() => {
+                    .catch((e) => {
+                        console.log("e",e)
                         navigate("/error");
                     });
             };
-            getAccessToken();
+            authenticateUser();
         }
-        if (!currentUserAppToken) {
-            window.location.assign(githubAppInstallURL);
-        }
-        if (installationIdParam && !currentUserAppToken) {
-            const getAppAccessToken = async () => {
+        if (!installationId || installationId == -1) {
+            const confirmInstall = async () => {
                 await axios
-                    .get(getGithubAppTokenURL + installationIdParam)
+                    .get(getGithubInstallationCheck + username)
                     .then((res) => {
                         return res.data;
                     })
                     .then((data) => {
-                        console.log("data:",data)
-                        if (data.token) {
-                            setUserAppToken(data.token);
+                        const { installation_id } = data;
+                        if (installation_id == -1) {
+                            window.location.assign(githubAppInstallURL);
+                        } else {
+                            setInstallationId(installation_id);
                             navigate("/home");
                         }
-                    })
-                    .catch(() => {
-                        navigate("/error");
                     });
             };
-            getAppAccessToken();
+            confirmInstall();
+        }
+        if (installationId != -1) {
+            navigate("/home");
         }
     }, []);
     return <div></div>;

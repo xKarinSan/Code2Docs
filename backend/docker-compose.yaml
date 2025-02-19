@@ -1,0 +1,39 @@
+version: "3"
+
+services:
+    code2docs-backend:
+        container_name: code2docs-backend
+        build: .
+        working_dir: /backend/
+        image: kallenl/code2docs-backend-dev-main:latest
+        command: sh -c "uvicorn src.main:app --reload --port=8000 --host=0.0.0.0"
+        ports:
+            - 8000:8000
+        env_file: ".env"
+        volumes:
+            - ./src:/backend/src
+        restart: on-failure
+    db:
+        container_name: postgres_db
+        image: postgres
+        restart: always
+        environment:
+            POSTGRES_USER: root
+            POSTGRES_PASSWORD: root
+            POSTGRES_DB: test_db
+        ports:
+            - 5432:5432
+        volumes:
+            - data:/var/lib/postgresql/data
+    pg-admin:
+        image: dpage/pgadmin4
+        environment:
+            PGADMIN_DEFAULT_EMAIL: admin@email.com
+            PGADMIN_DEFAULT_PASSWORD: admin
+            PGADMIN_LISTEN_PORT: 5050
+        ports:
+            - 5050:5050
+
+volumes:
+    data: 
+

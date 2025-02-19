@@ -1,0 +1,80 @@
+# name: CI/CD Pipeline
+# on:
+#   push:
+#     branches: [dev-docker]
+#   workflow_call:
+#     secrets:
+#       AWS_ACCESS_KEY_ID:
+#         required: true
+#       AWS_SECRET_ACCESS_KEY:
+#         required: true
+#       AWS_DEFAULT_REGION:
+#         required: true
+#       AWS_ECS_REPO:
+#         required: true
+#       AWS_ECS_IMAGE_NAME:
+#         required: true
+#       DOCKER_HUB_USERNAME:
+#         required: true
+#       DOCKER_HUB_ACCESS_TOKEN:
+#         required: true
+#       DOCKER_IMAGE_NAME:
+#         required: true
+      
+#       OPENAI_API_KEY:
+#         required: true
+#       OPENAI_MODEL:
+#         required: true
+
+#       GITHUB_CLIENT_ID:
+#         required: true
+#       GITHUB_CLIENT_SECRET:
+#         required: true
+#       GITHUB_APP_ID:
+#         required: true
+
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v2
+
+#       - name: Install AWS CLI
+#         uses: unfor19/install-aws-cli-action@v1
+#         with:
+#           version: 1
+#         env:
+#           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+
+#       - name: Login to AWS
+#         run: aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin ${{ secrets.AWS_ECS_REPO }}
+#         env:
+#           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+
+#       - name: Set up Docker Build
+#         uses: docker/setup-buildx-action@v1
+
+#       - name: Login to Docker Hub
+#         uses: docker/login-action@v1
+#         with:
+#           username: ${{ secrets.DOCKER_HUB_USERNAME }}
+#           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+#       - name: Build and push Docker image
+#         run: |
+#           docker build -t ${{ secrets.AWS_ECS_REPO }}/${{ secrets.AWS_ECS_IMAGE_NAME }}:latest ./backend \
+#           --build-arg BOTO_REGION_NAME_ARG=${{ secrets.BOTO_REGION_NAME }} \
+#           --build-arg BOTO_SECRET_NAME_ARG=${{ secrets.BOTO_SECRET_NAME }} \
+#           --build-arg BOTO_SECRET_KEYNAME_ARG=${{ secrets.BOTO_SECRET_KEYNAME }} \
+#           --build-arg OPENAI_API_KEY_ARG=${{ secrets.OPENAI_API_KEY }} \
+#           --build-arg OPENAI_MODEL_ARG=${{ secrets.OPENAI_MODEL }} \
+#           --build-arg GITHUB_CLIENT_ID_ARG=${{ secrets.GH_CLIENT_ID }} \
+#           --build-arg GITHUB_CLIENT_SECRET_ARG=${{ secrets.GH_CLIENT_SECRET }} \
+#           --build-arg GITHUB_APP_ID_ARG=${{ secrets.GH_APP_ID }}
+#           docker push ${{ secrets.AWS_ECS_REPO }}/${{ secrets.AWS_ECS_IMAGE_NAME }}:latest
+

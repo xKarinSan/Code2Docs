@@ -4,3 +4,5 @@ file_items
 *.md
 !readme.md
 keys/*
+
+env/

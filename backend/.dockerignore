@@ -1,0 +1,10 @@
+env/
+__pycache__/
+
+.git
+.cache
+.md
+
+*.env
+*.env.*
+env.*
