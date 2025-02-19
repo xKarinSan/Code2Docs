@@ -1,0 +1,174 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Accent colors */
+    --brand: 25 90% 48%;
+    --brand-foreground: 27 96% 61%;
+
+    /* Customized shadcn/ui colors */
+    --background: 0 5.9% 97%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: var(--brand);
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 94.9%;
+    --muted-foreground: 240 10% 3.9%;
+    --accent: 240 5% 64.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 72.22% 50.59%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 85%;
+    --ring: 240 5% 64.9%;
+    --radius: 0.5rem;
+
+    /* Shadcn/ui chart colors */
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+
+    /* Illustrations colors */
+    --light: var(--brand);
+    --light-foreground: var(--brand-foreground);
+
+    /* Shadows */
+    --shadow: #00000008;
+    --shadow-strong: #00000008;
+  }
+
+  .dark {
+    /* Accent colors */
+    --brand: 31 97% 72%;
+    --brand-foreground: 27 96% 61%;
+
+    /* Customized shadcn/ui colors */
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 3.7% 15.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 0 0% 98%;
+    --accent: 0 0% 98%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 85.7% 97.3%;
+    --border: 0 0% 98%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+
+    /* Illustrations colors */
+    --light: var(--foreground);
+    --light-foreground: var(--foreground);
+
+    /* Shadows */
+    --shadow: #00000020;
+    --shadow-strong: #00000088;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  .glass-1 {
+    @apply border border-border/15 bg-gradient-to-b from-card/80 to-card/40 dark:border-b-0 dark:border-border/5 dark:border-t-border/10 dark:from-card/5 dark:to-card/0;
+  }
+
+  .glass-2 {
+    @apply border border-border/15 bg-gradient-to-b from-card/100 to-card/80 dark:border-b-0 dark:border-border/5 dark:border-t-border/10 dark:from-card/10 dark:to-card/5;
+  }
+
+  .glass-3 {
+    @apply border border-border/15 bg-gradient-to-b from-card/30 to-card/20 dark:border-b-0 dark:border-border/5 dark:border-t-border/10;
+  }
+
+  .glass-4 {
+    @apply border border-border/80 border-b-input/90 bg-gradient-to-b from-card/60 to-card/20 dark:border-b-0 dark:border-border/5 dark:border-t-border/20 dark:from-primary/10 dark:to-primary/5;
+  }
+
+  .glass-5 {
+    @apply border border-border/100 border-b-input bg-gradient-to-b from-card/100 to-card/20 dark:border-b-0 dark:border-border/5 dark:border-t-border/20 dark:from-primary/15 dark:to-primary/5;
+  }
+}
+
+@layer utilities {
+  .fade-x {
+    mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      black 25%,
+      black 75%,
+      transparent 100%
+    );
+  }
+
+  .fade-y {
+    mask-image: linear-gradient(
+      to top,
+      transparent 0%,
+      black 25%,
+      black 75%,
+      transparent 100%
+    );
+  }
+
+  .fade-top {
+    mask-image: linear-gradient(to bottom, transparent 0%, black 35%);
+  }
+
+  .fade-bottom {
+    mask-image: linear-gradient(to top, transparent 0%, black 35%);
+  }
+
+  .fade-top-lg {
+    mask-image: linear-gradient(to bottom, transparent 15%, black 100%);
+  }
+
+  .fade-bottom-lg {
+    mask-image: linear-gradient(to top, transparent 15%, black 100%);
+  }
+
+  .fade-left {
+    mask-image: linear-gradient(to right, transparent 0%, black 35%);
+  }
+
+  .fade-right {
+    mask-image: linear-gradient(to left, transparent 0%, black 35%);
+  }
+
+  .fade-left-lg {
+    mask-image: linear-gradient(to right, transparent 15%, black 100%);
+  }
+
+  .fade-right-lg {
+    mask-image: linear-gradient(to left, transparent 15%, black 100%);
+  }
+}
