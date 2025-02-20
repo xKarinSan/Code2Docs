@@ -8,3 +8,9 @@ PyJWT==2.10.0
 python-dotenv==1.0.1
 Requests==2.32.3
 uvicorn==0.32.1
+
+
+python-multipart
+pyjwt[crypto]
+pipreqs
+psycopg2-binary
