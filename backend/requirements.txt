@@ -14,5 +14,3 @@ python-multipart
 pyjwt[crypto]
 pipreqs
 psycopg2-binary
-
-pydantic==1.10.11
