@@ -4,7 +4,7 @@ import GlobalBar from "./components/global/Navbars/GlobalBar.tsx";
 
 import { BrowserRouter } from "react-router-dom";
 
-import { ChakraProvider, extendTheme, Heading } from "@chakra-ui/react";
+import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import "@fontsource/open-sans";
 import "@fontsource/raleway";
 

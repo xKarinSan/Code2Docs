@@ -1,7 +1,6 @@
 import { Box, Button, Image, Heading, Link, Text } from "@chakra-ui/react";
 import { githubAuthURL } from "../../global/constants";
 import { useNavigate } from "react-router-dom";
-import TransparentLogo from "../../assets/TransparentLogo.png";
 import TransparentLogoWithSlogan from "../../assets/TransparentLogoWithSlogan.png";
 
 function AuthContainer({ isLogin }: { isLogin: boolean }) {

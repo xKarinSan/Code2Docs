@@ -14,9 +14,6 @@ function UserAccountPage() {
     const githubProfilePictureUrl = useUserStore(
         (state: any) => state.githubProfilePictureUrl
     );
-    const githubDisplayName = useUserStore(
-        (state: any) => state.githubDisplayName
-    );
     const githubUsername = useUserStore((state: any) => state.githubUsername);
     return (
         <Box>

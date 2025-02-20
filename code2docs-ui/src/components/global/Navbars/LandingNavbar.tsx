@@ -13,7 +13,7 @@ import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 import { ReactNode, useEffect, useState } from "react";
 
 import TransparentLogo from "../../../assets/TransparentLogo.png";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 type NavigationLink = {
     label: string;
