@@ -1,6 +1,9 @@
-import { Button, Card, Heading, Link, Text } from "@chakra-ui/react";
-import { githubAuthURL } from "../../constants";
+import { Box, Button, Image, Heading, Link, Text } from "@chakra-ui/react";
+import { githubAuthURL } from "../../global/constants";
 import { useNavigate } from "react-router-dom";
+import TransparentLogo from "../../assets/TransparentLogo.png";
+import TransparentLogoWithSlogan from "../../assets/TransparentLogoWithSlogan.png";
+
 function AuthContainer({ isLogin }: { isLogin: boolean }) {
     const navigate = useNavigate();
     const authenticateGithubUser = () => {
@@ -11,7 +14,7 @@ function AuthContainer({ isLogin }: { isLogin: boolean }) {
         navigate(isLogin ? "/register" : "/login");
     };
     return (
-        <Card
+        <Box
             padding="10px"
             margin={"auto"}
             width={{
@@ -21,10 +24,30 @@ function AuthContainer({ isLogin }: { isLogin: boolean }) {
                 lg: "40%",
             }}
         >
-            <Heading margin="5px auto" variant={"h3"}>
-                {isLogin ? "Login" : "Registration"}
+            <Image
+                src={TransparentLogoWithSlogan}
+                margin={"auto"}
+                width={{ base: "250px", md: "450px" }}
+            />
+            <Heading margin="5px auto" variant={"h3"} textAlign={"center"}>
+                {isLogin ? "Welcome Back" : "Registration"}
             </Heading>
+            <Text margin="10px auto" textAlign={"center"}>
+                {" "}
+                {isLogin
+                    ? "Do not have an account? Register "
+                    : "Aleady have an account? Login "}
+                <Link
+                    onClick={togglePage}
+                    textDecoration={"underline"}
+                    fontWeight={"bold"}
+                >
+                    here
+                </Link>
+                .
+            </Text>
             <Button
+                display={"flex"}
                 background={"black"}
                 color="white"
                 margin={"20px auto"}
@@ -33,17 +56,7 @@ function AuthContainer({ isLogin }: { isLogin: boolean }) {
             >
                 {isLogin ? "Login" : "Register"} with Github
             </Button>
-            <Text margin="10px auto">
-                {" "}
-                {isLogin
-                    ? "Do not have an account? Register "
-                    : "Aleady have an account? Login "}
-                <Link color="blue" onClick={togglePage}>
-                    here
-                </Link>
-                .
-            </Text>
-        </Card>
+        </Box>
     );
 }
 

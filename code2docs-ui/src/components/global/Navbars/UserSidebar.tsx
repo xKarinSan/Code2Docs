@@ -92,7 +92,8 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
             >
                 <Image
                     src={TransparentLogo}
-                    width={{ base: "200px", md: "350px" }}
+                    margin={"auto"}
+                    width={{ base: "100px", md: "150px" }}
                 />
                 <CloseButton
                     display={{ base: "flex", md: "none" }}
@@ -178,7 +179,8 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
             />
             <Image
                 src={TransparentLogo}
-                width={{ base: "200px", md: "50px" }}
+                margin={"auto"}
+                width={{ base: "100px", md: "150px" }}
             />
         </Flex>
     );

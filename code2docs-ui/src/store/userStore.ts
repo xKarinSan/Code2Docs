@@ -5,20 +5,31 @@ export const useUserStore = create(
     persist(
         (set) => ({
             githubAuthToken: "",
-            githubAuthRefreshToken: "",
-            githubAppToken: "",
+            githubInstallationId: -1,
+            githubUsername: "",
+            githubProfilePictureUrl: "",
+            githubDisplayName: "",
 
             setGithubAuthToken: (token: string) =>
                 set({ githubAuthToken: token }),
             removeGithubAuthToken: () => set({ githubAuthToken: "" }),
-            setGithubAuthRefreshToken: (refreshToken: string) =>
-                set({ githubAuthRefreshToken: refreshToken }),
-            removeGithubAuthRefreshToken: () =>
-                set({ githubAuthRefreshToken: "" }),
 
-            setGithubAppToken: (token: string) =>
-                set({ githubAppToken: token }),
-            removeGithubAppToken: () => set({ githubAppToken: "" }),
+            setGithubInstallationId: (installation_id: number) =>
+                set({ githubInstallationId: installation_id }),
+            removeGithubInstallationId: () => set({ githubInstallationId: -1 }),
+
+            setGithubUsername: (username: string) =>
+                set({ githubUsername: username }),
+            removeGithubUsername: () => set({ githubUsername: "" }),
+
+            setGithubProfilePicUrl: (profilePicUrl: string) =>
+                set({ githubProfilePictureUrl: profilePicUrl }),
+            removeGithubProfilePicUrl: () =>
+                set({ githubProfilePictureUrl: "" }),
+
+            setGithubDisplayName: (displayName: string) =>
+                set({ githubDisplayName: displayName }),
+            removeGithubDisplayName: () => set({ githubDisplayName: "" }),
         }),
 
         {

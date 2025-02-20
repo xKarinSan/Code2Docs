@@ -1,5 +1,6 @@
 import {
     Box,
+    Button,
     Flex,
     HStack,
     IconButton,
@@ -12,45 +13,76 @@ import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 import { ReactNode, useEffect, useState } from "react";
 
 import TransparentLogo from "../../../assets/TransparentLogo.png";
+import { Link, useNavigate } from "react-router-dom";
 
-interface Props {
-    children: React.ReactNode;
-}
+type NavigationLink = {
+    label: string;
+    href: string;
+};
 
-const LandingPageLinks = [
-    "Home",
-    "About Us",
-    "Highlights",
-    "How We Work",
-    "Demo",
-    "Contact Us",
+const LandingPageLinks: NavigationLink[] = [
+    {
+        label: "Home",
+        href: "#home",
+    },
+    {
+        label: "Highlights",
+        href: "#highlights",
+    },
+    {
+        label: "How We Work",
+        href: "#howwework",
+    },
+    {
+        label: "Demo",
+        href: "#demo",
+    },
+    {
+        label: "Contact Us",
+        href: "#contactus",
+    },
 ];
 
-const HomepageLinks = ["Home", "Codebases", "Documentations", "Account"];
-
-const NavLink = (props: Props) => {
-    const { children } = props;
+const NavLink = ({ label, href }: NavigationLink) => {
+    const navigate = useNavigate();
+    const handleClick = (
+        event: React.MouseEvent<HTMLAnchorElement, MouseEvent>
+    ) => {
+        event.preventDefault(); // Prevent default anchor behavior
+        navigate("/");
+        const targetElement = document.getElementById(href.replace("#", "")); // Get the element by ID
+        if (targetElement) {
+            targetElement.scrollIntoView({ behavior: "smooth" });
+        }
+    };
     return (
         <Box
             as="a"
             px={2}
             py={1}
-            rounded={"md"}
+            rounded="md"
             _hover={{
                 textDecoration: "none",
                 bg: useColorModeValue("gray.200", "gray.700"),
             }}
-            href={"#"}
+            href={href}
+            onClick={handleClick}
         >
-            {children}
+            {label}
+            {/* <Link to={""}>{label}</Link> */}
         </Box>
     );
 };
 
 export default function LandingNavbar({ children }: { children: ReactNode }) {
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const navigate = useNavigate();
 
-    const [links, setLinks] = useState<string[]>([]);
+    const [links, setLinks] = useState<NavigationLink[]>([]);
+
+    const goToLogin = () => {
+        navigate("/login");
+    };
 
     useEffect(() => {
         setLinks(LandingPageLinks);
@@ -58,7 +90,12 @@ export default function LandingNavbar({ children }: { children: ReactNode }) {
 
     return (
         <>
-            <Box bg={"white"} px={4}>
+            <Box
+                position={"sticky"}
+                bg={"white"}
+                px={4}
+                boxShadow={"0px 1px 3px rgba(0, 0, 0, 0.25)"}
+            >
                 <Flex
                     h={16}
                     alignItems={"center"}
@@ -75,10 +112,8 @@ export default function LandingNavbar({ children }: { children: ReactNode }) {
                         <Box>
                             <Image
                                 src={TransparentLogo}
-                                width={{
-                                    base: "200px",
-                                    md: "350px",
-                                }}
+                                margin={"auto"}
+                                width={{ base: "80px", md: "100px" }}
                             />
                         </Box>
                         <HStack
@@ -86,9 +121,18 @@ export default function LandingNavbar({ children }: { children: ReactNode }) {
                             spacing={4}
                             display={{ base: "none", md: "flex" }}
                         >
-                            {links.map((link) => (
-                                <NavLink key={link}>{link}</NavLink>
+                            {links.map((link: NavigationLink) => (
+                                <NavLink label={link.label} href={link.href} />
                             ))}
+                            <Button
+                                background={"black"}
+                                color="white"
+                                onClick={() => {
+                                    goToLogin();
+                                }}
+                            >
+                                Login
+                            </Button>
                         </HStack>
                     </HStack>
                 </Flex>
@@ -96,15 +140,23 @@ export default function LandingNavbar({ children }: { children: ReactNode }) {
                 {isOpen ? (
                     <Box pb={4} display={{ md: "none" }}>
                         <Stack as={"nav"} spacing={4}>
-                            {links.map((link) => (
-                                <NavLink key={link}>{link}</NavLink>
+                            {links.map((link: NavigationLink) => (
+                                <NavLink label={link.label} href={link.href} />
                             ))}
+                            <Button
+                                background={"black"}
+                                color="white"
+                                onClick={() => {
+                                    goToLogin();
+                                }}
+                            >
+                                Login
+                            </Button>
                         </Stack>
                     </Box>
                 ) : null}
             </Box>
-
-            <Box p={4}>{children}</Box>
+            <Box>{children}</Box>
         </>
     );
 }
