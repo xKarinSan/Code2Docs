@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import { getDocsetURL } from "../../global/constants";
 import { useUserStore } from "../../store/userStore";
 import {
-    Button,
-    Heading,
     Box,
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    Heading,
     Card,
     TableContainer,
     Table,
@@ -53,43 +55,55 @@ function DocumentationListPage() {
     return (
         <div>
             <Heading>Documentation History</Heading>
-            <Card margin={5}>
-                <TableContainer>
-                    <Table variant="simple">
-                        <Thead>
-                            <Th>Doc ID</Th>
-                            <Th>Doc Name</Th>
-                            <Th>Created Date</Th>
-                            <Th>Codebase Link</Th>
-                        </Thead>
-                        <Tbody>
-                            {docSetList.map((docset: DocSet) => {
-                                const {
-                                    docset_id: docsetId,
-                                    docset_name: docsetName,
-                                    date_generated: dateCreated,
-                                } = docset;
-                                return (
-                                    <Tr>
-                                        <Td>{docsetId}</Td>
-                                        <Td>{docsetName}</Td>
-                                        <Td>{dateCreated.toString()}</Td>
-                                        <Td>
-                                            <Link
-                                                onClick={() => {
-                                                    goToDocset(docsetId);
-                                                }}
-                                            >
-                                                Go to documentations
-                                            </Link>
-                                        </Td>
-                                    </Tr>
-                                );
-                            })}
-                        </Tbody>
-                    </Table>
-                </TableContainer>
-            </Card>
+            <Breadcrumb>
+                <BreadcrumbItem>
+                    <NavLink to="/home">
+                        <BreadcrumbLink>Home</BreadcrumbLink>
+                    </NavLink>
+                </BreadcrumbItem>
+                <BreadcrumbItem>
+                    <BreadcrumbLink>Documentations</BreadcrumbLink>
+                </BreadcrumbItem>
+            </Breadcrumb>
+            <Box>
+                <Card>
+                    <TableContainer>
+                        <Table variant="simple">
+                            <Thead>
+                                <Th>Doc ID</Th>
+                                <Th>Doc Name</Th>
+                                <Th>Created Date</Th>
+                                <Th>Codebase Link</Th>
+                            </Thead>
+                            <Tbody>
+                                {docSetList.map((docset: DocSet) => {
+                                    const {
+                                        docset_id: docsetId,
+                                        docset_name: docsetName,
+                                        date_generated: dateCreated,
+                                    } = docset;
+                                    return (
+                                        <Tr>
+                                            <Td>{docsetId}</Td>
+                                            <Td>{docsetName}</Td>
+                                            <Td>{dateCreated.toString()}</Td>
+                                            <Td>
+                                                <Link
+                                                    onClick={() => {
+                                                        goToDocset(docsetId);
+                                                    }}
+                                                >
+                                                    Go to documentations
+                                                </Link>
+                                            </Td>
+                                        </Tr>
+                                    );
+                                })}
+                            </Tbody>
+                        </Table>
+                    </TableContainer>
+                </Card>
+            </Box>
         </div>
     );
 }

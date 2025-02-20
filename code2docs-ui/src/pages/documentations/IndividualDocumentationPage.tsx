@@ -1,9 +1,16 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, NavLink } from "react-router-dom";
 import { getDocsetURL } from "../../global/constants";
 import { useUserStore } from "../../store/userStore";
-import { Button, Heading, Box, Card } from "@chakra-ui/react";
+import {
+    Breadcrumb,
+    BreadcrumbLink,
+    BreadcrumbItem,
+    Heading,
+    Box,
+    Card,
+} from "@chakra-ui/react";
 import MarkdownEditor from "@uiw/react-markdown-editor";
 
 interface Doc {
@@ -24,7 +31,7 @@ function IndividualDocumentationPage() {
     const githubInstallationId = useUserStore(
         (state: any) => state.githubInstallationId
     );
-    const [selectedDoc, setSelectedDoc] = useState<Doc>();
+    const [selectedDoc, setSelectedDoc] = useState<Doc | null>();
     const [selectedDocSet, setSelectedDocSet] = useState<DocSet>();
     const [docsList, setDocsList] = useState([]);
 
@@ -45,32 +52,76 @@ function IndividualDocumentationPage() {
                 });
         } catch (e) {}
     };
+
+    const selectDocumentation = (currentDoc: Doc) => {
+        setSelectedDoc(
+            selectedDoc?.doc_id != currentDoc.doc_id ? currentDoc : null
+        );
+    };
     return (
         <Box>
-            <Heading margin={5}>{selectedDocSet?.docset_name}</Heading>
-            <Box display={"flex"}>
-                <Box height={"auto"}>
+            <Breadcrumb>
+                <BreadcrumbItem>
+                    <NavLink to="/home">
+                        <BreadcrumbLink>Home</BreadcrumbLink>
+                    </NavLink>
+                </BreadcrumbItem>
+                <BreadcrumbItem>
+                    <NavLink to="/documentations">
+                        <BreadcrumbLink>Documentations</BreadcrumbLink>
+                    </NavLink>
+                </BreadcrumbItem>
+                <BreadcrumbItem>
+                    <BreadcrumbLink>
+                        {selectedDocSet?.docset_name}
+                    </BreadcrumbLink>
+                </BreadcrumbItem>
+            </Breadcrumb>
+            <Heading margin={5}>
+                Documentations for {selectedDocSet?.docset_name}
+            </Heading>
+            <Box display={"flex"} margin={2}>
+                <Box height={"80vh"} width={"30%"} overflow={"scroll"}>
                     {docsList.map((documentation: Doc) => {
-                        const { doc_name } = documentation;
+                        const { doc_name, doc_id } = documentation;
                         return (
-                            <Card margin={2}>
-                                <Button
-                                    background={"white"}
-                                    onClick={() => {
-                                        setSelectedDoc(documentation);
-                                    }}
-                                >
-                                    {doc_name}
-                                </Button>
+                            <Card
+                                background={
+                                    selectedDoc?.doc_id == doc_id
+                                        ? "black"
+                                        : "white"
+                                }
+                                textColor={
+                                    selectedDoc?.doc_id == doc_id
+                                        ? "white"
+                                        : "black"
+                                }
+                                margin={2}
+                                padding={3}
+                                whiteSpace={"nowrap"}
+                                overflow={"scroll"}
+                                textAlign={"left"}
+                                _hover={{ cursor: "pointer" }}
+                                onClick={() => {
+                                    selectDocumentation(documentation);
+                                }}
+                            >
+                                {doc_name}
                             </Card>
                         );
                     })}
                 </Box>
-                <MarkdownEditor
-                    width={"auto"}
-                    height="520px"
-                    value={selectedDoc?.contents}
-                />
+                <Box
+                    overflow={"scroll"}
+                    width={"60%"}
+                    height={"80vh"}
+                    padding={2}
+                >
+                    <MarkdownEditor
+                        minHeight="60vh"
+                        value={selectedDoc?.contents}
+                    />
+                </Box>
             </Box>
         </Box>
     );

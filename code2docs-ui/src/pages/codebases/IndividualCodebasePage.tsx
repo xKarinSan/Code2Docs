@@ -7,10 +7,10 @@ import {
     Button,
     useToast,
     Breadcrumb,
+    BreadcrumbLink,
     BreadcrumbItem,
     Text,
     Image,
-    BreadcrumbLink,
     Modal,
     ModalOverlay,
     ModalContent,
@@ -212,6 +212,13 @@ function IndividualCodebasePage() {
                                 </NavLink>
                             </BreadcrumbItem>
                             <BreadcrumbItem>
+                                <NavLink to="/codebases">
+                                    <BreadcrumbLink>
+                                        Codebases
+                                    </BreadcrumbLink>
+                                </NavLink>
+                            </BreadcrumbItem>
+                            <BreadcrumbItem>
                                 <BreadcrumbLink>{repoName}</BreadcrumbLink>
                             </BreadcrumbItem>
                         </Breadcrumb>
@@ -287,7 +294,7 @@ function IndividualCodebasePage() {
                                             <GridItem margin="10px">
                                                 <Button
                                                     leftIcon={<FaPencilAlt />}
-                                                    background="#2809E3"
+                                                    background="black"
                                                     color="white"
                                                     borderRadius={5}
                                                     size="md"

@@ -51,7 +51,7 @@ function UserAccountPage() {
                         margin={"auto"}
                         alignSelf={"start"}
                         left={0}
-                        background="#2809E3"
+                        background="black"
                         color="white"
                         borderRadius={5}
                     >

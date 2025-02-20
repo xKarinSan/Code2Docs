@@ -14,6 +14,8 @@
     "@chakra-ui/react": "^2.8.2",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
+    "@fontsource/open-sans": "^5.1.1",
+    "@fontsource/raleway": "^5.1.1",
     "@types/js-cookie": "^3.0.6",
     "@uiw/react-markdown-editor": "^6.1.2",
     "axios": "^1.7.7",
