@@ -1,10 +1,10 @@
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
-from backend.src.services.docs_service.schemas.DocSetSchemas import CreateDocSet, DocSet
+from src.services.docs_service.schemas.DocSetSchemas import CreateDocSet, DocSet
 
-from backend.src.services.docs_service.schemas.DocSchemas import Docs, CreateDocs
+from src.services.docs_service.schemas.DocSchemas import Docs, CreateDocs
 
-from backend.src.services.docs_service.docs_service import docs_service
+from src.services.docs_service.docs_service import docs_service
 
 router = APIRouter()
 

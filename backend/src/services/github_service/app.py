@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request
-from backend.src.services.github_service.routes import router
+from src.services.github_service.routes import router
 import time
 
 github_service_app = FastAPI()

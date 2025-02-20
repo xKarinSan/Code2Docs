@@ -1,9 +1,9 @@
 from typing import Dict, List
-from backend.src.services.codebase_service.CodebaseSchemas import (
+from src.services.codebase_service.CodebaseSchemas import (
     Codebase,
 )
-from backend.src.services.db_service.models.CodebaseModel import CodebaseModel
-from backend.src.services.db_service.db import get_db_session
+from src.services.db_service.models.CodebaseModel import CodebaseModel
+from src.services.db_service.db import get_db_session
 from datetime import datetime
 import json
 

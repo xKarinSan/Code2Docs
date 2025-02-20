@@ -1,10 +1,10 @@
 from fastapi import APIRouter, UploadFile, HTTPException
 from fastapi.responses import JSONResponse
-from backend.src.services.doc_gen_service.doc_gen_service import doc_gen_service
-from backend.src.services.docs_service.docs_service import docs_service
-from backend.src.services.codebase_service.codebase_service import codebase_service
+from src.services.doc_gen_service.doc_gen_service import doc_gen_service
+from src.services.docs_service.docs_service import docs_service
+from src.services.codebase_service.codebase_service import codebase_service
 
-from backend.src.services.docs_service.schemas.DocSetSchemas import (
+from src.services.docs_service.schemas.DocSetSchemas import (
     DocSet,
     CreateDocSet,
 )

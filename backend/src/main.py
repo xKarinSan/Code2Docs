@@ -3,15 +3,15 @@ import sys
 sys.path.append("../")
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from backend.src.services.doc_gen_service.app import doc_gen_service_app
-from backend.src.services.github_service.app import github_service_app
-from backend.src.services.codebase_service.app import codebase_service_app
-from backend.src.services.docs_service.app import docs_service_app
-from backend.src.services.db_service.db import Base, engine
+from src.services.doc_gen_service.app import doc_gen_service_app
+from src.services.github_service.app import github_service_app
+from src.services.codebase_service.app import codebase_service_app
+from src.services.docs_service.app import docs_service_app
+from src.services.db_service.db import Base, engine
 from mangum import Mangum
 
 # add the schemas
-from backend.src.services.db_service.models import DocModel, DocSetModel, CodebaseModel
+from src.services.db_service.models import DocModel, DocSetModel, CodebaseModel
 import uvicorn
 
 app = FastAPI()

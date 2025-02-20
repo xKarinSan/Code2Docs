@@ -1,10 +1,10 @@
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
-from backend.src.services.codebase_service.CodebaseSchemas import (
+from src.services.codebase_service.CodebaseSchemas import (
     CreateCodebase,
     Codebase,
 )
-from backend.src.services.codebase_service.codebase_service import codebase_service
+from src.services.codebase_service.codebase_service import codebase_service
 from typing import Any
 
 router = APIRouter()

@@ -15,10 +15,10 @@ from langchain.schema.runnable import (
 )
 from datetime import datetime
 
-from backend.src.services.db_service.db import get_db
-from backend.src.services.codebase_service.codebase_service import codebase_service
-from backend.src.services.db_service.models.DocModel import DocModel
-from backend.src.services.db_service.models.DocSetModel import DocSetModel
+from src.services.db_service.db import get_db
+from src.services.codebase_service.codebase_service import codebase_service
+from src.services.db_service.models.DocModel import DocModel
+from src.services.db_service.models.DocSetModel import DocSetModel
 import json
 
 # OPENAI_MODEL

@@ -1,15 +1,15 @@
 import json
 from typing import Dict, Any, List
 from datetime import datetime
-from backend.src.services.db_service.models.DocModel import DocModel
-from backend.src.services.db_service.models.DocSetModel import DocSetModel
-from backend.src.services.db_service.models.CodebaseModel import CodebaseModel
-from backend.src.services.db_service.models.DocModel import DocModel
+from src.services.db_service.models.DocModel import DocModel
+from src.services.db_service.models.DocSetModel import DocSetModel
+from src.services.db_service.models.CodebaseModel import CodebaseModel
+from src.services.db_service.models.DocModel import DocModel
 
-from backend.src.services.docs_service.schemas.DocSchemas import Docs
-from backend.src.services.docs_service.schemas.DocSetSchemas import DocSet
-from backend.src.services.codebase_service.codebase_service import codebase_service
-from backend.src.services.db_service.db import get_db_session
+from src.services.docs_service.schemas.DocSchemas import Docs
+from src.services.docs_service.schemas.DocSetSchemas import DocSet
+from src.services.codebase_service.codebase_service import codebase_service
+from src.services.db_service.db import get_db_session
 
 
 class DocsService:

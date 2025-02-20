@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
-from backend.src.services.db_service.db import Base
+from src.services.db_service.db import Base
 
 
 class DocModel(Base):
