@@ -17,4 +17,3 @@ pip install code2docs-cli
 ```
 code2docs-cli
 ```
-NOTE: This is still under construction 

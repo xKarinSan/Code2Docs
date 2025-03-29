@@ -10,7 +10,12 @@ app = typer.Typer(no_args_is_help=True)
 @app.command("upload-key")
 def upload_key(key: str):
     """
-    To upload an API key
+    \b
+    To upload an API key.
+    \nParameters:
+      - key (string): the value of the API key
+    \nExample:
+      code2docs-cli upload-key test_key
     """
     if not key:
         print("Key not found")
@@ -25,6 +30,7 @@ def upload_key(key: str):
 @app.command("show-key")
 def show_key(masked: bool = True):
     """
+    \b
     To show if the key is present or not. NOTE: This should at least be masked during production.
     """
     curr_key = os.environ.get("api_key", None)
@@ -41,22 +47,18 @@ def show_key(masked: bool = True):
 @app.command("wave")
 def hello(name: str, iq: int, display_iq: bool = True):
     """
-    To say hello
-    name (string): name of person
-    iq (int): iq of person
+    \b
+    To say hello. here are the following parameters
+    \nParameters:
+      - name (string): Name of the person
+      - iq (int): IQ of the person
+      - display_iq (bool, optional): Whether to display the IQ (default: True)
+    \nExample:
+      code2docs-cli wave John 130 --display-iq
     """
     print(f"Hello {name}")
     if display_iq:
         print(f"This is your IQ: {iq}")
-
-
-@app.command("bye")
-def goodbye():
-    """
-    To say goodbye
-    """
-    print("Goodbye")
-
 
 if __name__ == "__main__":
     load_dotenv()

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "code2docs-cli"
-version = "0.1.0"
+version = "0.1.1"
 description = ""
 authors = ["xKarinSan <setsunayukii88@gmail.com>"]
 readme = "README.md"
