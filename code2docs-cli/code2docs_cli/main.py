@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 import typer
 
 
-app = typer.Typer()
+app = typer.Typer(no_args_is_help=True)
 
 
 @app.command("upload-key")
@@ -16,6 +16,7 @@ def upload_key(key: str):
         print("Key not found")
     else:
         env_path = Path(".env")
+        env_path.parent.mkdir(parents=True, exist_ok=True)
         with env_path.open("w") as f:
             f.write(f"api_key={key}")
         print("key saved")
