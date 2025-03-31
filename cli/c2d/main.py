@@ -1,8 +1,8 @@
 from pathlib import Path
-import subprocess
 import sys
 import os
 from dotenv import load_dotenv
+from c2d.utils.scan import scan_repo
 import typer
 from rich import print
 from rich.console import Console
@@ -52,7 +52,7 @@ def show_key(masked: bool = True):
 def scan_directory():
     """
     \b
-    This scans the current directory which the c2d cli is at
+    This scans the current directory which the c2d cli is used at.
 
     """
     print("Scanning ...")
@@ -72,24 +72,11 @@ def scan_for_repo():
       - repository name if a repository is found
       - "Not found" if there is no repository found.
     """
-    git_dir = Path(".git")
-    if not git_dir.exists():
+    repo_found = scan_repo()
+    if not repo_found:
         print("Not found!")
         return
-
-    try:
-        remote_url = (
-            subprocess.check_output(
-                ["git", "config", "--get", "remote.origin.url"],
-                stderr=subprocess.DEVNULL,
-            )
-            .decode()
-            .strip()
-        )
-
-        print(f"Repo URL: {remote_url.lower()}")
-    except subprocess.CalledProcessError:
-        print("Error, please try again later!")
+    print("Repo found!")
 
 
 @app.command("wave")
