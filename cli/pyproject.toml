@@ -1,12 +1,12 @@
 [tool.poetry]
-name = "code2docs-cli"
-version = "0.1.1"
+name = "c2d"
+version = "0.1.0"
 description = ""
 authors = ["xKarinSan <setsunayukii88@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.scripts]
-code2docs-cli = "code2docs_cli.main:app"
+c2d = "c2d.main:main"
 
 [tool.poetry.dependencies]
 python = "^3.12"
