@@ -2,7 +2,7 @@ from pathlib import Path
 import sys
 import os
 from dotenv import load_dotenv
-from c2d.utils.scan import scan_repo
+from c2d.utils.scan import detect_repo, get_gitignore_contents, scan_subfolders
 import typer
 from rich import print
 from rich.console import Console
@@ -58,7 +58,7 @@ def scan_directory():
     print("Scanning ...")
     path = os.curdir
 
-    print(os.listdir(path))
+    scan_subfolders()
     return
 
 
@@ -72,28 +72,13 @@ def scan_for_repo():
       - repository name if a repository is found
       - "Not found" if there is no repository found.
     """
-    repo_found = scan_repo()
+    repo_found = detect_repo()
     if not repo_found:
         print("Not found!")
         return
-    print("Repo found!")
-
-
-@app.command("wave")
-def hello(name: str, iq: int, display_iq: bool = True):
-    """
-    \b
-    To say hello. here are the following parameters
-    \nParameters:
-      - name (string): Name of the person
-      - iq (int): IQ of the person
-      - display_iq (bool, optional): Whether to display the IQ (default: True)
-    \nExample:
-      c2d wave John 130 --display-iq
-    """
-    print(f"Hello {name}")
-    if display_iq:
-        print(f"This is your IQ: {iq}")
+    gitignore_contents = get_gitignore_contents()
+    print(gitignore_contents)
+    # print("Repo found!")
 
 
 def main():
