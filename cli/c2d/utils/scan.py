@@ -1,6 +1,5 @@
 from pathlib import Path
 import os
-import pathspec
 import subprocess
 
 
@@ -70,7 +69,7 @@ def scan_subfolders():
     """
     path = os.curdir
     # path = "/Users/demonicaoi/Documents/GitHub/sensei-gigs/backend"
-    path = "/Users/demonicaoi/Documents/Experiments/mern-app/"
+    # path = "/Users/demonicaoi/Documents/Experiments/mern-app/"
 
     programming_extensions = {
         ".py",

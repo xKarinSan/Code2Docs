@@ -2,7 +2,12 @@ from pathlib import Path
 import sys
 import os
 from dotenv import load_dotenv
-from c2d.utils.scan import detect_repo, get_gitignore_contents, scan_subfolders
+from c2d.utils.scan import (
+    detect_repo,
+    get_gitignore_contents,
+    scan_subfolders,
+    read_contents,
+)
 import typer
 from rich import print
 from rich.console import Console
@@ -56,10 +61,9 @@ def scan_directory():
 
     """
     print("Scanning ...")
-    path = os.curdir
 
-    scan_subfolders()
-    return
+    resultant_files = scan_subfolders()
+    read_contents(resultant_files)
 
 
 @app.command("repo-scan")
