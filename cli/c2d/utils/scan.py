@@ -68,9 +68,6 @@ def scan_subfolders():
     Scans all the contents in the subfolder(s)
     """
     path = os.curdir
-    # path = "/Users/demonicaoi/Documents/GitHub/sensei-gigs/backend"
-    # path = "/Users/demonicaoi/Documents/Experiments/mern-app/"
-
     programming_extensions = {
         ".py",
         ".js",
@@ -114,15 +111,25 @@ def scan_subfolders():
 
 
 def read_contents(files_to_read):
+    res = []
     for file in files_to_read:
-        print(f"\n--- {file} ---")
         try:
+            print(file)
+            _, extension = file.split(".")
             with open(file, "r", encoding="utf-8") as f:
-                print(f.read())
+                res.append({
+                    "filePath": file,
+                    "extension": extension,
+                    "contents":f.read()
+                })
+                
         except Exception as e:
             print(f"Could not read {file}: {e}")
-
+            return []
+    return res
 
 if __name__ == "__main__":
     resultant_files = scan_subfolders()
-    read_contents(resultant_files)
+    read_files = read_contents(resultant_files)
+    for file in read_files:
+        print(file)

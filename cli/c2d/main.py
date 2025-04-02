@@ -1,89 +1,71 @@
-from pathlib import Path
 import sys
-import os
 from dotenv import load_dotenv
-from c2d.utils.scan import (
-    detect_repo,
-    get_gitignore_contents,
-    scan_subfolders,
-    read_contents,
-)
+
 import typer
-from rich import print
+# from rich import print
 from rich.console import Console
 from rich.panel import Panel
 
 app = typer.Typer()
 console = Console()
 
+def under_construction():
+    console.print("🚧 [bold yellow]This feature is under construction.[/bold yellow] Stay tuned! 🛠️")
 
-@app.command("upload-key")
-def upload_key(key: str):
+def scanning_in_progress():
+    console.print("🔍 [bold cyan]Scanning your codebase...[/bold cyan] Please wait ⏳")
+
+def generating_in_progress():
+    console.print("🛠️  [bold green]Generating documentation...[/bold green] Almost there 🚀")
+
+@app.command("code-doc")
+def create_inline_doc():
     """
-    \b
-    To upload an API key.
-    \nParameters:
-      - key (string): the value of the API key
-    \nExample:
-      c2d upload-key test_key
+    This is for users to create in-line documentations
     """
-    if not key:
-        print("Key not found")
-    else:
-        env_path = Path(".env")
-        env_path.parent.mkdir(parents=True, exist_ok=True)
-        with env_path.open("w") as f:
-            f.write(f"api_key={key}")
-        print("key saved")
+    scanning_in_progress()
+    generating_in_progress()
+    console.print("✅ [bold green]Code documentation successfully created![/bold green] 🚀")
 
-
-@app.command("show-key")
-def show_key(masked: bool = True):
+@app.command("api-doc")
+def create_api_doc():
     """
-    To show if the key is present or not. NOTE: This should at least be masked during production.
+    This is for users to create API endpoint documentations
     """
-    curr_key = os.environ.get("api_key", None)
-    if not curr_key:
-        print("Key not found")
-    else:
-        if masked:
-            masked = curr_key[:2] + "*" * (len(curr_key) - 4) + curr_key[-2:]
-            print(f"Masked key is: {masked}")
-        else:
-            print(f"Unmasked key is:{curr_key}")
-
-
-@app.command("scan")
-def scan_directory():
+    under_construction()
+    # scanning_in_progress()
+    # generating_in_progress()
+    # console.print("✅ [bold green]API documentation successfully created![/bold green] 🚀")
+    
+@app.command("db-doc")
+def create_db_doc():
     """
-    \b
-    This scans the current directory which the c2d cli is used at.
-
+    This is for users to create database schema documentation
     """
-    print("Scanning ...")
-
-    resultant_files = scan_subfolders()
-    read_contents(resultant_files)
-
-
-@app.command("repo-scan")
-def scan_for_repo():
+    under_construction()
+    # scanning_in_progress()
+    # generating_in_progress()
+    # console.print("✅ [bold green]Database schema documentation successfully created![/bold green] 🚀")
+    
+@app.command("readme-doc")
+def create_readme_doc():
     """
-    \b
-    This scans for an existing github repository in the current path.
-
-    \nReturns:
-      - repository name if a repository is found
-      - "Not found" if there is no repository found.
+    This is for users to create README documentations
     """
-    repo_found = detect_repo()
-    if not repo_found:
-        print("Not found!")
-        return
-    gitignore_contents = get_gitignore_contents()
-    print(gitignore_contents)
-    # print("Repo found!")
+    under_construction()
+    # scanning_in_progress()
+    # generating_in_progress()
+    # console.print("✅ [bold green]Project README documentation successfully created![/bold green] 🚀")
 
+@app.command("archi-doc")
+def create_archi_doc():
+    """
+    This is for users to create project architecture diagrams
+    """
+    under_construction()
+    # scanning_in_progress()
+    # generating_in_progress()
+    # console.print("✅ [bold green]Project architecture documentation successfully created![/bold green] 🚀")
 
 def main():
     if len(sys.argv) == 1:
@@ -99,6 +81,6 @@ def main():
     load_dotenv()
     app()
 
-
+    
 if __name__ == "__main__":
     main()
