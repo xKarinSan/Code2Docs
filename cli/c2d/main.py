@@ -1,14 +1,24 @@
 import os
 import sys
 from dotenv import load_dotenv
+from pathlib import Path
 
 import typer
-# from rich import print
 from rich.console import Console
 from rich.panel import Panel
 
 app = typer.Typer()
 console = Console()
+
+ENV_DIR = Path.home() / "code2docs"
+ENV_FILE = ENV_DIR / ".env"
+
+def get_key(key="OPEN_AI_API_KEY"):
+    """
+    This function gets the API key from the environment variable
+    """
+    load_dotenv(dotenv_path=ENV_FILE)
+    return os.getenv(key)
 
 def under_construction():
     console.print("🚧 [bold yellow]This feature is under construction.[/bold yellow] Stay tuned! 🛠️")
@@ -24,6 +34,9 @@ def create_inline_doc():
     """
     This is for users to create in-line documentations
     """
+    if(get_key() is None):
+        console.print("🔑 [bold red]Please set your OpenAI API key first![/bold red]")
+        return
     scanning_in_progress()
     generating_in_progress()
     console.print("✅ [bold green]Code documentation successfully created![/bold green] 🚀")
@@ -33,6 +46,9 @@ def create_api_doc():
     """
     This is for users to create API endpoint documentations
     """
+    if(get_key() is None):
+        console.print("🔑 [bold red]Please set your OpenAI API key first![/bold red]")
+        return
     under_construction()
     # scanning_in_progress()
     # generating_in_progress()
@@ -43,6 +59,9 @@ def create_db_doc():
     """
     This is for users to create database schema documentation
     """
+    if(get_key() is None):
+        console.print("🔑 [bold red]Please set your OpenAI API key first![/bold red]")
+        return
     under_construction()
     # scanning_in_progress()
     # generating_in_progress()
@@ -53,6 +72,9 @@ def create_readme_doc():
     """
     This is for users to create README documentations
     """
+    if(get_key() is None):
+        console.print("🔑 [bold red]Please set your OpenAI API key first![/bold red]")
+        return
     under_construction()
     # scanning_in_progress()
     # generating_in_progress()
@@ -63,6 +85,9 @@ def create_archi_doc():
     """
     This is for users to create project architecture diagrams
     """
+    if(get_key() is None):
+        console.print("🔑 [bold red]Please set your OpenAI API key first![/bold red]")
+        return
     under_construction()
     # scanning_in_progress()
     # generating_in_progress()
@@ -73,25 +98,25 @@ def save_key(api_key):
     """
     This is for users to save their API keys
     """
-    with open(".env", "w") as f:
-        f.write(f"API_KEY={api_key}\n")
+    with open(ENV_FILE, "w") as f:
+        f.write(f"OPEN_AI_API_KEY={api_key}\n")
     console.print("🔑 [bold green]API key saved successfully![/bold green] 🚀")
-    # Here you would save the API key to a secure location
-    # For example, you could save it to a .env file or a secure vault
+
 @app.command("load-key")
 def load_key():
     """
     This is for users to load their API keys
     """
-    console.print("🔑 [bold green]Loading API key...[/bold green]")
-    # Here you would load the API key from a secure location
-    console.print("API key:",os.getenv("API_KEY"))
-    console.print("🔑 [bold green]API key loaded successfully![/bold green] 🚀")
+    API_KEY = get_key()
+    console.print("OPEN AI API key:",API_KEY)
     # Here you would load the API key from a secure location
     # For example, you could load it from a .env file or a secure vault
 
 
 def main():
+    if not os.path.exists(ENV_DIR):
+        os.makedirs(ENV_DIR)
+
     if len(sys.argv) == 1:
         console.print(
             Panel.fit(
@@ -102,7 +127,6 @@ def main():
             )
         )
         return
-    load_dotenv()
     app()
 
     
