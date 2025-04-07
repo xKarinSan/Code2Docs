@@ -1,3 +1,4 @@
+import os
 import sys
 from dotenv import load_dotenv
 
@@ -66,6 +67,29 @@ def create_archi_doc():
     # scanning_in_progress()
     # generating_in_progress()
     # console.print("✅ [bold green]Project architecture documentation successfully created![/bold green] 🚀")
+
+@app.command("save-key")
+def save_key(api_key):
+    """
+    This is for users to save their API keys
+    """
+    with open(".env", "w") as f:
+        f.write(f"API_KEY={api_key}\n")
+    console.print("🔑 [bold green]API key saved successfully![/bold green] 🚀")
+    # Here you would save the API key to a secure location
+    # For example, you could save it to a .env file or a secure vault
+@app.command("load-key")
+def load_key():
+    """
+    This is for users to load their API keys
+    """
+    console.print("🔑 [bold green]Loading API key...[/bold green]")
+    # Here you would load the API key from a secure location
+    console.print("API key:",os.getenv("API_KEY"))
+    console.print("🔑 [bold green]API key loaded successfully![/bold green] 🚀")
+    # Here you would load the API key from a secure location
+    # For example, you could load it from a .env file or a secure vault
+
 
 def main():
     if len(sys.argv) == 1:
