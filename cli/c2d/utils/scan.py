@@ -34,17 +34,16 @@ programming_extensions = [
 
 
 def detect_repo():
-    """
-    This detects if there is a github repo present in the current path
-    """
     git_dir = Path(".git")
-    if not git_dir.exists():
-        return False
-
-    try:
+    if git_dir.exists():
         return True
-    except subprocess.CalledProcessError:
-        return False
+
+    current_path = Path.cwd()
+    for parent in [current_path] + list(current_path.parents):
+        if (parent / ".git").exists():
+            return True
+
+    return False
 
 
 def get_gitignore_contents(gitignore_path=Path(".gitignore")):

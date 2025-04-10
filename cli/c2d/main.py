@@ -2,7 +2,7 @@ import os
 import sys
 from dotenv import load_dotenv
 from pathlib import Path
-
+from .utils.scan import detect_repo
 import typer
 from rich.console import Console
 from rich.panel import Panel
@@ -37,6 +37,9 @@ def create_inline_doc():
     if(get_key() is None):
         console.print("🔑 [bold red]Please set your OpenAI API key first![/bold red]")
         return
+    if(not detect_repo()):
+        console.print("📁 [bold red]Not inside a Git repository![/bold red]")
+        return
     scanning_in_progress()
     generating_in_progress()
     console.print("✅ [bold green]Code documentation successfully created![/bold green] 🚀")
@@ -48,6 +51,9 @@ def create_api_doc():
     """
     if(get_key() is None):
         console.print("🔑 [bold red]Please set your OpenAI API key first![/bold red]")
+        return
+    if(not detect_repo()):
+        console.print("📁 [bold red]Not inside a Git repository![/bold red]")
         return
     under_construction()
     # scanning_in_progress()
@@ -62,6 +68,9 @@ def create_db_doc():
     if(get_key() is None):
         console.print("🔑 [bold red]Please set your OpenAI API key first![/bold red]")
         return
+    if(not detect_repo()):
+        console.print("📁 [bold red]Not inside a Git repository![/bold red]")
+        return
     under_construction()
     # scanning_in_progress()
     # generating_in_progress()
@@ -75,6 +84,9 @@ def create_readme_doc():
     if(get_key() is None):
         console.print("🔑 [bold red]Please set your OpenAI API key first![/bold red]")
         return
+    if(not detect_repo()):
+        console.print("📁 [bold red]Not inside a Git repository![/bold red]")
+        return
     under_construction()
     # scanning_in_progress()
     # generating_in_progress()
@@ -87,6 +99,9 @@ def create_archi_doc():
     """
     if(get_key() is None):
         console.print("🔑 [bold red]Please set your OpenAI API key first![/bold red]")
+        return
+    if(not detect_repo()):
+        console.print("📁 [bold red]Not inside a Git repository![/bold red]")
         return
     under_construction()
     # scanning_in_progress()
