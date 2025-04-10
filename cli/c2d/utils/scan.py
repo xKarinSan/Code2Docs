@@ -1,7 +1,5 @@
 from pathlib import Path
 import os
-import subprocess
-
 
 programming_extensions = [
     ".py",
@@ -64,64 +62,54 @@ def get_gitignore_contents(gitignore_path=Path(".gitignore")):
 
 def scan_subfolders():
     """
-    Scans all the contents in the subfolder(s)
+    Scans all subfolders for source code files and returns their paths,
+    skipping dependency/config/lock files like package.json, yarn.lock, etc.
     """
     path = os.curdir
-    programming_extensions = {
-        ".py",
-        ".js",
-        ".ts",
-        ".java",
-        ".cs",
-        ".cpp",
-        ".c",
-        ".go",
-        ".rb",
-        ".php",
-        ".rs",
-        ".kt",
-        ".swift",
-        ".scala",
-        ".sh",
-        ".pl",
-        ".dart",
-        ".html",
-        ".css",
-        ".json",
-        ".xml",
-        ".yml",
-        ".yaml",
-        ".sql",
-        ".jsx",
-        ".tsx",
-    }
-    res_files = []
-    for root, _, files in os.walk(path, topdown=True):
-        # Filter files to only include programming language files
-        code_files = [
-            f for f in files if os.path.splitext(f)[1] in programming_extensions
-        ]
 
-        for file in code_files:
-            res_files.append(root + "/" + file)
+    # Supported programming-related file extensions
+    programming_extensions = {
+        ".py", ".js", ".ts", ".java", ".cs", ".cpp", ".c", ".go", ".rb",
+        ".php", ".rs", ".kt", ".swift", ".scala", ".sh", ".pl", ".dart",
+        ".html", ".css", ".json", ".xml", ".yml", ".yaml", ".sql", ".jsx",
+        ".tsx", ".vue", ".svelte"
+    }
+
+    # Filenames to skip (dependency/config/lock/build)
+    skip_filenames = {
+        "package.json", "package-lock.json", "yarn.lock", "requirements.txt",
+        "Pipfile", "Pipfile.lock", "poetry.lock", "go.mod", "go.sum",
+        "build.gradle", "settings.gradle", "pom.xml",
+        ".env", "Makefile", "Dockerfile", "Cargo.toml", "Cargo.lock",
+        "tsconfig.json", "vite.config.js", "babel.config.js",
+        "next.config.js", "jest.config.js", "webpack.config.js","manifest.json"
+    }
+
+    res_files = []
+
+    for root, _, files in os.walk(path, topdown=True):
+        for file in files:
+            ext = os.path.splitext(file)[1]
+            if ext in programming_extensions and file not in skip_filenames:
+                res_files.append(os.path.join(root, file))
+
     for file in res_files:
         print(file)
     return res_files
+
 
 
 def read_contents(files_to_read):
     res = []
     for file in files_to_read:
         try:
-            print(file)
-            _, extension = file.split(".")
+            extension = os.path.splitext(file)[1].lstrip(".")
             with open(file, "r", encoding="utf-8") as f:
                 res.append({
                     "filePath": file,
                     "extension": extension,
                     "contents":f.read()
                 })
-                
         except Exception as e:
             print(f"Could not read {file}: {e}")
             return []
