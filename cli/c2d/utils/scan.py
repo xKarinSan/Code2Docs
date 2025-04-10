@@ -82,7 +82,8 @@ def scan_subfolders():
         "build.gradle", "settings.gradle", "pom.xml",
         ".env", "Makefile", "Dockerfile", "Cargo.toml", "Cargo.lock",
         "tsconfig.json", "vite.config.js", "babel.config.js",
-        "next.config.js", "jest.config.js", "webpack.config.js","manifest.json"
+        "next.config.js", "jest.config.js", "webpack.config.js","manifest.json",
+        "index.html", "index.css", "index.js", "index.ts"
     }
 
     res_files = []
@@ -93,8 +94,6 @@ def scan_subfolders():
             if ext in programming_extensions and file not in skip_filenames:
                 res_files.append(os.path.join(root, file))
 
-    for file in res_files:
-        print(file)
     return res_files
 
 

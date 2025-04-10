@@ -1,8 +1,11 @@
+import asyncio
 import os
 import sys
 from dotenv import load_dotenv
+from langchain.chat_models import ChatOpenAI 
 from pathlib import Path
-from .utils.scan import detect_repo
+from .utils.scan import detect_repo, read_contents, scan_subfolders
+from .utils.tasks import run_all
 import typer
 from rich.console import Console
 from rich.panel import Panel
@@ -34,14 +37,21 @@ def create_inline_doc():
     """
     This is for users to create in-line documentations
     """
-    if(get_key() is None):
+    OPEN_AI_API_KEY = get_key()
+    if(OPEN_AI_API_KEY is None):
         console.print("🔑 [bold red]Please set your OpenAI API key first![/bold red]")
         return
     if(not detect_repo()):
         console.print("📁 [bold red]Not inside a Git repository![/bold red]")
         return
+    
     scanning_in_progress()
+    resultant_files = scan_subfolders()
+    read_files = read_contents(resultant_files)
     generating_in_progress()
+
+    model = ChatOpenAI(openai_api_key = OPEN_AI_API_KEY)
+    asyncio.run(run_all(read_files,model))
     console.print("✅ [bold green]Code documentation successfully created![/bold green] 🚀")
 
 @app.command("api-doc")
