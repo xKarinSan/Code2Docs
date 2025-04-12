@@ -1,5 +1,6 @@
 import asyncio
 import os
+from openai import OpenAI
 import sys
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
@@ -16,6 +17,17 @@ console = Console()
 ENV_DIR = Path.home() / "code2docs"
 ENV_FILE = ENV_DIR / ".env"
 
+
+
+def is_valid_openai_key(api_key: str) -> bool:
+    try:
+        client = OpenAI(api_key=api_key)
+        client.models.list()
+        return True
+    except Exception as e:
+        console.print(f"⚠️ [yellow]Unexpected error while validating API key: {e}[/yellow]")
+        return False
+    
 def get_key(key="OPEN_AI_API_KEY"):
     """
     Get the API key from the environment variable.
@@ -47,8 +59,11 @@ def create_inline_doc():
     Generate inline documentation (docstrings and comments) for the codebase.
     """
     OPEN_AI_API_KEY = get_key()
-    if OPEN_AI_API_KEY is None:
+    if not OPEN_AI_API_KEY:
         console.print("🔑 [bold red]Please set your OpenAI API key first![/bold red]")
+        return
+    if not is_valid_openai_key(OPEN_AI_API_KEY):
+        console.print("❌ [bold red]Invalid OpenAI API key![/bold red]")
         return
     if not detect_repo():
         console.print("📁 [bold red]Not inside a Git repository![/bold red]")
@@ -68,8 +83,12 @@ def create_api_doc():
     """
     Generate documentation for API endpoints. (Coming soon)
     """
-    if get_key() is None:
+    OPEN_AI_API_KEY = get_key()
+    if not OPEN_AI_API_KEY:
         console.print("🔑 [bold red]Please set your OpenAI API key first![/bold red]")
+        return
+    if not is_valid_openai_key(OPEN_AI_API_KEY):
+        console.print("❌ [bold red]Invalid OpenAI API key![/bold red]")
         return
     if not detect_repo():
         console.print("📁 [bold red]Not inside a Git repository![/bold red]")
@@ -84,8 +103,12 @@ def create_db_doc():
     """
     Generate documentation for the database schema. (Coming soon)
     """
-    if get_key() is None:
+    OPEN_AI_API_KEY = get_key()
+    if not OPEN_AI_API_KEY:
         console.print("🔑 [bold red]Please set your OpenAI API key first![/bold red]")
+        return
+    if not is_valid_openai_key(OPEN_AI_API_KEY):
+        console.print("❌ [bold red]Invalid OpenAI API key![/bold red]")
         return
     if not detect_repo():
         console.print("📁 [bold red]Not inside a Git repository![/bold red]")
@@ -100,8 +123,12 @@ def create_readme_doc():
     """
     Generate a comprehensive README.md for the project. (Coming soon)
     """
-    if get_key() is None:
+    OPEN_AI_API_KEY = get_key()
+    if not OPEN_AI_API_KEY:
         console.print("🔑 [bold red]Please set your OpenAI API key first![/bold red]")
+        return
+    if not is_valid_openai_key(OPEN_AI_API_KEY):
+        console.print("❌ [bold red]Invalid OpenAI API key![/bold red]")
         return
     if not detect_repo():
         console.print("📁 [bold red]Not inside a Git repository![/bold red]")
@@ -116,8 +143,12 @@ def create_archi_doc():
     """
     Generate architecture diagrams for the codebase. (Coming soon)
     """
-    if get_key() is None:
+    OPEN_AI_API_KEY = get_key()
+    if not OPEN_AI_API_KEY:
         console.print("🔑 [bold red]Please set your OpenAI API key first![/bold red]")
+        return
+    if not is_valid_openai_key(OPEN_AI_API_KEY):
+        console.print("❌ [bold red]Invalid OpenAI API key![/bold red]")
         return
     if not detect_repo():
         console.print("📁 [bold red]Not inside a Git repository![/bold red]")

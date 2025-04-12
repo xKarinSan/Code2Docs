@@ -1,4 +1,6 @@
 langchain==0.3.23
+langchain_openai==0.3.12
+openai==1.72.0
 python-dotenv==1.1.0
 rich==14.0.0
 typer==0.15.2
