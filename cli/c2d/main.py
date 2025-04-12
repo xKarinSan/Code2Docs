@@ -2,7 +2,7 @@ import asyncio
 import os
 import sys
 from dotenv import load_dotenv
-from langchain.chat_models import ChatOpenAI 
+from langchain_community.chat_models import ChatOpenAI 
 from pathlib import Path
 from .utils.scan import detect_repo, read_contents, scan_subfolders
 from .utils.tasks import run_all
