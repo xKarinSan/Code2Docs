@@ -40,7 +40,7 @@ Built for:
 Before pivoting to the CLI, Code2Docs was originally a web-based SaaS platform. It offered similar core features with a visual interface for generating and managing documentation.
 
 🎥 Demo of the legacy web version:  
-*Watch on YouTube*
+[Watch on YouTube](https://www.youtube.com/watch?v=XKGEy3yymLA)
 
 🗃️ Legacy repository (archived):  
 [github.com/xKarinSan/Code2Docs-legacy](https://github.com/xKarinSan/Code2Docs-legacy)
