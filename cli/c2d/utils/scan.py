@@ -83,7 +83,7 @@ def scan_subfolders():
         ".env", "Makefile", "Dockerfile", "Cargo.toml", "Cargo.lock",
         "tsconfig.json", "vite.config.js", "babel.config.js",
         "next.config.js", "jest.config.js", "webpack.config.js","manifest.json",
-        "index.html", "index.css", "index.js", "index.ts"
+        "index.html", "index.css", "index.js", "index.ts","__init__.py"
     }
 
     res_files = []
