@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "c2d"
-version = "0.1.0"
-description = ""
+version = "1.0.0"
+description = "Code2Docs: An AI-powered, open source CLI tool for generating inline code documentation, API references, database schema docs, and project READMEs from your codebase."
 authors = ["xKarinSan <setsunayukii88@gmail.com>"]
 readme = "README.md"
 
