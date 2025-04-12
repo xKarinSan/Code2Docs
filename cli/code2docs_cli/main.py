@@ -188,7 +188,7 @@ def main():
                 "[bold cyan]✨ Welcome to Code2Docs CLI ✨[/bold cyan]\n\n"
                 "[white]Your AI-powered documentation assistant 🧠📄[/white]\n\n"
                 "[green]Usage:[/green] Run [bold]c2d[command][/bold] to get started\n"
-                "[green]Help:[/green] Add [bold]--help[/bold] after any command for options\n\n"
+                "[green]Help:[/green] Add [bold]--help[/bold] for options\n\n"
                 "[dim]Happy documenting! 🚀[/dim]",
                 title="📘 Code2Docs",
                 border_style="bright_blue",
