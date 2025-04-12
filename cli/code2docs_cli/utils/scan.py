@@ -32,40 +32,17 @@ programming_extensions = [
 
 
 def detect_repo():
-    git_dir = Path(".git")
-    if git_dir.exists():
-        return True
-
     current_path = Path.cwd()
-    for parent in [current_path] + list(current_path.parents):
-        if (parent / ".git").exists():
-            return True
+    for path in [current_path] + list(current_path.parents):
+        if (path / ".git").exists():
+            return path
+    return ""
 
-    return False
-
-
-def get_gitignore_contents(gitignore_path=Path(".gitignore")):
-    """
-    This extracts the contents of gitignore files in the current path
-    """
-    if not gitignore_path.exists():
-        return []
-
-    try:
-        with gitignore_path.open("r") as file:
-            contents = file.read().splitlines()
-        return contents
-    except Exception as e:
-        print(f"Error reading .gitignore: {e}")
-        return []
-
-
-def scan_subfolders():
+def scan_subfolders(path):
     """
     Scans all subfolders for source code files and returns their paths,
     skipping dependency/config/lock files like package.json, yarn.lock, etc.
     """
-    path = os.curdir
 
     # Supported programming-related file extensions
     programming_extensions = {
