@@ -31,13 +31,13 @@
 1. Install the CLI:
 
     ```
-    pip install c2d
+    pip install code2docs-cli
     ```
 
 2. Run the CLI:
 
     ```
-    code2docs-cli
+    c2d
     ```
 
 ---

@@ -52,7 +52,7 @@ We learned a lot from the initial version — especially around dev workflows an
 ## 📢 Communications
 
 - 💬 Join our [Discord Channel](https://discord.gg/qugCeYBYud)
-- 📘 View the [CLI README and Setup Guide](https://github.com/xKarinSan/Code2Docs/cli/README.md)
+- 📘 View the [CLI README and Setup Guide](https://github.com/xKarinSan/Code2Docs/tree/main/cli)
 - 🌐 Visit our [Landing Page](https://code2docs-open-source.netlify.app/)
 - 🔗 Follow us on [LinkedIn](https://www.linkedin.com/company/code2docs)
 
