@@ -65,12 +65,13 @@ def create_inline_doc():
     if not is_valid_openai_key(OPEN_AI_API_KEY):
         console.print("❌ [bold red]Invalid OpenAI API key![/bold red]")
         return
-    if not detect_repo():
+    repo_start = detect_repo()
+    if not repo_start:
         console.print("📁 [bold red]Not inside a Git repository![/bold red]")
         return
     
     scanning_in_progress()
-    resultant_files = scan_subfolders()
+    resultant_files = scan_subfolders(repo_start)
     read_files = read_contents(resultant_files)
     generating_in_progress()
 
