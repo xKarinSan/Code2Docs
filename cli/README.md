@@ -6,8 +6,8 @@
 
 📚 **Base Repo:** [https://github.com/xKarinSan/Code2Docs](https://github.com/xKarinSan/Code2Docs)  
 💬 **Community Discord:** [https://discord.gg/qugCeYBYud](https://discord.gg/qugCeYBYud)
-
----
+🌐 **Landing Page:** [https://code2docs-open-source.netlify.app/](https://code2docs-open-source.netlify.app/)  
+🔗 **LinkedIn:** [https://www.linkedin.com/company/code2docs](https://www.linkedin.com/company/code2docs)
 
 ## ✨ Features
 
