@@ -36,18 +36,26 @@ Built for:
 
 ---
 
-🕰️ What We Previously Built
+🕰️ What We Previously Built  
 Before pivoting to the CLI, Code2Docs was originally a web-based SaaS platform. It offered similar core features with a visual interface for generating and managing documentation.
 
-🎥 Demo of the legacy web version:
-Watch on YouTube
+🎥 Demo of the legacy web version:  
+*Watch on YouTube*
 
-🗃️ Legacy repository (archived):
-github.com/xKarinSan/Code2Docs-legacy
+🗃️ Legacy repository (archived):  
+[github.com/xKarinSan/Code2Docs-legacy](https://github.com/xKarinSan/Code2Docs-legacy)
 
 We learned a lot from the initial version — especially around dev workflows and where automation adds real value — which led to the current CLI pivot.
 
-## Communications
-- <a href="https://discord.gg/qugCeYBYud" target="_blank">Discord Channel</a>
+---
 
-NOTE: This repository is under construction!
+## 📢 Communications
+
+- 💬 Join our [Discord Channel](https://discord.gg/qugCeYBYud)
+- 📘 View the [CLI README and Setup Guide](https://github.com/xKarinSan/Code2Docs/cli/README.md)
+- 🌐 Visit our [Landing Page](https://code2docs-open-source.netlify.app/)
+- 🔗 Follow us on [LinkedIn](https://www.linkedin.com/company/code2docs)
+
+---
+
+🛠️ **NOTE:** This repository is under construction!
