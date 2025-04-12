@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "code2docs-cli"
-version = "1.0.3"
+version = "1.0.4"
 description = "Code2Docs: An AI-powered, open source CLI tool for generating inline code documentation, API references, database schema docs, and project READMEs from your codebase."
 authors = ["xKarinSan <setsunayukii88@gmail.com>"]
 readme = "README.md"
@@ -14,8 +14,9 @@ python-dotenv = "1.1.0"
 typer = "0.15.2"
 langchain = "0.3.23"
 langchain-openai = "0.3.12"
-openai = "1.72.0"
+openai = "1.73.0"
 rich = "14.0.0"
+pathspec = "0.12.1"
 
 
 [build-system]
