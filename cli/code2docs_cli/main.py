@@ -4,9 +4,14 @@ from openai import OpenAI
 import sys
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
+from langchain_chroma import Chroma
+from langchain_openai import OpenAIEmbeddings
 from pathlib import Path
+
+from .utils.file_processes import create_archi_diagram
+from .utils.rag import read_all_file_contents
 from .utils.scan import detect_repo, read_contents, scan_subfolders
-from .utils.tasks import run_all
+from .utils.tasks import run_all, summarize_documents
 import typer
 from rich.console import Console
 from rich.panel import Panel
@@ -151,13 +156,32 @@ def create_archi_doc():
     if not is_valid_openai_key(OPEN_AI_API_KEY):
         console.print("❌ [bold red]Invalid OpenAI API key![/bold red]")
         return
-    if not detect_repo():
+    repo_start = detect_repo()
+    if not repo_start:
         console.print("📁 [bold red]Not inside a Git repository![/bold red]")
         return
-    under_construction()
-    # scanning_in_progress()
-    # generating_in_progress()
-    # console.print("✅ [bold green]Project architecture documentation successfully created![/bold green] 🚀")
+
+    embeddings = OpenAIEmbeddings(api_key=OPEN_AI_API_KEY, model="text-embedding-3-large")
+    vector_store = Chroma(
+        collection_name="codebase_name",
+        embedding_function=embeddings,
+        persist_directory="./vector_db",
+    )
+    
+    scanning_in_progress()
+    resultant_files = scan_subfolders(repo_start)
+    read_files = read_contents(resultant_files)
+    generating_in_progress()
+    
+    model = ChatOpenAI(openai_api_key = OPEN_AI_API_KEY)
+    documents, _ = read_all_file_contents(read_files)
+    vector_store.add_documents(documents)
+    
+    all_docs = vector_store.get(include=["documents", "metadatas"])
+    summaries = summarize_documents(all_docs, model)
+    full_context = "\n".join(summaries)    
+    create_archi_diagram(full_context, model,repo_start)
+    console.print("✅ [bold green]Project architecture documentation successfully created![/bold green] 🚀")
 
 @app.command("save-key")
 def save_key(api_key):

@@ -61,7 +61,80 @@ Your task is to overwrite each source file by adding high-quality inline documen
 
 '''
 
+inline_doc_user_template = "Language:{language} \n {code}"
 
-user_template = "Language:{language} \n {code}"
+inline_doc_prompt = ChatPromptTemplate.from_template(inline_doc_templates + "\n\n" + inline_doc_user_template)
 
-inline_doc_prompt = ChatPromptTemplate.from_template(inline_doc_templates + "\n\n" + user_template)
+
+"""
+For RAG (especially summarising each code)
+"""
+rag_file_summariser_template = """
+You are a software engineer summarizing source code for internal documentation. \n
+You need to retain key technical elements without formatting it for external readability.
+"""
+
+rag_file_summarise_user_template = """
+Summarize the following file while keeping all important implementation details.
+
+Include:
+- All function and class definitions (keep signatures and bodies)
+- Import statements
+- Core logic (retain control flow and important operations)
+- All environment variable usage (e.g., os.getenv, os.environ, process.env)
+
+Ignore:
+- Docstrings
+- Markdown formatting
+- Unnecessary comments
+
+You may simplify some repeated logic, but do not omit anything important.
+
+--- FILE START ---
+
+{code}
+
+--- FILE END ---"""
+
+rag_file_summarise_prompt = ChatPromptTemplate.from_template(rag_file_summariser_template + "\n\n" + rag_file_summarise_user_template)
+
+
+
+""" 
+For the architectural diagram
+"""
+
+architecture_diagram_system_template = """
+You are a senior software architect. You analyze codebases and produce accurate, high-level system architecture diagrams using Mermaid syntax.
+"""
+
+architecture_diagram_user_template = """
+Given the following codebase context:\n\n
+{context}\n\n
+Determine whether the architecture is **monolithic** or **microservice-based** based on how the components are structured and interact.\n\n
+Then, generate a **high-level architecture diagram** using **Mermaid syntax** in `graph TD` layout, following this visual style:\n
+- For monoliths: group the business layer and data access layer inside a box, with the database below, and a single user interface at the top\n
+- For microservices: place a shared user interface at the top, then several independent microservices below, each connecting to its own database\n
+- Show **data flow** using directional arrows (`-->`) from UI to backend/microservices, and from those to their databases\n
+- Use **`subgraph` blocks** to visually group Monolithic or Microservice components\n
+- Use meaningful labels like `User Interface`, `Business Layer`, `Data Access Layer`, `Microservice A`, `Database/Store`, etc.\n\n
+**Only output the Mermaid diagram inside a code block** — no explanation or extra text.\n\n
+**Example structure for monolith:**\n
+graph TD\n
+   A[User Interface] --> B[Business Layer]\n
+   B --> C[Data Access Layer]\n
+   C --> D[(Database)]\n
+
+
+**Example structure for microservices:**\n
+
+graph TD\n
+   UI[User Interface]\n
+   UI --> MS1[Microservice A]\n
+   UI --> MS2[Microservice B]\n
+   MS1 --> DB1[(DB A)]\n
+   MS2 --> DB2[(DB B)]\n
+   MS1 --> MS2\n
+"""
+
+architecutre_diagram_prompt = ChatPromptTemplate.from_template(architecture_diagram_system_template + "\n\n" + architecture_diagram_user_template)

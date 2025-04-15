@@ -67,9 +67,6 @@ def scan_subfolders(path):
     
     ignored_paths = set(get_gitignored_contents(path)) if path else set()
     
-    for ignored in ignored_paths:
-        print(f"ignored: {ignored}")
-    
     res_files = []
 
     for root, _, files in os.walk(path, topdown=True):
