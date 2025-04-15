@@ -1,6 +1,8 @@
+from langchain_core.documents import Document
 
-from .prompt_templates import inline_doc_prompt, rag_file_summarise_prompt, architecutre_diagram_prompt
+from .prompt_templates import inline_doc_prompt, architecutre_diagram_prompt
 from .parsers import SimpleOutputParser
+from .rag import summarize_documents
 
 def document_code_file(file_path: str, code: str, extension: str,model):
     
@@ -15,17 +17,19 @@ def document_code_file(file_path: str, code: str, extension: str,model):
     except Exception as e:
         print(f"[❌] Error processing {file_path}: {e}")
 
-def summarize_doc(doc,model):
-    chain = rag_file_summarise_prompt | model
-    # print("doc",doc)
-    content = doc.page_content.strip()
-    if len(content) <= 50:
-        return None
-    summary = chain.invoke({"code": content}).content
-    return f"File: {doc.metadata['source']}\n{summary}\n"
 
-def create_archi_diagram(context,model,location):
+def create_archi_diagram(vector_store,model,location):
+    all_docs = vector_store.get(include=["documents", "metadatas"])
+    all_texts = all_docs["documents"]
+    all_metas = all_docs["metadatas"]
+    processed_docs = [   
+        Document(page_content=text, metadata=meta)
+        for text, meta in zip(all_texts, all_metas)
+    ]
+    summaries = summarize_documents(processed_docs, model)
+    full_context = "\n".join(summaries) 
+    
     chain = architecutre_diagram_prompt | model
-    completed_diagram = chain.invoke({"context": context}).content
+    completed_diagram = chain.invoke({"context": full_context}).content
     with open(location+"/c2d_archi_diagram.md", "w") as f:
         f.write(completed_diagram)

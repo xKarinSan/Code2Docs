@@ -11,7 +11,7 @@ from pathlib import Path
 from .utils.file_processes import create_archi_diagram
 from .utils.rag import read_all_file_contents
 from .utils.scan import detect_repo, read_contents, scan_subfolders
-from .utils.tasks import run_all, summarize_documents
+from .utils.tasks import run_all
 import typer
 from rich.console import Console
 from rich.panel import Panel
@@ -19,6 +19,7 @@ from rich.panel import Panel
 app = typer.Typer()
 console = Console()
 
+VECTOR_DB_DIR = Path.home() / "code2docs" / "vector_db"
 ENV_DIR = Path.home() / "code2docs"
 ENV_FILE = ENV_DIR / ".env"
 
@@ -163,24 +164,22 @@ def create_archi_doc():
 
     embeddings = OpenAIEmbeddings(api_key=OPEN_AI_API_KEY, model="text-embedding-3-large")
     vector_store = Chroma(
-        collection_name="codebase_name",
+        collection_name="c2d",
         embedding_function=embeddings,
-        persist_directory="./vector_db",
+        persist_directory=str(VECTOR_DB_DIR),
     )
-    
+    vector_store.reset_collection()
+
     scanning_in_progress()
     resultant_files = scan_subfolders(repo_start)
     read_files = read_contents(resultant_files)
     generating_in_progress()
     
     model = ChatOpenAI(openai_api_key = OPEN_AI_API_KEY)
-    documents, _ = read_all_file_contents(read_files)
+    documents, uuids = read_all_file_contents(read_files)
     vector_store.add_documents(documents)
-    
-    all_docs = vector_store.get(include=["documents", "metadatas"])
-    summaries = summarize_documents(all_docs, model)
-    full_context = "\n".join(summaries)    
-    create_archi_diagram(full_context, model,repo_start)
+          
+    create_archi_diagram(vector_store, model, str(repo_start))
     console.print("✅ [bold green]Project architecture documentation successfully created![/bold green] 🚀")
 
 @app.command("save-key")

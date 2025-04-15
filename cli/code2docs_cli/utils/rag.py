@@ -1,12 +1,6 @@
-import os
-from pathlib import Path
 from uuid import uuid4
-
-from langchain_chroma import Chroma
-from langchain_openai import OpenAIEmbeddings
 from langchain_core.documents import Document
-from langchain.prompts.chat import ChatPromptTemplate
-
+from .prompt_templates import rag_file_summarise_prompt
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
@@ -30,43 +24,13 @@ def read_all_file_contents(read_files):
     uuids = [str(uuid4()) for _ in range(len(documents))]
     return documents, uuids
 
+def summarize_documents(docs, model, max_workers=6):
     """
     Summarize each file concurrently to reduce total token usage and speed up processing.
     """
     print(f"[⚡️] Summarizing {len(docs)} documents in parallel...")
 
-    summarization_prompt = ChatPromptTemplate.from_messages([
-    (
-        "system",
-        "You are a software engineer summarizing source code for internal documentation. "
-        "You need to retain key technical elements without formatting it for external readability."
-    ),
-    (
-        "user",
-        """Summarize the following file while keeping all important implementation details.
-
-        Include:
-        - All function and class definitions (keep signatures and bodies)
-        - Import statements
-        - Core logic (retain control flow and important operations)
-        - All environment variable usage (e.g., os.getenv, os.environ, process.env)
-
-        Ignore:
-        - Docstrings
-        - Markdown formatting
-        - Unnecessary comments
-
-        You may simplify some repeated logic, but do not omit anything important.
-
-        --- FILE START ---
-
-        {code}
-
-        --- FILE END ---"""
-            )
-        ])
-
-    chain = summarization_prompt | model
+    chain = rag_file_summarise_prompt | model
 
     summaries = []
 
