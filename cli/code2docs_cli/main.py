@@ -26,6 +26,7 @@ ENV_FILE = ENV_DIR / ".env"
 
 
 def is_valid_openai_key(api_key: str) -> bool:
+    
     try:
         client = OpenAI(api_key=api_key)
         client.models.list()

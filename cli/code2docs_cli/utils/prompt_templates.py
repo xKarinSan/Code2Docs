@@ -105,36 +105,50 @@ For the architectural diagram
 """
 
 architecture_diagram_system_template = """
-You are a senior software architect. You analyze codebases and produce accurate, high-level system architecture diagrams using Mermaid syntax.
+You are a senior software architect. Your job is to analyze codebases and generate accurate, high-level architecture diagrams using Mermaid.
+Analyze the structure and purpose of the following. Determine its architectural style or design pattern if applicable (e.g., monolithic, client-server, layered, microservices, modular, or single-purpose).
+Then, generate a high-level architecture diagram that shows the main components and how they interact or relate to each other.
+
+Abstract the system into logical components such as:
+- Frontend or UI layer (if any)
+- Backend or API services
+- Databases or storage
+- Background jobs, workers, or schedulers
+- Third-party integrations or cloud services
+- Configuration or environment dependencies
+- Core modules or internal layers (e.g., Compiler, CLI, SDK, etc.)
+
+Use Mermaid syntax in graph TD layout:
+- Group related parts into subgraph blocks (e.g., Frontend, Backend, Database, External Services, Core Modules).
+- Show connections both within subgraphs and between subgraphs, if components interact.
+- Use directional arrows to show communication flow, data flow, or dependency relationships.
+- Label each node with concise, meaningful names (e.g., React Frontend, Node.js API, Redis Cache, GitHub API, .env Config, Parser Module, CLI Entry Point).
+
+✅ Only output a valid Mermaid diagram inside a code block.
+🚫 Do not include file paths, filenames, explanations, or extra markdown.
+
+Example:
+
+graph TD
+  subgraph Frontend
+    A[Next.js App]
+  end
+  subgraph Backend
+    B[Express.js Server]
+    B --> C[(PostgreSQL)]
+    B --> D[Stripe API]
+    B --> E[.env Configuration]
+  end
+  A --> B
+
+Additional guidelines:
+- If the context includes too much information, focus on the components most essential to the system’s functionality and architecture.
+- %% Only include high-level logical components, not file names.
 """
 
 architecture_diagram_user_template = """
-Given the following codebase context:\n\n
-{context}\n\n
-Determine whether the architecture is **monolithic** or **microservice-based** based on how the components are structured and interact.\n\n
-Then, generate a **high-level architecture diagram** using **Mermaid syntax** in `graph TD` layout, following this visual style:\n
-- For monoliths: group the business layer and data access layer inside a box, with the database below, and a single user interface at the top\n
-- For microservices: place a shared user interface at the top, then several independent microservices below, each connecting to its own database\n
-- Show **data flow** using directional arrows (`-->`) from UI to backend/microservices, and from those to their databases\n
-- Use **`subgraph` blocks** to visually group Monolithic or Microservice components\n
-- Use meaningful labels like `User Interface`, `Business Layer`, `Data Access Layer`, `Microservice A`, `Database/Store`, etc.\n\n
-**Only output the Mermaid diagram inside a code block** — no explanation or extra text.\n\n
-**Example structure for monolith:**\n
-graph TD\n
-   A[User Interface] --> B[Business Layer]\n
-   B --> C[Data Access Layer]\n
-   C --> D[(Database)]\n
-
-
-**Example structure for microservices:**\n
-
-graph TD\n
-   UI[User Interface]\n
-   UI --> MS1[Microservice A]\n
-   UI --> MS2[Microservice B]\n
-   MS1 --> DB1[(DB A)]\n
-   MS2 --> DB2[(DB B)]\n
-   MS1 --> MS2\n
+Given the following codebase:\n\n
+{context}
 """
 
-architecutre_diagram_prompt = ChatPromptTemplate.from_template(architecture_diagram_system_template + "\n\n" + architecture_diagram_user_template)
+architecutre_diagram_prompt = ChatPromptTemplate([("system",architecture_diagram_system_template) , ("user",architecture_diagram_user_template)])
