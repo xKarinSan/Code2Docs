@@ -62,13 +62,12 @@ def scan_subfolders(path):
         ".env", "Makefile", "Dockerfile", "Cargo.toml", "Cargo.lock",
         "tsconfig.json", "vite.config.js", "babel.config.js",
         "next.config.js", "jest.config.js", "webpack.config.js","manifest.json",
-        "index.html", "index.css", "index.js", "index.ts","__init__.py"
+        "index.html", "index.css", "index.js", "index.ts","__init__.py",
+        "tsconfig.node.json", "vite.config.ts", "vite-env.d.ts", "vercel.json",
+        "typings.d.ts", "index.spec.ts", "swagger.json", ".github/workflows/node.js.yml"
     }
     
     ignored_paths = set(get_gitignored_contents(path)) if path else set()
-    
-    for ignored in ignored_paths:
-        print(f"ignored: {ignored}")
     
     res_files = []
 
@@ -82,6 +81,9 @@ def scan_subfolders(path):
                 continue
             if ext in programming_extensions and file not in skip_filenames:
                 res_files.append(os.path.join(root, file))
+
+    for i in res_files:
+        print("file: ",i)
 
     return res_files
 
@@ -118,7 +120,7 @@ def get_gitignored_contents(base_path="."):
                         ignored.add(str(Path(sub_root) / f))
                     for sd in sub_dirs:
                         ignored.add(str(Path(sub_root) / sd))
-                ignored.add(str(abs_path))  # Include the folder itself
+                ignored.add(str(abs_path)) 
                 dirs.remove(d)
 
         # Check ignored files
@@ -139,6 +141,7 @@ def read_contents(files_to_read):
         try:
             extension = os.path.splitext(file)[1].lstrip(".")
             with open(file, "r", encoding="utf-8") as f:
+                print(file)
                 res.append({
                     "filePath": file,
                     "extension": extension,
@@ -147,6 +150,7 @@ def read_contents(files_to_read):
         except Exception as e:
             print(f"Could not read {file}: {e}")
             return []
+        
     return res
 
 if __name__ == "__main__":
