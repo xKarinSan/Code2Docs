@@ -120,7 +120,7 @@ def get_gitignored_contents(base_path="."):
                         ignored.add(str(Path(sub_root) / f))
                     for sd in sub_dirs:
                         ignored.add(str(Path(sub_root) / sd))
-                ignored.add(str(abs_path))  # Include the folder itself
+                ignored.add(str(abs_path)) 
                 dirs.remove(d)
 
         # Check ignored files

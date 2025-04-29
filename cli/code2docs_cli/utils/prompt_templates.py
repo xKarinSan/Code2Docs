@@ -66,40 +66,6 @@ inline_doc_user_template = "Language:{language} \n {code}"
 inline_doc_prompt = ChatPromptTemplate.from_template(inline_doc_templates + "\n\n" + inline_doc_user_template)
 
 
-"""
-For RAG (especially summarising each code)
-"""
-rag_file_summariser_template = """
-You are a software engineer summarizing source code for internal documentation. \n
-You need to retain key technical elements without formatting it for external readability.
-"""
-
-rag_file_summarise_user_template = """
-Summarize the following file while keeping all important implementation details.
-
-Include:
-- All function and class definitions (keep signatures and bodies)
-- Import statements
-- Core logic (retain control flow and important operations)
-- All environment variable usage (e.g., os.getenv, os.environ, process.env)
-
-Ignore:
-- Docstrings
-- Markdown formatting
-- Unnecessary comments
-
-You may simplify some repeated logic, but do not omit anything important.
-
---- FILE START ---
-
-{code}
-
---- FILE END ---"""
-
-rag_file_summarise_prompt = ChatPromptTemplate.from_template(rag_file_summariser_template + "\n\n" + rag_file_summarise_user_template)
-
-
-
 """ 
 For the architectural diagram
 """

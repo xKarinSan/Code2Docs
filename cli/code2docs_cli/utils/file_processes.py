@@ -1,8 +1,5 @@
-from langchain_core.documents import Document
-
 from .prompt_templates import inline_doc_prompt, architecutre_diagram_prompt
 from .parsers import SimpleOutputParser
-from .rag import summarize_documents
 
 def document_code_file(file_path: str, code: str, extension: str,model):
     
@@ -31,7 +28,7 @@ def clean_mermaid_format(output:str):
 def create_archi_diagram(vector_store,model,location):
     results = vector_store.similarity_search(
         query="What are the main components and their relationships in the codebase?",
-        k=50
+        k=60
     )
     key_extensions = {
         ".py",

@@ -149,7 +149,7 @@ def create_readme_doc():
 @app.command("archi-doc")
 def create_archi_doc():
     """
-    Generate architecture diagrams for the codebase. (Coming soon)
+    Generate architecture diagrams for the codebase. (Beta)
     """
     OPEN_AI_API_KEY = get_key()
     if not OPEN_AI_API_KEY:
