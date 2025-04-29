@@ -11,11 +11,11 @@
 
 ## ✨ Features
 
-- 📄 Inline documentation (docstrings + inline comments)
+- 📄 Inline documentation (docstrings + inline comments) *beta*
 - 📡 API endpoint documentation *(coming soon)*
 - 🧩 Database schema documentation *(coming soon)*
 - 📘 README.md generation *(coming soon)*
-- 🗂️ Architecture diagram generation *(coming soon)*
+- 🗂️ Architecture diagram generation *beta*
 
 ---
 ## 🔐 Requirements
@@ -34,7 +34,7 @@
     pip install code2docs-cli
     ```
 
-2. Run the CLI:
+2. Run the CLI to verify the installation:
 
     ```
     c2d
@@ -64,7 +64,7 @@ c2d save-key sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 Lists ALL the commands for Code2Docs CLI
 
 
-### `code-doc`
+### `code-doc`(Beta)
 Generates inline documentation (docstrings and comments) for your codebase.
 ```
 c2d code-doc
@@ -88,20 +88,14 @@ Generates a project-level README.md based on your codebase.
 c2d readme-doc
 ```
 
-### `archi-doc` (Coming Soon)
-Generates an architecture diagram based on the structure of your codebase.
-```
-c2d archi-doc
-```
-
-### `archi-doc` (Coming Soon)
+### `archi-doc` (Beta)
 Generates an architecture diagram based on the structure of your codebase.
 ```
 c2d archi-doc
 ```
 
 ### `save-key`
-Saves your OpenAI API key locally for authentication.
+Saves your OpenAI API key *locally* for authentication.
 ```
 c2d save-key sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
