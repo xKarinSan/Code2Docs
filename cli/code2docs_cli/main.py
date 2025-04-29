@@ -8,7 +8,7 @@ from langchain_chroma import Chroma
 from langchain_openai import OpenAIEmbeddings
 from pathlib import Path
 
-from .utils.file_processes import create_archi_diagram
+from .utils.file_processes import create_archi_diagram,create_readme_file
 from .utils.rag import read_all_file_contents
 from .utils.scan import detect_repo, read_contents, scan_subfolders
 from .utils.tasks import run_all
@@ -63,7 +63,7 @@ def generating_in_progress():
 @app.command("code-doc")
 def create_inline_doc():
     """
-    Generate inline documentation (docstrings and comments) for the codebase.
+    Generate inline documentation (docstrings and comments) for the codebase. (Beta)
     """
     OPEN_AI_API_KEY = get_key()
     if not OPEN_AI_API_KEY:
@@ -129,7 +129,7 @@ def create_db_doc():
 @app.command("readme-doc")
 def create_readme_doc():
     """
-    Generate a comprehensive README.md for the project. (Coming soon)
+    Generate a comprehensive README.md for the project. (Beta)
     """
     OPEN_AI_API_KEY = get_key()
     if not OPEN_AI_API_KEY:
@@ -138,13 +138,30 @@ def create_readme_doc():
     if not is_valid_openai_key(OPEN_AI_API_KEY):
         console.print("❌ [bold red]Invalid OpenAI API key![/bold red]")
         return
-    if not detect_repo():
+    repo_start = detect_repo()
+    if not repo_start:
         console.print("📁 [bold red]Not inside a Git repository![/bold red]")
         return
-    under_construction()
-    # scanning_in_progress()
-    # generating_in_progress()
-    # console.print("✅ [bold green]Project README documentation successfully created![/bold green] 🚀")
+    
+    embeddings = OpenAIEmbeddings(api_key=OPEN_AI_API_KEY, model="text-embedding-3-large")
+    vector_store = Chroma(
+        collection_name="c2d",
+        embedding_function=embeddings,
+        persist_directory=str(VECTOR_DB_DIR),
+    )
+    vector_store.reset_collection()
+    
+    scanning_in_progress()
+    resultant_files = scan_subfolders(repo_start)
+    read_files = read_contents(resultant_files)
+    generating_in_progress()
+    
+    model = ChatOpenAI(openai_api_key = OPEN_AI_API_KEY)
+    documents, _ = read_all_file_contents(read_files)
+    vector_store.add_documents(documents)
+    
+    create_readme_file(vector_store,model,str(repo_start))
+    console.print("✅ [bold green]Project README documentation successfully created![/bold green] 🚀")
 
 @app.command("archi-doc")
 def create_archi_doc():
@@ -177,7 +194,7 @@ def create_archi_doc():
     generating_in_progress()
     
     model = ChatOpenAI(openai_api_key = OPEN_AI_API_KEY)
-    documents, uuids = read_all_file_contents(read_files)
+    documents, _ = read_all_file_contents(read_files)
     vector_store.add_documents(documents)
           
     create_archi_diagram(vector_store, model, str(repo_start))
