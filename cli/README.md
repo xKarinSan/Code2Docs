@@ -82,7 +82,7 @@ Generates documentation for your database schema.
 c2d db-doc
 ```
 
-### `readme-doc` (Coming Soon)
+### `readme-doc` (Beta)
 Generates a project-level README.md based on your codebase.
 ```
 c2d readme-doc

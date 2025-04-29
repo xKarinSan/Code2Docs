@@ -112,9 +112,49 @@ Additional guidelines:
 - %% Only include high-level logical components, not file names.
 """
 
-architecture_diagram_user_template = """
+rag_user_codebase = """
 Given the following codebase:\n\n
 {context}
 """
 
-architecutre_diagram_prompt = ChatPromptTemplate([("system",architecture_diagram_system_template) , ("user",architecture_diagram_user_template)])
+architecutre_diagram_prompt = ChatPromptTemplate(
+   [
+      ("system",architecture_diagram_system_template), 
+      ("user",rag_user_codebase)
+   ]
+)
+
+
+""" 
+For the readme.md doc
+"""
+readme_doc_system_template = """
+You are an expert software engineer who writes clean, production-ready README.md files for codebases.
+
+Your task:
+- Only generate a professional README.md file.
+- Only use clean and valid markdown formatting.
+- Strictly include the following sections, in this order:
+1. **Project Description** – Explain what the project does and its purpose.
+2. **Tech Stack** – List the programming languages, libraries, and frameworks used.
+3. **Environment Variables** – Mention any environment variables required (e.g., API keys, DB configs).
+4. **Setup Instructions** – Include steps to install dependencies and set up the environment.
+5. **Running Instructions** – Provide commands or steps to run the project locally or in production.
+
+Important Rules:
+- Do NOT generate any Mermaid diagrams.
+- Do NOT generate architecture diagrams.
+- Do NOT add extra sections beyond the 5 listed.
+- Do NOT explain your reasoning.
+- Do NOT add comments, tips, or additional markdown outside the 5 sections.
+- Focus on being concise but informative.
+- Only output pure markdown content for the README.md file.
+"""
+
+
+readme_doc_prompt = ChatPromptTemplate(
+   [
+      ("system",readme_doc_system_template), 
+      ("user",rag_user_codebase)
+   ]
+)
