@@ -11,11 +11,11 @@
 
 ## ✨ Features
 
-- 📄 Inline documentation (docstrings + inline comments) *beta*
+- 📄 Inline documentation (docstrings + inline comments) *(beta)*
 - 📡 API endpoint documentation *(coming soon)*
 - 🧩 Database schema documentation *(coming soon)*
 - 📘 README.md generation *(coming soon)*
-- 🗂️ Architecture diagram generation *beta*
+- 🗂️ Architecture diagram generation *(beta)*
 
 ---
 ## 🔐 Requirements
