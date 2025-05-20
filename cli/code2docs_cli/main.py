@@ -16,6 +16,12 @@ import typer
 from rich.console import Console
 from rich.panel import Panel
 
+import time
+__t0 = time.perf_counter()
+
+# ...all your existing imports below...
+
+
 app = typer.Typer()
 console = Console()
 
@@ -236,6 +242,7 @@ def main():
                 border_style="bright_blue",
             )
         )
+        print(f"⏱️ Total startup time (from import): {time.perf_counter() - __t0}s")
         return
     app()
 
