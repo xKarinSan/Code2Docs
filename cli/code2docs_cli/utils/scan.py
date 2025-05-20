@@ -132,9 +132,6 @@ def get_gitignored_contents(base_path="."):
 
     return ignored
 
-
-
-
 def read_contents(files_to_read):
     res = []
     for file in files_to_read:

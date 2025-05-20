@@ -1,11 +1,11 @@
+import time
+__t0 = time.perf_counter()
+
 import asyncio
 import os
-from openai import OpenAI
 import sys
+
 from dotenv import load_dotenv
-from langchain_openai import ChatOpenAI
-from langchain_chroma import Chroma
-from langchain_openai import OpenAIEmbeddings
 from pathlib import Path
 
 from .utils.file_processes import create_archi_diagram,create_readme_file
@@ -16,10 +16,6 @@ import typer
 from rich.console import Console
 from rich.panel import Panel
 
-import time
-__t0 = time.perf_counter()
-
-# ...all your existing imports below...
 
 
 app = typer.Typer()
@@ -32,7 +28,7 @@ ENV_FILE = ENV_DIR / ".env"
 
 
 def is_valid_openai_key(api_key: str) -> bool:
-    
+    from openai import OpenAI
     try:
         client = OpenAI(api_key=api_key)
         client.models.list()
@@ -71,6 +67,8 @@ def create_inline_doc():
     """
     Generate inline documentation (docstrings and comments) for the codebase. (Beta)
     """
+    from langchain_openai import ChatOpenAI
+    
     OPEN_AI_API_KEY = get_key()
     if not OPEN_AI_API_KEY:
         console.print("🔑 [bold red]Please set your OpenAI API key first![/bold red]")
@@ -137,6 +135,10 @@ def create_readme_doc():
     """
     Generate a comprehensive README.md for the project. (Beta)
     """
+    from langchain_openai import ChatOpenAI
+    from langchain_chroma import Chroma
+    from langchain_openai import OpenAIEmbeddings
+    
     OPEN_AI_API_KEY = get_key()
     if not OPEN_AI_API_KEY:
         console.print("🔑 [bold red]Please set your OpenAI API key first![/bold red]")
@@ -174,6 +176,10 @@ def create_archi_doc():
     """
     Generate architecture diagrams for the codebase. (Beta)
     """
+    from langchain_openai import ChatOpenAI
+    from langchain_chroma import Chroma
+    from langchain_openai import OpenAIEmbeddings
+    
     OPEN_AI_API_KEY = get_key()
     if not OPEN_AI_API_KEY:
         console.print("🔑 [bold red]Please set your OpenAI API key first![/bold red]")
@@ -244,7 +250,8 @@ def main():
         )
         print(f"⏱️ Total startup time (from import): {time.perf_counter() - __t0}s")
         return
-    app()
+    cli = typer.main.get_command(app)
+    cli()
 
 if __name__ == "__main__":
     main()
