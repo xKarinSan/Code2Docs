@@ -248,7 +248,7 @@ def main():
                 border_style="bright_blue",
             )
         )
-        print(f"⏱️ Total startup time (from import): {time.perf_counter() - __t0}s")
+        # print(f"⏱️ Total startup time (from import): {time.perf_counter() - __t0}s")
         return
     cli = typer.main.get_command(app)
     cli()
