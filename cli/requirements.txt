@@ -6,4 +6,4 @@ openai==1.74.0
 pathspec==0.12.1
 python-dotenv==1.1.0
 rich==14.0.0
-typer==0.15.2
+typer==0.16
